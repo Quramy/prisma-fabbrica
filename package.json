@@ -1,0 +1,32 @@
+{
+  "private": true,
+  "name": "@quramy/prisma-fabbrica-workspaces",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "husky install && npm run link:bin",
+    "link:bin": "cd node_modules/.bin; ln -sF ../../packages/prisma-fabbrica/bin.js prisma-fabbrica",
+    "build:lib": "tsc -b tsconfig.build.json",
+    "bootstrap": "npm run build:lib && npm run bootstrap --workspace examples/example-prj",
+    "migrate:test": "npm run migrate:test:ci --workspace examples/example-prj",
+    "test:ci": "npm run test:ci --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run prettier -- --check",
+    "format": "npm run prettier -- --write",
+    "prettier": "prettier ."
+  },
+  "keywords": [],
+  "author": "Quramy",
+  "license": "MIT",
+  "devDependencies": {
+    "husky": "8.0.1",
+    "prettier": "2.7.1",
+    "pretty-quick": "3.1.3",
+    "typescript": "4.8.4"
+  },
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ]
+}
