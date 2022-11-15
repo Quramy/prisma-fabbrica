@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getSourceFile fuga 1`] = `
+"import { PrismaClient, Prisma } from "@prisma/client";
+let prisma: PrismaClient;
+export function configure(client: PrismaClient) {
+    prisma = client;
+}
+type Resolver<T extends Record<string, unknown>> = T | (() => T) | (() => PromiseLike<T>);
+async function resolveValue<T extends Record<string, unknown>>(resolver: Resolver<T>) {
+    const fn = typeof resolver === "function" ? resolver : () => Promise.resolve(resolver);
+    return (await fn()) as T;
+}
+const defineFnMap = new Map<unknown, (options: any) => unknown>();
+type DefineUserFactoryOptions = {
+    defaultAttrs: Resolver<Prisma.UserCreateInput>;
+};
+function defineUserFactory({ defaultAttrs: defaultAttributesResolver }: DefineUserFactoryOptions) {
+    const create = async (inputAttributes: Partial<Prisma.UserCreateInput> = {}) => {
+        const defaultAttributes = await resolveValue(defaultAttributesResolver);
+        const data = { ...defaultAttributes, ...inputAttributes };
+        return await prisma.user.create({ data });
+    };
+    return { create };
+}
+defineFnMap.set("User", defineUserFactory);
+export function defineFactory(name: "User", options: DefineUserFactoryOptions): ReturnType<typeof defineUserFactory>;
+export function defineFactory(name: unknown, options: unknown): unknown {
+    const defineFn = defineFnMap.get(name);
+    if (!defineFn)
+        throw new Error("Invalid model name");
+    return defineFn(options);
+}
+"
+`;
