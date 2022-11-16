@@ -6,3 +6,4 @@ e2e_coverage/
 node_modules/
 prisma/
 lib/
+__generated__/

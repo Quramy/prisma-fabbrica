@@ -1,14 +1,15 @@
 import type { PrismaClient } from "@prisma/client";
 
-let _client: PrismaClient;
+let _client: () => PrismaClient;
 
-export function setClient(client: PrismaClient) {
+export function setClient(client: () => PrismaClient) {
   _client = client;
 }
 
 export function getClient() {
-  if (!_client) {
+  const client = _client?.();
+  if (!client) {
     throw new Error("No prisma client");
   }
-  return _client;
+  return client;
 }
