@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "bootstrap": "npm run generate",
+    "clean": "echo nothing to do",
     "migrate:test:ci": "DATABASE_URL=\"file:./test.db\" prisma migrate dev",
     "generate": "prisma generate",
     "test": "jest",

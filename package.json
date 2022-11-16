@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "prepare": "husky install",
+    "clean": "npm run clean --workspaces && rimraf \"*.tsbuildinfo\"",
     "bootstrap": "npm run build:lib && npm run bootstrap --workspace examples/example-prj",
     "build:lib": "tsc -b tsconfig.build.json",
     "postbuild:lib": "cd node_modules/.bin; rm -f prisma-fabbrica; ln -s ../../packages/prisma-fabbrica/bin.js prisma-fabbrica",
@@ -23,6 +24,7 @@
     "husky": "8.0.1",
     "prettier": "2.7.1",
     "pretty-quick": "3.1.3",
+    "rimraf": "^3.0.2",
     "typescript": "4.8.4"
   },
   "workspaces": [
