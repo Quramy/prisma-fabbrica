@@ -4,7 +4,7 @@ import { printNode } from "talt";
 import { getSourceFile } from "./templates";
 
 describe(getSourceFile, () => {
-  test("fuga", async () => {
+  it("generates TypeScript AST", async () => {
     const dmmf = await getDMMF({
       datamodel: `
       datasource db {

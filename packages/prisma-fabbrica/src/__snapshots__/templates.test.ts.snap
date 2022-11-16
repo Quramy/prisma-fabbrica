@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`getSourceFile fuga 1`] = `
+exports[`getSourceFile generates TypeScript AST 1`] = `
 "import { Prisma } from "@prisma/client";
 import { getClient } from "@quramy/prisma-fabbrica";
 type Resolver<T extends Record<string, unknown>> = T | (() => T) | (() => PromiseLike<T>);
