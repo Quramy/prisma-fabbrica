@@ -7,7 +7,8 @@
     "prisma-fabbrica": "./bin.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:ci": "jest --coverage"
   },
   "dependencies": {
     "@prisma/generator-helper": "^4.2.0",
