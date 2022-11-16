@@ -4,6 +4,7 @@
   "description": "",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
+  "files": ["lib", "bin.js"],
   "bin": {
     "prisma-fabbrica": "./bin.js"
   },
@@ -27,11 +28,7 @@
     "ts-jest": "29.0.3",
     "typescript": "*"
   },
-  "keywords": [
-    "prisma",
-    "generator",
-    "factory"
-  ],
+  "keywords": ["prisma", "generator", "factory"],
   "author": "Quramy",
   "license": "MIT"
 }
