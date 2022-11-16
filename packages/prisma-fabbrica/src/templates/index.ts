@@ -3,13 +3,8 @@ import ts from "typescript";
 import { template } from "talt";
 
 export const header = template.sourceFile`
-  import { PrismaClient, Prisma } from "@prisma/client";
-  
-  let prisma: PrismaClient;
-  
-  export function configure(client: PrismaClient) {
-    prisma = client;
-  }
+  import { Prisma } from "@prisma/client";
+  import { getClient } from "@quramy/prisma-fabbrica";
   
   type Resolver<T extends Record<string, unknown>> =
     | T
@@ -51,7 +46,7 @@ const defineModelFactory = (modelName: string) =>
       ) => {
         const defaultAttributes = await resolveValue(defaultAttributesResolver);
         const data = { ...defaultAttributes, ...inputAttributes };
-        return await prisma.MODEL_KEY.create({ data });
+        return await getClient().MODEL_KEY.create({ data });
       };
       return { create };
     }

@@ -1,11 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`getSourceFile fuga 1`] = `
-"import { PrismaClient, Prisma } from "@prisma/client";
-let prisma: PrismaClient;
-export function configure(client: PrismaClient) {
-    prisma = client;
-}
+"import { Prisma } from "@prisma/client";
+import { getClient } from "@quramy/prisma-fabbrica";
 type Resolver<T extends Record<string, unknown>> = T | (() => T) | (() => PromiseLike<T>);
 async function resolveValue<T extends Record<string, unknown>>(resolver: Resolver<T>) {
     const fn = typeof resolver === "function" ? resolver : () => Promise.resolve(resolver);
@@ -19,7 +16,7 @@ function defineUserFactory({ defaultAttrs: defaultAttributesResolver }: DefineUs
     const create = async (inputAttributes: Partial<Prisma.UserCreateInput> = {}) => {
         const defaultAttributes = await resolveValue(defaultAttributesResolver);
         const data = { ...defaultAttributes, ...inputAttributes };
-        return await prisma.user.create({ data });
+        return await getClient().user.create({ data });
     };
     return { create };
 }
