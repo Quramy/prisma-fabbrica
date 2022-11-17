@@ -1,7 +1,7 @@
 import { getDMMF } from "@prisma/internals";
 import { template, printNode } from "talt";
 
-import { modelScalarFields, getSourceFile, findPrsimaCreateInputTypeFromModelName } from "./templates";
+import { modelScalarFields, getSourceFile, findPrsimaCreateInputTypeFromModelName } from ".";
 
 describe(modelScalarFields, () => {
   it("generates literal type field type pattern", async () => {
