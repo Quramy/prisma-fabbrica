@@ -48,8 +48,6 @@ export const header = template.sourceFile`
       typeof resolver === "function" ? resolver : () => Promise.resolve(resolver);
     return (await fn()) as T;
   }
-
-  const defineFnMap = new Map<unknown, (options: any) => unknown>();
 `;
 
 export const scalarFieldType = (
@@ -174,7 +172,7 @@ export const autoGenrateModelScalars = (modelName: string, inputType: DMMF.Input
 
 export const defineModelFactory = (modelName: string) =>
   template.statement<ts.FunctionDeclaration>`
-    function DEFINE_MODEL_FACTORY({
+    export function DEFINE_MODEL_FACTORY({
       defaultData: defaultDataResolver
     }: MODEL_FACTORY_DEFINE_OPTIONS) {
       const create = async (
@@ -203,26 +201,6 @@ export const defineFnMapSet = (modelName: string) =>
     DEFINE_MODEL_FACTORY: ts.factory.createIdentifier(`define${modelName}Factory`),
   });
 
-export const defineFactoryOverload = (modelName: string) =>
-  template.statement<ts.FunctionDeclaration>`
-    export function defineFactory(
-      name: MODEL_NAME,
-      options: MODEL_FACTORY_DEFINE_OPTIONS,
-    ): ReturnType<typeof DEFINE_MODEL_FACTORY>;
-  `({
-    MODEL_NAME: ts.factory.createStringLiteral(modelName),
-    MODEL_FACTORY_DEFINE_OPTIONS: ts.factory.createIdentifier(`${modelName}FactoryDefineOptions`),
-    DEFINE_MODEL_FACTORY: ts.factory.createIdentifier(`define${modelName}Factory`),
-  });
-
-export const defineFactoryImpl = template.statement`
-  export function defineFactory(name: unknown, options: unknown): unknown {
-    const defineFn = defineFnMap.get(name);
-    if (!defineFn) throw new Error("Invalid model name");
-    return defineFn(options);
-  }
-`;
-
 export function getSourceFile(document: DMMF.Document) {
   const statements = [
     ...header().statements,
@@ -233,9 +211,6 @@ export function getSourceFile(document: DMMF.Document) {
       autoGenrateModelScalars(model.name, findPrsimaCreateInputTypeFromModelName(document, model.name), model),
       defineModelFactory(model.name),
     ]),
-    ...document.datamodel.models.map(model => defineFnMapSet(model.name)),
-    ...document.datamodel.models.map(model => defineFactoryOverload(model.name)),
-    defineFactoryImpl(),
   ];
 
   return ts.factory.updateSourceFile(header(), statements);

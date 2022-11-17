@@ -9,7 +9,6 @@ async function resolveValue<T extends Record<string, unknown>>(resolver: Resolve
     const fn = typeof resolver === "function" ? resolver : () => Promise.resolve(resolver);
     return (await fn()) as T;
 }
-const defineFnMap = new Map<unknown, (options: any) => unknown>();
 type UserScalarFields = {
     id: number;
     name: string;
@@ -27,7 +26,7 @@ function autoGenrateUserScalars(): UserScalarFields {
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
     };
 }
-function defineUserFactory({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
+export function defineUserFactory({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
     const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const requiredScalarData = autoGenrateUserScalars();
         const defaultData = await resolveValue(defaultDataResolver);
@@ -35,14 +34,6 @@ function defineUserFactory({ defaultData: defaultDataResolver }: UserFactoryDefi
         return await getClient().user.create({ data });
     };
     return { create };
-}
-defineFnMap.set("User", defineUserFactory);
-export function defineFactory(name: "User", options: UserFactoryDefineOptions): ReturnType<typeof defineUserFactory>;
-export function defineFactory(name: unknown, options: unknown): unknown {
-    const defineFn = defineFnMap.get(name);
-    if (!defineFn)
-        throw new Error("Invalid model name");
-    return defineFn(options);
 }
 "
 `;

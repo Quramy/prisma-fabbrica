@@ -1,10 +1,10 @@
-import { defineFactory } from "./__generated__/fabbrica";
+import { defineUserFactory, definePostFactory } from "./__generated__/fabbrica";
 
-const UserFactory = defineFactory("User", {
+const UserFactory = defineUserFactory({
   defaultData: {},
 });
 
-const PostFactory = defineFactory("Post", {
+const PostFactory = definePostFactory({
   defaultData: async () => ({
     author: {
       connect: {
