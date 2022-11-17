@@ -1,4 +1,4 @@
-import { defineFactory } from "./__generated__/factories";
+import { defineFactory } from "./__generated__/fabbrica";
 
 const UserFactory = defineFactory("User", {
   defaultData: {},

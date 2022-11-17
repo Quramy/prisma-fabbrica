@@ -11,7 +11,7 @@ import { getSourceFile } from "./templates";
 generatorHandler({
   onManifest: () => ({
     prettyName: "fabbrica",
-    defaultOutput: "../src/__generated__/factories.ts",
+    defaultOutput: "../src/__generated__/fabbrica.ts",
     requiresGenerators: ["prisma-client-js"],
   }),
   onGenerate: async options => {
