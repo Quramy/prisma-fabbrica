@@ -4,7 +4,10 @@
   "description": "",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
-  "files": ["lib", "bin.js"],
+  "files": [
+    "lib",
+    "bin.js"
+  ],
   "bin": {
     "prisma-fabbrica": "./bin.js"
   },
@@ -16,6 +19,7 @@
   "dependencies": {
     "@prisma/generator-helper": "^4.2.0",
     "@prisma/internals": "^4.2.0",
+    "short-uuid": "4.2.2",
     "talt": "2.3.1"
   },
   "peerDependencies": {
@@ -28,7 +32,11 @@
     "ts-jest": "29.0.3",
     "typescript": "*"
   },
-  "keywords": ["prisma", "generator", "factory"],
+  "keywords": [
+    "prisma",
+    "generator",
+    "factory"
+  ],
   "author": "Quramy",
   "license": "MIT"
 }

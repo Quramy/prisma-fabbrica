@@ -3,19 +3,35 @@
 exports[`getSourceFile generates TypeScript AST 1`] = `
 "import { Prisma } from "@prisma/client";
 import { getClient } from "@quramy/prisma-fabbrica";
+import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
 type Resolver<T extends Record<string, unknown>> = T | (() => T) | (() => PromiseLike<T>);
 async function resolveValue<T extends Record<string, unknown>>(resolver: Resolver<T>) {
     const fn = typeof resolver === "function" ? resolver : () => Promise.resolve(resolver);
     return (await fn()) as T;
 }
 const defineFnMap = new Map<unknown, (options: any) => unknown>();
-type DefineUserFactoryOptions = {
-    defaultAttrs: Resolver<Prisma.UserCreateInput>;
+type UserScalarFields = {
+    id: number;
+    name: string;
 };
+type UserFactoryDefineInput = {
+    id?: number;
+    name?: string;
+};
+type DefineUserFactoryOptions = {
+    defaultAttrs: Resolver<UserFactoryDefineInput>;
+};
+function autoGenrateUserScalars(): UserScalarFields {
+    return {
+        id: scalarFieldValueGenerator.Int({ modelName: "User", fieldName: "id", isId: true, isUnique: false }),
+        name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
+    };
+}
 function defineUserFactory({ defaultAttrs: defaultAttributesResolver }: DefineUserFactoryOptions) {
     const create = async (inputAttributes: Partial<Prisma.UserCreateInput> = {}) => {
+        const scalarsAttributes = autoGenrateUserScalars();
         const defaultAttributes = await resolveValue(defaultAttributesResolver);
-        const data = { ...defaultAttributes, ...inputAttributes };
+        const data = { ...scalarsAttributes, ...defaultAttributes, ...inputAttributes };
         return await getClient().user.create({ data });
     };
     return { create };
