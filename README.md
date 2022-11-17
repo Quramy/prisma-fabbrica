@@ -6,7 +6,7 @@ Factory helper for Prisma.
 
 ```graphql
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 generator fabbrica {
