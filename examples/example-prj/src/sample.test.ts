@@ -1,11 +1,11 @@
 import { defineFactory } from "./__generated__/factories";
 
 const UserFactory = defineFactory("User", {
-  defaultAttrs: {},
+  defaultData: {},
 });
 
 const PostFactory = defineFactory("Post", {
-  defaultAttrs: async () => ({
+  defaultData: async () => ({
     author: {
       connect: {
         id: (await UserFactory.create()).id,

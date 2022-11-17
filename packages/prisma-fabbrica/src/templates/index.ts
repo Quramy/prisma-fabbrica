@@ -134,7 +134,7 @@ export const modelFactoryDefineInput = (modelName: string, inputTpue: DMMF.Input
 export const modelFactoryDefineOptions = (modelName: string) =>
   template.statement<ts.TypeAliasDeclaration>`
     type MODEL_FACTORY_DEFINE_OPTIONS = {
-      defaultAttrs: Resolver<MODEL_FACTORY_DEFINE_INPUT>;
+      defaultData: Resolver<MODEL_FACTORY_DEFINE_INPUT>;
     };
   `({
     MODEL_FACTORY_DEFINE_OPTIONS: ts.factory.createIdentifier(`${modelName}FactoryDefineOptions`),
@@ -175,14 +175,14 @@ export const autoGenrateModelScalars = (modelName: string, inputType: DMMF.Input
 export const defineModelFactory = (modelName: string) =>
   template.statement<ts.FunctionDeclaration>`
     function DEFINE_MODEL_FACTORY({
-      defaultAttrs: defaultAttributesResolver
+      defaultData: defaultDataResolver
     }: MODEL_FACTORY_DEFINE_OPTIONS) {
       const create = async (
-        inputAttributes: Partial<Prisma.MODEL_CREATE_INPUT> = {}
+        inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
       ) => {
-        const scalarsAttributes = AUTO_GENRATE_MODEL_SCALARS()
-        const defaultAttributes = await resolveValue(defaultAttributesResolver);
-        const data = { ...scalarsAttributes, ...defaultAttributes, ...inputAttributes };
+        const requiredScalarData = AUTO_GENRATE_MODEL_SCALARS()
+        const defaultData= await resolveValue(defaultDataResolver);
+        const data = { ...requiredScalarData, ...defaultData, ...inputData};
         return await getClient().MODEL_KEY.create({ data });
       };
       return { create };
