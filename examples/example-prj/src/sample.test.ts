@@ -1,21 +1,42 @@
-import { v4 as uuid } from "uuid";
 import { defineFactory } from "./__generated__/factories";
 
 const UserFactory = defineFactory("User", {
-  defaultAttrs: () => ({
-    id: uuid(),
-    name: "",
+  defaultAttrs: {},
+});
+
+const PostFactory = defineFactory("Post", {
+  defaultAttrs: async () => ({
+    author: {
+      connect: {
+        id: (await UserFactory.create()).id,
+      },
+    },
   }),
 });
 
 const prisma = jestPrisma.client;
 
 describe("factories", () => {
-  beforeEach(async () => {
-    await UserFactory.create({ name: "quramy" });
-    await UserFactory.create({ name: "kurami" });
+  describe("UserFactory", () => {
+    it("creates records without input parameters", async () => {
+      await UserFactory.create();
+      await UserFactory.create();
+      await expect(prisma.user.count()).resolves.toBe(2);
+    });
+
+    it("creates record with input parameters", async () => {
+      await UserFactory.create({ id: "user001", name: "Quramy" });
+      const user = await prisma.user.findUnique({ where: { id: "user001" } });
+      expect(user).toEqual({ id: "user001", name: "Quramy" });
+    });
   });
-  test("created", async () => {
-    await expect(prisma.user.count()).resolves.toBe(2);
+
+  describe("PostFactory", () => {
+    it("creates required association", async () => {
+      await PostFactory.create();
+      const created = await prisma.post.findFirst({ include: { author: true } });
+      expect(created?.id).not.toBeFalsy();
+      expect(created?.author.id).not.toBeFalsy();
+    });
   });
 });
