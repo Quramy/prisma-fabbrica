@@ -1,11 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { getClient } from "@quramy/prisma-fabbrica";
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
-type Resolver<T extends Record<string, unknown>> = T | (() => T) | (() => PromiseLike<T>);
-async function resolveValue<T extends Record<string, unknown>>(resolver: Resolver<T>) {
-    const fn = typeof resolver === "function" ? resolver : () => Promise.resolve(resolver);
-    return (await fn()) as T;
-}
+import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
 type UserScalarFields = {
     id: string;
     name: string;

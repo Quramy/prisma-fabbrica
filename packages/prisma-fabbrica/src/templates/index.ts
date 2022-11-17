@@ -35,19 +35,8 @@ export const header = template.sourceFile`
   import { Prisma } from "@prisma/client";
   import { getClient } from "@quramy/prisma-fabbrica";
   import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
+  import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
   
-  type Resolver<T extends Record<string, unknown>> =
-    | T
-    | (() => T)
-    | (() => PromiseLike<T>);
-  
-  async function resolveValue<T extends Record<string, unknown>>(
-    resolver: Resolver<T>
-  ) {
-    const fn =
-      typeof resolver === "function" ? resolver : () => Promise.resolve(resolver);
-    return (await fn()) as T;
-  }
 `;
 
 export const scalarFieldType = (
