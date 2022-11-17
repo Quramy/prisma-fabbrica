@@ -12,18 +12,18 @@ export function findPrsimaCreateInputTypeFromModelName(document: DMMF.Document, 
   return inputType;
 }
 
-function filterScalarFields(inputType: DMMF.InputType) {
+export function filterScalarFields(inputType: DMMF.InputType) {
   return inputType.fields.filter(
     field =>
       field.inputTypes.length > 0 && field.inputTypes.every(childInputType => childInputType.location === "scalar"),
   );
 }
 
-function filterNonNullScalarFields(inputType: DMMF.InputType) {
+export function filterNonNullScalarFields(inputType: DMMF.InputType) {
   return filterScalarFields(inputType).filter(field => !field.isNullable);
 }
 
-function filterObjectTypeFields(inputType: DMMF.InputType) {
+export function filterObjectTypeFields(inputType: DMMF.InputType) {
   return inputType.fields.filter(
     field =>
       field.inputTypes.length > 0 &&
