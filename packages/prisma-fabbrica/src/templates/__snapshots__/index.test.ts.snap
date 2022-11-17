@@ -18,7 +18,7 @@ type UserFactoryDefineInput = {
     id?: number;
     name?: string;
 };
-type DefineUserFactoryOptions = {
+type UserFactoryDefineOptions = {
     defaultAttrs: Resolver<UserFactoryDefineInput>;
 };
 function autoGenrateUserScalars(): UserScalarFields {
@@ -27,7 +27,7 @@ function autoGenrateUserScalars(): UserScalarFields {
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
     };
 }
-function defineUserFactory({ defaultAttrs: defaultAttributesResolver }: DefineUserFactoryOptions) {
+function defineUserFactory({ defaultAttrs: defaultAttributesResolver }: UserFactoryDefineOptions) {
     const create = async (inputAttributes: Partial<Prisma.UserCreateInput> = {}) => {
         const scalarsAttributes = autoGenrateUserScalars();
         const defaultAttributes = await resolveValue(defaultAttributesResolver);
@@ -37,7 +37,7 @@ function defineUserFactory({ defaultAttrs: defaultAttributesResolver }: DefineUs
     return { create };
 }
 defineFnMap.set("User", defineUserFactory);
-export function defineFactory(name: "User", options: DefineUserFactoryOptions): ReturnType<typeof defineUserFactory>;
+export function defineFactory(name: "User", options: UserFactoryDefineOptions): ReturnType<typeof defineUserFactory>;
 export function defineFactory(name: unknown, options: unknown): unknown {
     const defineFn = defineFnMap.get(name);
     if (!defineFn)

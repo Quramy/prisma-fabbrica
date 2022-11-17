@@ -131,13 +131,13 @@ export const modelFactoryDefineInput = (modelName: string, inputTpue: DMMF.Input
     ]),
   });
 
-export const defineModelFactoryOptions = (modelName: string) =>
+export const modelFactoryDefineOptions = (modelName: string) =>
   template.statement<ts.TypeAliasDeclaration>`
-    type DEFINE_MODEL_FACTORY_OPTIONS = {
+    type MODEL_FACTORY_DEFINE_OPTIONS = {
       defaultAttrs: Resolver<MODEL_FACTORY_DEFINE_INPUT>;
     };
   `({
-    DEFINE_MODEL_FACTORY_OPTIONS: ts.factory.createIdentifier(`Define${modelName}FactoryOptions`),
+    MODEL_FACTORY_DEFINE_OPTIONS: ts.factory.createIdentifier(`${modelName}FactoryDefineOptions`),
     MODEL_FACTORY_DEFINE_INPUT: ts.factory.createIdentifier(`${modelName}FactoryDefineInput`),
   });
 
@@ -176,7 +176,7 @@ export const defineModelFactory = (modelName: string) =>
   template.statement<ts.FunctionDeclaration>`
     function DEFINE_MODEL_FACTORY({
       defaultAttrs: defaultAttributesResolver
-    }: DEFINE_MODEL_FACTORY_OPTIONS) {
+    }: MODEL_FACTORY_DEFINE_OPTIONS) {
       const create = async (
         inputAttributes: Partial<Prisma.MODEL_CREATE_INPUT> = {}
       ) => {
@@ -190,7 +190,7 @@ export const defineModelFactory = (modelName: string) =>
   `({
     MODEL_KEY: ts.factory.createIdentifier(camelize(modelName)),
     DEFINE_MODEL_FACTORY: ts.factory.createIdentifier(`define${modelName}Factory`),
-    DEFINE_MODEL_FACTORY_OPTIONS: ts.factory.createIdentifier(`Define${modelName}FactoryOptions`),
+    MODEL_FACTORY_DEFINE_OPTIONS: ts.factory.createIdentifier(`${modelName}FactoryDefineOptions`),
     MODEL_CREATE_INPUT: ts.factory.createIdentifier(`${modelName}CreateInput`),
     AUTO_GENRATE_MODEL_SCALARS: ts.factory.createIdentifier(`autoGenrate${modelName}Scalars`),
   });
@@ -207,12 +207,12 @@ export const defineFactoryOverload = (modelName: string) =>
   template.statement<ts.FunctionDeclaration>`
     export function defineFactory(
       name: MODEL_NAME,
-      options: DEFINE_MODEL_FACTORY_OPTIONS,
+      options: MODEL_FACTORY_DEFINE_OPTIONS,
     ): ReturnType<typeof DEFINE_MODEL_FACTORY>;
   `({
     MODEL_NAME: ts.factory.createStringLiteral(modelName),
+    MODEL_FACTORY_DEFINE_OPTIONS: ts.factory.createIdentifier(`${modelName}FactoryDefineOptions`),
     DEFINE_MODEL_FACTORY: ts.factory.createIdentifier(`define${modelName}Factory`),
-    DEFINE_MODEL_FACTORY_OPTIONS: ts.factory.createIdentifier(`Define${modelName}FactoryOptions`),
   });
 
 export const defineFactoryImpl = template.statement`
@@ -229,7 +229,7 @@ export function getSourceFile(document: DMMF.Document) {
     ...document.datamodel.models.flatMap(model => [
       modelScalarFields(model.name, findPrsimaCreateInputTypeFromModelName(document, model.name)),
       modelFactoryDefineInput(model.name, findPrsimaCreateInputTypeFromModelName(document, model.name)),
-      defineModelFactoryOptions(model.name),
+      modelFactoryDefineOptions(model.name),
       autoGenrateModelScalars(model.name, findPrsimaCreateInputTypeFromModelName(document, model.name), model),
       defineModelFactory(model.name),
     ]),
