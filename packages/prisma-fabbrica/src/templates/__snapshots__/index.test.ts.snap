@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getSourceFile generates TypeScript AST 1`] = `
+"import { Prisma } from "@prisma/client";
+import { getClient } from "@quramy/prisma-fabbrica";
+import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
+import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
+type UserScalarFields = {
+    id: number;
+    name: string;
+};
+type UserFactoryDefineInput = {
+    id?: number;
+    name?: string;
+};
+type UserFactoryDefineOptions = {
+    defaultData: Resolver<UserFactoryDefineInput>;
+};
+function autoGenrateUserScalars(): UserScalarFields {
+    return {
+        id: scalarFieldValueGenerator.Int({ modelName: "User", fieldName: "id", isId: true, isUnique: false }),
+        name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
+    };
+}
+export function defineUserFactory({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
+    const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
+        const requiredScalarData = autoGenrateUserScalars();
+        const defaultData = await resolveValue(defaultDataResolver);
+        const data = { ...requiredScalarData, ...defaultData, ...inputData };
+        return await getClient().user.create({ data });
+    };
+    return { create };
+}
+"
+`;

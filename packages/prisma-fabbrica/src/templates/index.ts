@@ -35,21 +35,8 @@ export const header = template.sourceFile`
   import { Prisma } from "@prisma/client";
   import { getClient } from "@quramy/prisma-fabbrica";
   import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
+  import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
   
-  type Resolver<T extends Record<string, unknown>> =
-    | T
-    | (() => T)
-    | (() => PromiseLike<T>);
-  
-  async function resolveValue<T extends Record<string, unknown>>(
-    resolver: Resolver<T>
-  ) {
-    const fn =
-      typeof resolver === "function" ? resolver : () => Promise.resolve(resolver);
-    return (await fn()) as T;
-  }
-
-  const defineFnMap = new Map<unknown, (options: any) => unknown>();
 `;
 
 export const scalarFieldType = (
@@ -131,13 +118,13 @@ export const modelFactoryDefineInput = (modelName: string, inputTpue: DMMF.Input
     ]),
   });
 
-export const defineModelFactoryOptions = (modelName: string) =>
+export const modelFactoryDefineOptions = (modelName: string) =>
   template.statement<ts.TypeAliasDeclaration>`
-    type DEFINE_MODEL_FACTORY_OPTIONS = {
-      defaultAttrs: Resolver<MODEL_FACTORY_DEFINE_INPUT>;
+    type MODEL_FACTORY_DEFINE_OPTIONS = {
+      defaultData: Resolver<MODEL_FACTORY_DEFINE_INPUT>;
     };
   `({
-    DEFINE_MODEL_FACTORY_OPTIONS: ts.factory.createIdentifier(`Define${modelName}FactoryOptions`),
+    MODEL_FACTORY_DEFINE_OPTIONS: ts.factory.createIdentifier(`${modelName}FactoryDefineOptions`),
     MODEL_FACTORY_DEFINE_INPUT: ts.factory.createIdentifier(`${modelName}FactoryDefineInput`),
   });
 
@@ -174,15 +161,15 @@ export const autoGenrateModelScalars = (modelName: string, inputType: DMMF.Input
 
 export const defineModelFactory = (modelName: string) =>
   template.statement<ts.FunctionDeclaration>`
-    function DEFINE_MODEL_FACTORY({
-      defaultAttrs: defaultAttributesResolver
-    }: DEFINE_MODEL_FACTORY_OPTIONS) {
+    export function DEFINE_MODEL_FACTORY({
+      defaultData: defaultDataResolver
+    }: MODEL_FACTORY_DEFINE_OPTIONS) {
       const create = async (
-        inputAttributes: Partial<Prisma.MODEL_CREATE_INPUT> = {}
+        inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
       ) => {
-        const scalarsAttributes = AUTO_GENRATE_MODEL_SCALARS()
-        const defaultAttributes = await resolveValue(defaultAttributesResolver);
-        const data = { ...scalarsAttributes, ...defaultAttributes, ...inputAttributes };
+        const requiredScalarData = AUTO_GENRATE_MODEL_SCALARS()
+        const defaultData= await resolveValue(defaultDataResolver);
+        const data = { ...requiredScalarData, ...defaultData, ...inputData};
         return await getClient().MODEL_KEY.create({ data });
       };
       return { create };
@@ -190,7 +177,7 @@ export const defineModelFactory = (modelName: string) =>
   `({
     MODEL_KEY: ts.factory.createIdentifier(camelize(modelName)),
     DEFINE_MODEL_FACTORY: ts.factory.createIdentifier(`define${modelName}Factory`),
-    DEFINE_MODEL_FACTORY_OPTIONS: ts.factory.createIdentifier(`Define${modelName}FactoryOptions`),
+    MODEL_FACTORY_DEFINE_OPTIONS: ts.factory.createIdentifier(`${modelName}FactoryDefineOptions`),
     MODEL_CREATE_INPUT: ts.factory.createIdentifier(`${modelName}CreateInput`),
     AUTO_GENRATE_MODEL_SCALARS: ts.factory.createIdentifier(`autoGenrate${modelName}Scalars`),
   });
@@ -203,39 +190,16 @@ export const defineFnMapSet = (modelName: string) =>
     DEFINE_MODEL_FACTORY: ts.factory.createIdentifier(`define${modelName}Factory`),
   });
 
-export const defineFactoryOverload = (modelName: string) =>
-  template.statement<ts.FunctionDeclaration>`
-    export function defineFactory(
-      name: MODEL_NAME,
-      options: DEFINE_MODEL_FACTORY_OPTIONS,
-    ): ReturnType<typeof DEFINE_MODEL_FACTORY>;
-  `({
-    MODEL_NAME: ts.factory.createStringLiteral(modelName),
-    DEFINE_MODEL_FACTORY: ts.factory.createIdentifier(`define${modelName}Factory`),
-    DEFINE_MODEL_FACTORY_OPTIONS: ts.factory.createIdentifier(`Define${modelName}FactoryOptions`),
-  });
-
-export const defineFactoryImpl = template.statement`
-  export function defineFactory(name: unknown, options: unknown): unknown {
-    const defineFn = defineFnMap.get(name);
-    if (!defineFn) throw new Error("Invalid model name");
-    return defineFn(options);
-  }
-`;
-
 export function getSourceFile(document: DMMF.Document) {
   const statements = [
     ...header().statements,
     ...document.datamodel.models.flatMap(model => [
       modelScalarFields(model.name, findPrsimaCreateInputTypeFromModelName(document, model.name)),
       modelFactoryDefineInput(model.name, findPrsimaCreateInputTypeFromModelName(document, model.name)),
-      defineModelFactoryOptions(model.name),
+      modelFactoryDefineOptions(model.name),
       autoGenrateModelScalars(model.name, findPrsimaCreateInputTypeFromModelName(document, model.name), model),
       defineModelFactory(model.name),
     ]),
-    ...document.datamodel.models.map(model => defineFnMapSet(model.name)),
-    ...document.datamodel.models.map(model => defineFactoryOverload(model.name)),
-    defineFactoryImpl(),
   ];
 
   return ts.factory.updateSourceFile(header(), statements);
