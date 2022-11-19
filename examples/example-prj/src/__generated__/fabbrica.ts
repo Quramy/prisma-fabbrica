@@ -22,13 +22,21 @@ function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
     };
 }
 export function defineUserFactory({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
-    const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
+    const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const requiredScalarData = autoGenrateUserScalarsOrEnums();
         const defaultData = await resolveValue(defaultDataResolver);
         const data = { ...requiredScalarData, ...defaultData, ...inputData };
+        return data;
+    };
+    const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
+        const data = await buildCreateInput(inputData);
         return await getClient<PrismaClient>().user.create({ data });
     };
-    return { create };
+    return {
+        _factoryFor: "User" as const,
+        buildCreateInput,
+        create,
+    };
 }
 type PostScalarOrEnumFields = {
     id: string;
@@ -49,11 +57,19 @@ function autoGenratePostScalarsOrEnums(): PostScalarOrEnumFields {
     };
 }
 export function definePostFactory({ defaultData: defaultDataResolver }: PostFactoryDefineOptions) {
-    const create = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
+    const buildCreateInput = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
         const requiredScalarData = autoGenratePostScalarsOrEnums();
         const defaultData = await resolveValue(defaultDataResolver);
         const data = { ...requiredScalarData, ...defaultData, ...inputData };
+        return data;
+    };
+    const create = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
+        const data = await buildCreateInput(inputData);
         return await getClient<PrismaClient>().post.create({ data });
     };
-    return { create };
+    return {
+        _factoryFor: "Post" as const,
+        buildCreateInput,
+        create,
+    };
 }

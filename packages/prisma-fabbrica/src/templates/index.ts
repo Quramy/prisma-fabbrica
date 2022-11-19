@@ -204,15 +204,25 @@ export const defineModelFactory = (modelName: string) =>
     export function DEFINE_MODEL_FACTORY({
       defaultData: defaultDataResolver
     }: MODEL_FACTORY_DEFINE_OPTIONS) {
-      const create = async (
+      const buildCreateInput = async (
         inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
       ) => {
         const requiredScalarData = AUTO_GENRATE_MODEL_SCALARS_OR_ENUMS()
         const defaultData= await resolveValue(defaultDataResolver);
         const data = { ...requiredScalarData, ...defaultData, ...inputData};
+        return data;
+      };
+      const create = async (
+        inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
+      ) => {
+        const data = await buildCreateInput(inputData);
         return await getClient<PrismaClient>().MODEL_KEY.create({ data });
       };
-      return { create };
+      return {
+        _factoryFor: ${() => ts.factory.createStringLiteral(modelName)} as const,
+        buildCreateInput,
+        create,
+      };
     }
   `({
     MODEL_KEY: ts.factory.createIdentifier(camelize(modelName)),
