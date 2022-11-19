@@ -74,48 +74,47 @@ export const scalarFieldType = (
 
 export const modelScalarFields = (modelName: string, inputType: DMMF.InputType) =>
   template.statement<ts.TypeAliasDeclaration>`
-    type MODEL_SCALAR_FIELDS = TYPE_RHS;
+    type MODEL_SCALAR_FIELDS = ${() =>
+      ts.factory.createTypeLiteralNode(
+        filterNonNullScalarFields(inputType).map(field =>
+          ts.factory.createPropertySignature(
+            undefined,
+            field.name,
+            undefined,
+            scalarFieldType(modelName, field.name, field.inputTypes[0]),
+          ),
+        ),
+      )}
   `({
     MODEL_SCALAR_FIELDS: ts.factory.createIdentifier(`${modelName}ScalarFields`),
-    TYPE_RHS: ts.factory.createTypeLiteralNode(
-      filterNonNullScalarFields(inputType).map(field =>
-        ts.factory.createPropertySignature(
-          undefined,
-          field.name,
-          undefined,
-          scalarFieldType(modelName, field.name, field.inputTypes[0]),
-        ),
-      ),
-    ),
   });
 
 export const modelFactoryDefineInput = (modelName: string, inputTpue: DMMF.InputType) =>
   template.statement<ts.TypeAliasDeclaration>`
-    type MODEL_FACTORY_DEFINE_INPUT = TYPE_RHS;
-  `({
-    MODEL_FACTORY_DEFINE_INPUT: ts.factory.createIdentifier(`${modelName}FactoryDefineInput`),
-    TYPE_RHS: ts.factory.createTypeLiteralNode([
-      ...filterScalarFields(inputTpue).map(field =>
-        ts.factory.createPropertySignature(
-          undefined,
-          field.name,
-          ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-          scalarFieldType(modelName, field.name, field.inputTypes[0]),
-        ),
-      ),
-      ...filterObjectTypeFields(inputTpue).map(field =>
-        ts.factory.createPropertySignature(
-          undefined,
-          field.name,
-          !field.isRequired ? ts.factory.createToken(ts.SyntaxKind.QuestionToken) : undefined,
-          ts.factory.createTypeReferenceNode(
-            template.expression<ts.Identifier>`Prisma.TYPE_ID`({
-              TYPE_ID: ts.factory.createIdentifier(field.inputTypes[0].type as string),
-            }),
+    type MODEL_FACTORY_DEFINE_INPUT = ${() =>
+      ts.factory.createTypeLiteralNode([
+        ...filterScalarFields(inputTpue).map(field =>
+          ts.factory.createPropertySignature(
+            undefined,
+            field.name,
+            ts.factory.createToken(ts.SyntaxKind.QuestionToken),
+            scalarFieldType(modelName, field.name, field.inputTypes[0]),
           ),
         ),
-      ),
-    ]),
+        ...filterObjectTypeFields(inputTpue).map(field =>
+          ts.factory.createPropertySignature(
+            undefined,
+            field.name,
+            !field.isRequired ? ts.factory.createToken(ts.SyntaxKind.QuestionToken) : undefined,
+            ts.factory.createTypeReferenceNode(
+              template.expression<ts.Identifier>`Prisma.${() =>
+                ts.factory.createIdentifier(field.inputTypes[0].type as string)}`(),
+            ),
+          ),
+        ),
+      ])};
+  `({
+    MODEL_FACTORY_DEFINE_INPUT: ts.factory.createIdentifier(`${modelName}FactoryDefineInput`),
   });
 
 export const modelFactoryDefineOptions = (modelName: string) =>
@@ -131,32 +130,32 @@ export const modelFactoryDefineOptions = (modelName: string) =>
 export const autoGenrateModelScalars = (modelName: string, inputType: DMMF.InputType, model: DMMF.Model) =>
   template.statement<ts.FunctionDeclaration>`
     function AUTO_GENRATE_MODEL_SCALARS(): MODEL_SCALAR_FIELDS {
-      return OBJECT_VALUE;
+      return ${() =>
+        ts.factory.createObjectLiteralExpression(
+          filterNonNullScalarFields(inputType).map(field =>
+            ts.factory.createPropertyAssignment(
+              ts.factory.createIdentifier(field.name),
+              template.expression`scalarFieldValueGenerator.SCALAR_TYPE({ modelName: MODEL_NAME, fieldName: FIELD_NAME, isId: IS_ID, isUnique: IS_UNIQUE })`(
+                {
+                  SCALAR_TYPE: ts.factory.createIdentifier(field.inputTypes[0].type as string),
+                  MODEL_NAME: ts.factory.createStringLiteral(modelName),
+                  FIELD_NAME: ts.factory.createStringLiteral(field.name),
+                  IS_ID: model.fields.find(f => f.name === field.name)!.isId
+                    ? ts.factory.createTrue()
+                    : ts.factory.createFalse(),
+                  IS_UNIQUE: model.fields.find(f => f.name === field.name)!.isUnique
+                    ? ts.factory.createTrue()
+                    : ts.factory.createFalse(),
+                },
+              ),
+            ),
+          ),
+          true,
+        )};
     }
   `({
     AUTO_GENRATE_MODEL_SCALARS: ts.factory.createIdentifier(`autoGenrate${modelName}Scalars`),
     MODEL_SCALAR_FIELDS: ts.factory.createIdentifier(`${modelName}ScalarFields`),
-    OBJECT_VALUE: ts.factory.createObjectLiteralExpression(
-      filterNonNullScalarFields(inputType).map(field =>
-        ts.factory.createPropertyAssignment(
-          ts.factory.createIdentifier(field.name),
-          template.expression`scalarFieldValueGenerator.SCALAR_TYPE({ modelName: MODEL_NAME, fieldName: FIELD_NAME, isId: IS_ID, isUnique: IS_UNIQUE })`(
-            {
-              SCALAR_TYPE: ts.factory.createIdentifier(field.inputTypes[0].type as string),
-              MODEL_NAME: ts.factory.createStringLiteral(modelName),
-              FIELD_NAME: ts.factory.createStringLiteral(field.name),
-              IS_ID: model.fields.find(f => f.name === field.name)!.isId
-                ? ts.factory.createTrue()
-                : ts.factory.createFalse(),
-              IS_UNIQUE: model.fields.find(f => f.name === field.name)!.isUnique
-                ? ts.factory.createTrue()
-                : ts.factory.createFalse(),
-            },
-          ),
-        ),
-      ),
-      true,
-    ),
   });
 
 export const defineModelFactory = (modelName: string) =>
