@@ -7,3 +7,4 @@ node_modules/
 prisma/
 lib/
 __generated__/
+dmmf.json

@@ -31,13 +31,14 @@ export function filterObjectTypeFields(inputType: DMMF.InputType) {
   );
 }
 
-export const header = template.sourceFile`
-  import { Prisma } from "@prisma/client";
+export const header = (importSpecifierToPrismaClient: string) =>
+  template.sourceFile`
+  import { Prisma } from ${() => ts.factory.createStringLiteral(importSpecifierToPrismaClient)};
+  import type { PrismaClient } from ${() => ts.factory.createStringLiteral(importSpecifierToPrismaClient)};
   import { getClient } from "@quramy/prisma-fabbrica";
   import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
   import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
-  
-`;
+`();
 
 export const scalarFieldType = (
   modelName: string,
@@ -169,7 +170,7 @@ export const defineModelFactory = (modelName: string) =>
         const requiredScalarData = AUTO_GENRATE_MODEL_SCALARS()
         const defaultData= await resolveValue(defaultDataResolver);
         const data = { ...requiredScalarData, ...defaultData, ...inputData};
-        return await getClient().MODEL_KEY.create({ data });
+        return await getClient<PrismaClient>().MODEL_KEY.create({ data });
       };
       return { create };
     }
@@ -189,9 +190,15 @@ export const defineFnMapSet = (modelName: string) =>
     DEFINE_MODEL_FACTORY: ts.factory.createIdentifier(`define${modelName}Factory`),
   });
 
-export function getSourceFile(document: DMMF.Document) {
+export function getSourceFile({
+  document,
+  importSpecifierToPrismaClient,
+}: {
+  document: DMMF.Document;
+  importSpecifierToPrismaClient: string;
+}) {
   const statements = [
-    ...header().statements,
+    ...header(importSpecifierToPrismaClient).statements,
     ...document.datamodel.models.flatMap(model => [
       modelScalarFields(model.name, findPrsimaCreateInputTypeFromModelName(document, model.name)),
       modelFactoryDefineInput(model.name, findPrsimaCreateInputTypeFromModelName(document, model.name)),
@@ -201,5 +208,5 @@ export function getSourceFile(document: DMMF.Document) {
     ]),
   ];
 
-  return ts.factory.updateSourceFile(header(), statements);
+  return ts.factory.updateSourceFile(template.sourceFile("")(), statements);
 }

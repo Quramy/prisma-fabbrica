@@ -1,2 +1,2 @@
 export * from "./setup";
-export { getClient } from "./clientHolder";
+export { PrismaClientLike, getClient } from "./clientHolder";

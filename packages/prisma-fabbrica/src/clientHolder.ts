@@ -1,15 +1,18 @@
-import type { PrismaClient } from "@prisma/client";
+export type PrismaClientLike = {
+  $connect: () => PromiseLike<unknown>;
+  $disconnect: () => PromiseLike<unknown>;
+};
 
-let _client: () => PrismaClient;
+let _client: () => PrismaClientLike;
 
-export function setClient(client: () => PrismaClient) {
+export function setClient<T extends PrismaClientLike>(client: () => T) {
   _client = client;
 }
 
-export function getClient() {
+export function getClient<T extends PrismaClientLike>() {
   const client = _client?.();
   if (!client) {
     throw new Error("No prisma client");
   }
-  return client;
+  return client as T;
 }
