@@ -15,18 +15,33 @@ generatorHandler({
     requiresGenerators: ["prisma-client-js"],
   }),
   onGenerate: async options => {
-    logger.info("onGenerate", options.generator.output?.value);
-    logger.info("onGenerate", options.dmmf);
+    const clientGeneratorConfig = options.otherGenerators.find(gc => gc.name === "client");
+    if (!clientGeneratorConfig) {
+      logger.error("No prisma client generator.");
+      return;
+    }
+    const clientGeneratorOutputPath = clientGeneratorConfig.output?.value;
+    if (!clientGeneratorOutputPath) {
+      logger.warn("no output value");
+      return;
+    }
     const outputPath = options.generator.output?.value;
     if (!outputPath) {
       logger.warn("no output value");
       return;
     }
+
+    const importSpecifierToPrismaClient = clientGeneratorOutputPath.endsWith(
+      ["node_modules", "@prisma", "client"].join(path.sep),
+    )
+      ? "@prisma/client"
+      : "./" + path.relative(path.dirname(outputPath), clientGeneratorOutputPath).replace("\\", "/");
+
     const printer = ts.createPrinter({
       omitTrailingSemicolon: false,
       removeComments: false,
     });
-    const contents = printer.printFile(getSourceFile(options.dmmf));
+    const contents = printer.printFile(getSourceFile({ document: options.dmmf, importSpecifierToPrismaClient }));
     await fs.mkdir(path.dirname(outputPath), { recursive: true });
     await fs.writeFile(outputPath, contents, "utf8");
   },

@@ -1,17 +1,14 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`getSourceFile generates TypeScript AST 1`] = `
-"import { Prisma } from "@prisma/client";
-import type { PrismaClient } from "@prisma/client";
+import { Prisma } from "./client";
+import type { PrismaClient } from "./client";
 import { getClient } from "@quramy/prisma-fabbrica";
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
 import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
 type UserScalarFields = {
-    id: number;
+    id: string;
     name: string;
 };
 type UserFactoryDefineInput = {
-    id?: number;
+    id?: string;
     name?: string;
 };
 type UserFactoryDefineOptions = {
@@ -19,7 +16,7 @@ type UserFactoryDefineOptions = {
 };
 function autoGenrateUserScalars(): UserScalarFields {
     return {
-        id: scalarFieldValueGenerator.Int({ modelName: "User", fieldName: "id", isId: true, isUnique: false }),
+        id: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false }),
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
     };
 }
@@ -32,5 +29,3 @@ export function defineUserFactory({ defaultData: defaultDataResolver }: UserFact
     };
     return { create };
 }
-"
-`;

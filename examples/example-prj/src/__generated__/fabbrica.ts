@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 import { getClient } from "@quramy/prisma-fabbrica";
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
 import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
@@ -25,7 +26,7 @@ export function defineUserFactory({ defaultData: defaultDataResolver }: UserFact
         const requiredScalarData = autoGenrateUserScalars();
         const defaultData = await resolveValue(defaultDataResolver);
         const data = { ...requiredScalarData, ...defaultData, ...inputData };
-        return await getClient().user.create({ data });
+        return await getClient<PrismaClient>().user.create({ data });
     };
     return { create };
 }
@@ -52,7 +53,7 @@ export function definePostFactory({ defaultData: defaultDataResolver }: PostFact
         const requiredScalarData = autoGenratePostScalars();
         const defaultData = await resolveValue(defaultDataResolver);
         const data = { ...requiredScalarData, ...defaultData, ...inputData };
-        return await getClient().post.create({ data });
+        return await getClient<PrismaClient>().post.create({ data });
     };
     return { create };
 }
