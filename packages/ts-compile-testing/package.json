@@ -5,7 +5,9 @@
   "scripts": {
     "clean": "rimraf \"fixtures/*/__generated__/client\" \"fixtures/*/dmmf.json\"",
     "pretest": "ts-node scripts/generateFixtures.ts",
-    "test": "tsc"
+    "pretest:ci": "ts-node scripts/generateFixtures.ts",
+    "test": "tsc",
+    "test:ci": "tsc"
   },
   "devDependencies": {
     "@prisma/client": "4.6.1",
