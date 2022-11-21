@@ -1,9 +1,9 @@
 import { getDMMF } from "@prisma/internals";
 import { template, printNode } from "talt";
 
-import { modelScalarFields, getSourceFile, findPrsimaCreateInputTypeFromModelName } from ".";
+import { modelScalarOrEnumFields, getSourceFile, findPrsimaCreateInputTypeFromModelName } from ".";
 
-describe(modelScalarFields, () => {
+describe(modelScalarOrEnumFields, () => {
   it("generates literal type field type pattern", async () => {
     const dmmf = await getDMMF({
       datamodel: `
@@ -18,7 +18,7 @@ describe(modelScalarFields, () => {
     });
     const inputType = findPrsimaCreateInputTypeFromModelName(dmmf, "TestModel");
     const expected = template.sourceFile`
-      type TestModelScalarFields = {
+      type TestModelScalarOrEnumFields = {
         id: number;
         boolField: boolean;
         strField: string;
@@ -26,7 +26,7 @@ describe(modelScalarFields, () => {
         dateTimeField: Date;
       }
     `();
-    expect(printNode(modelScalarFields("TestModel", inputType))).toBe(printNode(expected).trim());
+    expect(printNode(modelScalarOrEnumFields("TestModel", inputType))).toBe(printNode(expected).trim());
   });
 
   it("does not generate for nullable field", async () => {
@@ -40,11 +40,11 @@ describe(modelScalarFields, () => {
     });
     const inputType = findPrsimaCreateInputTypeFromModelName(dmmf, "TestModel");
     const expected = template.sourceFile`
-      type TestModelScalarFields = {
+      type TestModelScalarOrEnumFields = {
         id: number;
       }
     `();
-    expect(printNode(modelScalarFields("TestModel", inputType))).toBe(printNode(expected).trim());
+    expect(printNode(modelScalarOrEnumFields("TestModel", inputType))).toBe(printNode(expected).trim());
   });
 });
 

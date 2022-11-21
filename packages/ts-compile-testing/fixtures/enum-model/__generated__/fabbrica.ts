@@ -1,26 +1,25 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`getSourceFile generates TypeScript AST 1`] = `
-"import { Prisma } from "@prisma/client";
-import type { PrismaClient } from "@prisma/client";
+import { Role } from "./client";
+import { Prisma } from "./client";
+import type { PrismaClient } from "./client";
 import { getClient } from "@quramy/prisma-fabbrica";
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
 import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
 type UserScalarOrEnumFields = {
-    id: number;
-    name: string;
+    id: string;
+    role: Role;
 };
 type UserFactoryDefineInput = {
-    id?: number;
-    name?: string;
+    id?: string;
+    role?: Role;
+    roleDefault?: Role;
 };
 type UserFactoryDefineOptions = {
     defaultData: Resolver<UserFactoryDefineInput>;
 };
 function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
     return {
-        id: scalarFieldValueGenerator.Int({ modelName: "User", fieldName: "id", isId: true, isUnique: false }),
-        name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
+        id: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false }),
+        role: "USER"
     };
 }
 export function defineUserFactory({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
@@ -32,5 +31,3 @@ export function defineUserFactory({ defaultData: defaultDataResolver }: UserFact
     };
     return { create };
 }
-"
-`;
