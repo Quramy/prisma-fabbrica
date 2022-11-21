@@ -1,5 +1,6 @@
-type PrismaClientLike = {
-  $connect: () => Promise<unknown>;
+export type PrismaClientLike = {
+  $connect: () => PromiseLike<unknown>;
+  $disconnect: () => PromiseLike<unknown>;
 };
 
 let _client: () => PrismaClientLike;

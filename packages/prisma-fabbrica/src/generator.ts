@@ -15,19 +15,15 @@ generatorHandler({
     requiresGenerators: ["prisma-client-js"],
   }),
   onGenerate: async options => {
-    const clientGeneratorConfig = options.otherGenerators.find(gc => gc.name === "client");
+    const clientGeneratorConfig = options.otherGenerators.find(generatorConfig => generatorConfig.name === "client");
     if (!clientGeneratorConfig) {
       logger.error("No prisma client generator.");
       return;
     }
-    const clientGeneratorOutputPath = clientGeneratorConfig.output?.value;
-    if (!clientGeneratorOutputPath) {
-      logger.warn("no output value");
-      return;
-    }
     const outputPath = options.generator.output?.value;
-    if (!outputPath) {
-      logger.warn("no output value");
+    const clientGeneratorOutputPath = clientGeneratorConfig.output?.value;
+    if (!clientGeneratorOutputPath || !outputPath) {
+      logger.error("no output value");
       return;
     }
 
