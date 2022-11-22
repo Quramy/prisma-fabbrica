@@ -13,9 +13,10 @@
     "prisma-fabbrica": "./bin.js"
   },
   "scripts": {
-    "clean": "rimraf \"*.tsbuildinfo\" lib coverage",
+    "clean": "rimraf \"*.tsbuildinfo\" \"lib/**/*.{js,ts}\" coverage",
     "test": "jest",
-    "test:ci": "jest --coverage"
+    "test:ci": "jest --coverage",
+    "prepublishOnly": "cp ../../README.md ."
   },
   "dependencies": {
     "@prisma/generator-helper": "^4.2.0",
