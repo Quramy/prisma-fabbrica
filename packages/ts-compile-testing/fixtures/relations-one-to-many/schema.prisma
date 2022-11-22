@@ -4,8 +4,9 @@ generator client {
 }
 
 generator fabbrica {
-  provider = "prisma-fabbrica"
-  output   = "./__generated__/fabbrica"
+  provider    = "prisma-fabbrica"
+  output      = "./__generated__/fabbrica"
+  noTranspile = true
 }
 
 datasource db {

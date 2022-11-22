@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import { existsSync } from "node:fs";
 import path from "node:path";
 
 import ts from "typescript";
@@ -7,6 +8,28 @@ import { generatorHandler } from "@prisma/generator-helper";
 import { logger } from "@prisma/internals";
 
 import { getSourceFile } from "./templates";
+
+function readTsConfig(tsconfigPath: string) {
+  const opt: ts.CompilerOptions = {
+    target: ts.ScriptTarget.ES2020,
+    module: ts.ModuleKind.CommonJS,
+  };
+  return existsSync(tsconfigPath)
+    ? ts.getParsedCommandLineOfConfigFile(tsconfigPath, {}, ts.sys as any)?.options ?? opt
+    : opt;
+}
+
+function compile(fileName: string, content: string, options: ts.CompilerOptions) {
+  const fileMap = new Map<string, string>();
+  const host = ts.createCompilerHost(options);
+  host.readFile = fname => (fname === fileName ? content : ts.sys.readFile(fname));
+  host.writeFile = (fname: string, contents: string) => fileMap.set(fname, contents);
+  const program = ts.createProgram([fileName], options, host);
+  program.emit();
+  const js = fileMap.get(fileName.replace(".ts", ".js"))!;
+  const dts = fileMap.get(fileName.replace(".ts", ".d.ts"))!;
+  return { js, dts };
+}
 
 generatorHandler({
   onManifest: () => ({
@@ -20,10 +43,11 @@ generatorHandler({
       logger.error("No prisma client generator.");
       return;
     }
+    const noTranspile = options.generator.config.noTranspile ?? false;
     const outputDirname = options.generator.output?.value;
     const clientGeneratorOutputPath = clientGeneratorConfig.output?.value;
     if (!clientGeneratorOutputPath || !outputDirname) {
-      logger.error("no output value");
+      logger.error("No output value");
       return;
     }
 
@@ -38,7 +62,27 @@ generatorHandler({
       removeComments: false,
     });
     const contents = printer.printFile(getSourceFile({ document: options.dmmf, prismaClientModuleSpecifier }));
-    await fs.mkdir(path.dirname(path.join(outputDirname, "index")), { recursive: true });
-    await fs.writeFile(path.join(outputDirname, "index.ts"), contents, "utf8");
+
+    await fs.rm(outputDirname, { recursive: true, force: true });
+    await fs.mkdir(outputDirname, { recursive: true });
+
+    if (noTranspile) {
+      await fs.writeFile(path.join(outputDirname, "index.ts"), contents, "utf8");
+    } else {
+      const tsconfigPath = path.resolve(
+        path.dirname(options.schemaPath),
+        options.generator.config.tsconfig ?? "../tsconfig.json",
+      );
+      const compileOptions = readTsConfig(tsconfigPath);
+      const output = compile(path.join(outputDirname, "index.ts"), contents, {
+        ...compileOptions,
+        declaration: true,
+        noEmit: false,
+      });
+      await Promise.all([
+        fs.writeFile(path.join(outputDirname, "index.js"), output.js, "utf8"),
+        fs.writeFile(path.join(outputDirname, "index.d.ts"), output.dts, "utf8"),
+      ]);
+    }
   },
 });
