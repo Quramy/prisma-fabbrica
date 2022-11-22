@@ -54,19 +54,20 @@ function extractFirstEnumValue(enums: DMMF.SchemaEnum[], field: DMMF.SchemaArg) 
   return found.values[0];
 }
 
-export const header = (importSpecifierToPrismaClient: string) =>
+export const header = (prismaClientModuleSpecifier: string) =>
   template.sourceFile`
-    import { Prisma } from ${() => ast.createStringLiteral(importSpecifierToPrismaClient)};
-    import type { PrismaClient } from ${() => ast.createStringLiteral(importSpecifierToPrismaClient)};
+    import { Prisma } from ${() => ast.createStringLiteral(prismaClientModuleSpecifier)};
+    import type { PrismaClient } from ${() => ast.createStringLiteral(prismaClientModuleSpecifier)};
     import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
     import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
     import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
     export { initialize } from "@quramy/prisma-fabbrica";
   `();
 
-export const importStatement = (specifier: string, moduleSpecifer: string) =>
+export const importStatement = (specifier: string, prismaClientModuleSpecifier: string) =>
   template.statement`
-    import { ${() => ast.createIdentifier(specifier)} } from ${() => ast.createStringLiteral(moduleSpecifer)};
+    import { ${() => ast.createIdentifier(specifier)} } from ${() =>
+    ast.createStringLiteral(prismaClientModuleSpecifier)};
   `();
 
 export const scalarFieldType = (
@@ -317,10 +318,10 @@ export const defineModelFactory = (modelName: string, inputType: DMMF.InputType)
 
 export function getSourceFile({
   document,
-  importSpecifierToPrismaClient,
+  prismaClientModuleSpecifier = "@prisma/client",
 }: {
   document: DMMF.Document;
-  importSpecifierToPrismaClient: string;
+  prismaClientModuleSpecifier?: string;
 }) {
   const enums = [
     ...new Set(
@@ -331,8 +332,8 @@ export function getSourceFile({
     ),
   ];
   const statements = [
-    ...enums.map(enumName => importStatement(enumName, importSpecifierToPrismaClient)),
-    ...header(importSpecifierToPrismaClient).statements,
+    ...enums.map(enumName => importStatement(enumName, prismaClientModuleSpecifier)),
+    ...header(prismaClientModuleSpecifier).statements,
     ...document.datamodel.models
       .map(model => ({ model, createInputType: findPrsimaCreateInputTypeFromModelName(document, model.name) }))
       .flatMap(({ model, createInputType }) => [

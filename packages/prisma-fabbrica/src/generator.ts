@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import { existsSync } from "node:fs";
 import path from "node:path";
 
 import ts from "typescript";
@@ -8,10 +9,32 @@ import { logger } from "@prisma/internals";
 
 import { getSourceFile } from "./templates";
 
+function readTsConfig(tsconfigPath: string) {
+  const opt: ts.CompilerOptions = {
+    target: ts.ScriptTarget.ES2020,
+    module: ts.ModuleKind.CommonJS,
+  };
+  return existsSync(tsconfigPath)
+    ? ts.getParsedCommandLineOfConfigFile(tsconfigPath, {}, ts.sys as any)?.options ?? opt
+    : opt;
+}
+
+function compile(fileName: string, content: string, options: ts.CompilerOptions) {
+  const fileMap = new Map<string, string>();
+  const host = ts.createCompilerHost(options);
+  host.readFile = fname => (fname === fileName ? content : ts.sys.readFile(fname));
+  host.writeFile = (fname: string, contents: string) => fileMap.set(fname, contents);
+  const program = ts.createProgram([fileName], options, host);
+  program.emit();
+  const js = fileMap.get(fileName.replace(".ts", ".js"))!;
+  const dts = fileMap.get(fileName.replace(".ts", ".d.ts"))!;
+  return { js, dts };
+}
+
 generatorHandler({
   onManifest: () => ({
     prettyName: "fabbrica",
-    defaultOutput: "../src/__generated__/fabbrica.ts",
+    defaultOutput: "../src/__generated__/fabbrica",
     requiresGenerators: ["prisma-client-js"],
   }),
   onGenerate: async options => {
@@ -20,25 +43,46 @@ generatorHandler({
       logger.error("No prisma client generator.");
       return;
     }
-    const outputPath = options.generator.output?.value;
+    const noTranspile = options.generator.config.noTranspile ?? false;
+    const outputDirname = options.generator.output?.value;
     const clientGeneratorOutputPath = clientGeneratorConfig.output?.value;
-    if (!clientGeneratorOutputPath || !outputPath) {
-      logger.error("no output value");
+    if (!clientGeneratorOutputPath || !outputDirname) {
+      logger.error("No output value");
       return;
     }
 
-    const importSpecifierToPrismaClient = clientGeneratorOutputPath.endsWith(
+    const prismaClientModuleSpecifier = clientGeneratorOutputPath.endsWith(
       ["node_modules", "@prisma", "client"].join(path.sep),
     )
       ? "@prisma/client"
-      : "./" + path.relative(path.dirname(outputPath), clientGeneratorOutputPath).replace("\\", "/");
+      : "./" + path.relative(outputDirname, clientGeneratorOutputPath).replace("\\", "/");
 
     const printer = ts.createPrinter({
       omitTrailingSemicolon: false,
       removeComments: false,
     });
-    const contents = printer.printFile(getSourceFile({ document: options.dmmf, importSpecifierToPrismaClient }));
-    await fs.mkdir(path.dirname(outputPath), { recursive: true });
-    await fs.writeFile(outputPath, contents, "utf8");
+    const contents = printer.printFile(getSourceFile({ document: options.dmmf, prismaClientModuleSpecifier }));
+
+    await fs.rm(outputDirname, { recursive: true, force: true });
+    await fs.mkdir(outputDirname, { recursive: true });
+
+    if (noTranspile) {
+      await fs.writeFile(path.join(outputDirname, "index.ts"), contents, "utf8");
+    } else {
+      const tsconfigPath = path.resolve(
+        path.dirname(options.schemaPath),
+        options.generator.config.tsconfig ?? "../tsconfig.json",
+      );
+      const compileOptions = readTsConfig(tsconfigPath);
+      const output = compile(path.join(outputDirname, "index.ts"), contents, {
+        ...compileOptions,
+        declaration: true,
+        noEmit: false,
+      });
+      await Promise.all([
+        fs.writeFile(path.join(outputDirname, "index.js"), output.js, "utf8"),
+        fs.writeFile(path.join(outputDirname, "index.d.ts"), output.dts, "utf8"),
+      ]);
+    }
   },
 });

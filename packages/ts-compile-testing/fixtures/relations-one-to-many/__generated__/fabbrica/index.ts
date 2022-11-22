@@ -1,5 +1,5 @@
-import { Prisma } from "./client";
-import type { PrismaClient } from "./client";
+import { Prisma } from "./../client";
+import type { PrismaClient } from "./../client";
 import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
 import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
