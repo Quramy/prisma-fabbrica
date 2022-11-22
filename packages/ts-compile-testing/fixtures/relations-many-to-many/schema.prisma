@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./__generated__/client"
+}
+
+generator fabbrica {
+  provider = "prisma-fabbrica"
+  output   = "./__generated__/fabbrica.ts"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id          String  @id
+  title       String
+  categories  Category[]
+}
+
+model Category {
+  id      String  @id
+  name    String
+  posts   Post[]
+}

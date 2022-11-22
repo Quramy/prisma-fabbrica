@@ -5,13 +5,9 @@ const UserFactory = defineUserFactory({
 });
 
 const PostFactory = definePostFactory({
-  defaultData: async () => ({
-    author: {
-      connect: {
-        id: (await UserFactory.create()).id,
-      },
-    },
-  }),
+  defaultData: {
+    author: UserFactory,
+  },
 });
 
 const prisma = jestPrisma.client;

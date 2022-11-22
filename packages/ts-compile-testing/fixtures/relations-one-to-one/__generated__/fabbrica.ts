@@ -1,5 +1,5 @@
-import { Prisma } from "@prisma/client";
-import type { PrismaClient } from "@prisma/client";
+import { Prisma } from "./client";
+import type { PrismaClient } from "./client";
 import { getClient } from "@quramy/prisma-fabbrica";
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
 import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
@@ -10,7 +10,7 @@ type UserScalarOrEnumFields = {
 type UserFactoryDefineInput = {
     id?: string;
     name?: string;
-    posts?: Prisma.PostCreateNestedManyWithoutAuthorInput;
+    profile?: Prisma.ProfileCreateNestedOneWithoutUserInput;
 };
 type UserFactoryDefineOptions = {
     defaultData: Resolver<UserFactoryDefineInput>;
@@ -39,47 +39,44 @@ export function defineUserFactory({ defaultData: defaultDataResolver }: UserFact
         create,
     };
 }
-type PostScalarOrEnumFields = {
+type ProfileScalarOrEnumFields = {
     id: string;
-    title: string;
 };
-type PostauthorFactory = {
+type ProfileuserFactory = {
     _factoryFor: "User";
-    buildCreateInput: () => PromiseLike<Prisma.UserCreateNestedOneWithoutPostsInput["create"]>;
+    buildCreateInput: () => PromiseLike<Prisma.UserCreateNestedOneWithoutProfileInput["create"]>;
 };
-type PostFactoryDefineInput = {
+type ProfileFactoryDefineInput = {
     id?: string;
-    title?: string;
-    author: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput;
+    user: ProfileuserFactory | Prisma.UserCreateNestedOneWithoutProfileInput;
 };
-type PostFactoryDefineOptions = {
-    defaultData: Resolver<PostFactoryDefineInput>;
+type ProfileFactoryDefineOptions = {
+    defaultData: Resolver<ProfileFactoryDefineInput>;
 };
-function isPostauthorFactory(x: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput): x is PostauthorFactory {
+function isProfileuserFactory(x: ProfileuserFactory | Prisma.UserCreateNestedOneWithoutProfileInput): x is ProfileuserFactory {
     return (x as any)._factoryFor === "User";
 }
-function autoGenratePostScalarsOrEnums(): PostScalarOrEnumFields {
+function autoGenrateProfileScalarsOrEnums(): ProfileScalarOrEnumFields {
     return {
-        id: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "id", isId: true, isUnique: false }),
-        title: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false })
+        id: scalarFieldValueGenerator.String({ modelName: "Profile", fieldName: "id", isId: true, isUnique: false })
     };
 }
-export function definePostFactory({ defaultData: defaultDataResolver }: PostFactoryDefineOptions) {
-    const buildCreateInput = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
-        const requiredScalarData = autoGenratePostScalarsOrEnums();
+export function defineProfileFactory({ defaultData: defaultDataResolver }: ProfileFactoryDefineOptions) {
+    const buildCreateInput = async (inputData: Partial<Prisma.ProfileCreateInput> = {}) => {
+        const requiredScalarData = autoGenrateProfileScalarsOrEnums();
         const defaultData = await resolveValue(defaultDataResolver);
         const defaultAssociations = {
-            author: isPostauthorFactory(defaultData.author) ? { create: await defaultData.author.buildCreateInput() } : defaultData.author
+            user: isProfileuserFactory(defaultData.user) ? { create: await defaultData.user.buildCreateInput() } : defaultData.user
         };
-        const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+        const data: Prisma.ProfileCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const create = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
+    const create = async (inputData: Partial<Prisma.ProfileCreateInput> = {}) => {
         const data = await buildCreateInput(inputData);
-        return await getClient<PrismaClient>().post.create({ data });
+        return await getClient<PrismaClient>().profile.create({ data });
     };
     return {
-        _factoryFor: "Post" as const,
+        _factoryFor: "Profile" as const,
         buildCreateInput,
         create,
     };
