@@ -182,14 +182,6 @@ export const defineModelFactory = (modelName: string) =>
     AUTO_GENRATE_MODEL_SCALARS: ts.factory.createIdentifier(`autoGenrate${modelName}Scalars`),
   });
 
-export const defineFnMapSet = (modelName: string) =>
-  template.statement<ts.ExpressionStatement>`
-    defineFnMap.set(MODEL_NAME, DEFINE_MODEL_FACTORY);
-  `({
-    MODEL_NAME: ts.factory.createStringLiteral(modelName),
-    DEFINE_MODEL_FACTORY: ts.factory.createIdentifier(`define${modelName}Factory`),
-  });
-
 export function getSourceFile({
   document,
   importSpecifierToPrismaClient,

@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -11,7 +12,9 @@ async function main() {
   const dirs = await fs.readdir(fixturesDir);
   for (const fixtureDir of dirs) {
     const schemaPath = path.resolve(fixturesDir, fixtureDir, "schema.prisma");
-    await exec(`npx prisma generate --schema=${schemaPath}`);
+    if (!existsSync(schemaPath)) continue;
+    const { stdout } = await exec(`npx prisma generate --schema=${schemaPath}`);
+    process.stdout.write(stdout)
     const schemaContents = await fs.readFile(schemaPath, "utf8");
     const dmmfDocument = await getDMMF({
       datamodel: schemaContents,
