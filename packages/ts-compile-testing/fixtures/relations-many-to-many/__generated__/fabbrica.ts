@@ -13,7 +13,7 @@ type PostFactoryDefineInput = {
     categories?: Prisma.CategoryCreateNestedManyWithoutPostsInput;
 };
 type PostFactoryDefineOptions = {
-    defaultData: Resolver<PostFactoryDefineInput>;
+    defaultData?: Resolver<PostFactoryDefineInput>;
 };
 function autoGenratePostScalarsOrEnums(): PostScalarOrEnumFields {
     return {
@@ -21,10 +21,10 @@ function autoGenratePostScalarsOrEnums(): PostScalarOrEnumFields {
         title: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false })
     };
 }
-export function definePostFactory({ defaultData: defaultDataResolver }: PostFactoryDefineOptions) {
+function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFactoryDefineOptions) {
     const buildCreateInput = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
         const requiredScalarData = autoGenratePostScalarsOrEnums();
-        const defaultData = await resolveValue(defaultDataResolver);
+        const defaultData = await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = {};
         const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
@@ -39,6 +39,9 @@ export function definePostFactory({ defaultData: defaultDataResolver }: PostFact
         create,
     };
 }
+export function definePostFactory(args: PostFactoryDefineOptions = {}) {
+    return definePostFactoryInternal(args);
+}
 type CategoryScalarOrEnumFields = {
     id: string;
     name: string;
@@ -49,7 +52,7 @@ type CategoryFactoryDefineInput = {
     posts?: Prisma.PostCreateNestedManyWithoutCategoriesInput;
 };
 type CategoryFactoryDefineOptions = {
-    defaultData: Resolver<CategoryFactoryDefineInput>;
+    defaultData?: Resolver<CategoryFactoryDefineInput>;
 };
 function autoGenrateCategoryScalarsOrEnums(): CategoryScalarOrEnumFields {
     return {
@@ -57,10 +60,10 @@ function autoGenrateCategoryScalarsOrEnums(): CategoryScalarOrEnumFields {
         name: scalarFieldValueGenerator.String({ modelName: "Category", fieldName: "name", isId: false, isUnique: false })
     };
 }
-export function defineCategoryFactory({ defaultData: defaultDataResolver }: CategoryFactoryDefineOptions) {
+function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: CategoryFactoryDefineOptions) {
     const buildCreateInput = async (inputData: Partial<Prisma.CategoryCreateInput> = {}) => {
         const requiredScalarData = autoGenrateCategoryScalarsOrEnums();
-        const defaultData = await resolveValue(defaultDataResolver);
+        const defaultData = await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = {};
         const data: Prisma.CategoryCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
@@ -74,4 +77,7 @@ export function defineCategoryFactory({ defaultData: defaultDataResolver }: Cate
         buildCreateInput,
         create,
     };
+}
+export function defineCategoryFactory(args: CategoryFactoryDefineOptions = {}) {
+    return defineCategoryFactoryInternal(args);
 }

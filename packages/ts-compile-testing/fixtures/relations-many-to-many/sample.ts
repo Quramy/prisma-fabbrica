@@ -1,4 +1,4 @@
 import { defineCategoryFactory, definePostFactory } from "./__generated__/fabbrica";
 
-export const PostFactory = definePostFactory({ defaultData: {} });
-export const CategoryFactory = defineCategoryFactory({ defaultData: {} });
+export const PostFactory = definePostFactory();
+export const CategoryFactory = defineCategoryFactory();

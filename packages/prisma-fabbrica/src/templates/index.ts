@@ -173,15 +173,24 @@ export const modelFactoryDefineInput = (modelName: string, inputType: DMMF.Input
     MODEL_FACTORY_DEFINE_INPUT: ast.createIdentifier(`${modelName}FactoryDefineInput`),
   });
 
-export const modelFactoryDefineOptions = (modelName: string) =>
-  template.statement<ts.TypeAliasDeclaration>`
-    type MODEL_FACTORY_DEFINE_OPTIONS = {
-      defaultData: Resolver<MODEL_FACTORY_DEFINE_INPUT>;
-    };
-  `({
-    MODEL_FACTORY_DEFINE_OPTIONS: ast.createIdentifier(`${modelName}FactoryDefineOptions`),
-    MODEL_FACTORY_DEFINE_INPUT: ast.createIdentifier(`${modelName}FactoryDefineInput`),
-  });
+export const modelFactoryDefineOptions = (modelName: string, isOpionalDefaultData: boolean) =>
+  isOpionalDefaultData
+    ? template.statement<ts.TypeAliasDeclaration>`
+        type MODEL_FACTORY_DEFINE_OPTIONS = {
+          defaultData?: Resolver<MODEL_FACTORY_DEFINE_INPUT>;
+        };
+      `({
+        MODEL_FACTORY_DEFINE_OPTIONS: ast.createIdentifier(`${modelName}FactoryDefineOptions`),
+        MODEL_FACTORY_DEFINE_INPUT: ast.createIdentifier(`${modelName}FactoryDefineInput`),
+      })
+    : template.statement<ts.TypeAliasDeclaration>`
+        type MODEL_FACTORY_DEFINE_OPTIONS = {
+          defaultData: Resolver<MODEL_FACTORY_DEFINE_INPUT>;
+        };
+      `({
+        MODEL_FACTORY_DEFINE_OPTIONS: ast.createIdentifier(`${modelName}FactoryDefineOptions`),
+        MODEL_FACTORY_DEFINE_INPUT: ast.createIdentifier(`${modelName}FactoryDefineInput`),
+      });
 
 export const isModelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF.Model) => {
   const targetModel = model.fields.find(f => f.name === fieldType.name)!;
@@ -234,16 +243,16 @@ export const autoGenrateModelScalarsOrEnums = (
     MODEL_SCALAR_OR_ENUM_FIELDS: ast.createIdentifier(`${modelName}ScalarOrEnumFields`),
   });
 
-export const defineModelFactory = (modelName: string, inputType: DMMF.InputType) =>
+export const defineModelFactoryInernal = (modelName: string, inputType: DMMF.InputType) =>
   template.statement<ts.FunctionDeclaration>`
-    export function DEFINE_MODEL_FACTORY({
+    function DEFINE_MODEL_FACTORY_INERNAL({
       defaultData: defaultDataResolver
     }: MODEL_FACTORY_DEFINE_OPTIONS) {
       const buildCreateInput = async (
         inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
       ) => {
         const requiredScalarData = AUTO_GENRATE_MODEL_SCALARS_OR_ENUMS()
-        const defaultData= await resolveValue(defaultDataResolver);
+        const defaultData= await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = ${() =>
           ast.createObjectLiteralExpression(
             filterRequiredInputObjectTypeField(inputType).map(field =>
@@ -278,11 +287,32 @@ export const defineModelFactory = (modelName: string, inputType: DMMF.InputType)
     }
   `({
     MODEL_KEY: ast.createIdentifier(camelize(modelName)),
-    DEFINE_MODEL_FACTORY: ast.createIdentifier(`define${modelName}Factory`),
+    DEFINE_MODEL_FACTORY_INERNAL: ast.createIdentifier(`define${modelName}FactoryInternal`),
     MODEL_FACTORY_DEFINE_OPTIONS: ast.createIdentifier(`${modelName}FactoryDefineOptions`),
     MODEL_CREATE_INPUT: ast.createIdentifier(`${modelName}CreateInput`),
     AUTO_GENRATE_MODEL_SCALARS_OR_ENUMS: ast.createIdentifier(`autoGenrate${modelName}ScalarsOrEnums`),
   });
+
+export const defineModelFactory = (modelName: string, inputType: DMMF.InputType) =>
+  filterRequiredInputObjectTypeField(inputType).length
+    ? template.statement<ts.FunctionDeclaration>`
+        export function DEFINE_MODEL_FACTORY(args: MODEL_FACTORY_DEFINE_OPTIONS) {
+          return DEFINE_MODEL_FACTORY_INERNAL(args);
+        }
+      `({
+        DEFINE_MODEL_FACTORY: ast.createIdentifier(`define${modelName}Factory`),
+        DEFINE_MODEL_FACTORY_INERNAL: ast.createIdentifier(`define${modelName}FactoryInternal`),
+        MODEL_FACTORY_DEFINE_OPTIONS: ast.createIdentifier(`${modelName}FactoryDefineOptions`),
+      })
+    : template.statement<ts.FunctionDeclaration>`
+        export function DEFINE_MODEL_FACTORY(args: MODEL_FACTORY_DEFINE_OPTIONS = {}) {
+          return DEFINE_MODEL_FACTORY_INERNAL(args);
+        }
+      `({
+        DEFINE_MODEL_FACTORY: ast.createIdentifier(`define${modelName}Factory`),
+        DEFINE_MODEL_FACTORY_INERNAL: ast.createIdentifier(`define${modelName}FactoryInternal`),
+        MODEL_FACTORY_DEFINE_OPTIONS: ast.createIdentifier(`${modelName}FactoryDefineOptions`),
+      });
 
 export function getSourceFile({
   document,
@@ -310,11 +340,12 @@ export function getSourceFile({
           modelBelongsToRelationFactory(fieldType, model),
         ),
         modelFactoryDefineInput(model.name, createInputType),
-        modelFactoryDefineOptions(model.name),
+        modelFactoryDefineOptions(model.name, filterRequiredInputObjectTypeField(createInputType).length === 0),
         ...filterRequiredInputObjectTypeField(createInputType).map(fieldType =>
           isModelAssociationFactory(fieldType, model),
         ),
         autoGenrateModelScalarsOrEnums(model.name, createInputType, model, document.schema.enumTypes.model ?? []),
+        defineModelFactoryInernal(model.name, createInputType),
         defineModelFactory(model.name, createInputType),
       ]),
   ];

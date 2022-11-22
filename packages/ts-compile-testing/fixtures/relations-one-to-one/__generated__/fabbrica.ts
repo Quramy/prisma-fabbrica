@@ -13,7 +13,7 @@ type UserFactoryDefineInput = {
     profile?: Prisma.ProfileCreateNestedOneWithoutUserInput;
 };
 type UserFactoryDefineOptions = {
-    defaultData: Resolver<UserFactoryDefineInput>;
+    defaultData?: Resolver<UserFactoryDefineInput>;
 };
 function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
     return {
@@ -21,10 +21,10 @@ function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
     };
 }
-export function defineUserFactory({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
+function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
     const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const requiredScalarData = autoGenrateUserScalarsOrEnums();
-        const defaultData = await resolveValue(defaultDataResolver);
+        const defaultData = await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = {};
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
@@ -38,6 +38,9 @@ export function defineUserFactory({ defaultData: defaultDataResolver }: UserFact
         buildCreateInput,
         create,
     };
+}
+export function defineUserFactory(args: UserFactoryDefineOptions = {}) {
+    return defineUserFactoryInternal(args);
 }
 type ProfileScalarOrEnumFields = {
     id: string;
@@ -61,12 +64,14 @@ function autoGenrateProfileScalarsOrEnums(): ProfileScalarOrEnumFields {
         id: scalarFieldValueGenerator.String({ modelName: "Profile", fieldName: "id", isId: true, isUnique: false })
     };
 }
-export function defineProfileFactory({ defaultData: defaultDataResolver }: ProfileFactoryDefineOptions) {
+function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: ProfileFactoryDefineOptions) {
     const buildCreateInput = async (inputData: Partial<Prisma.ProfileCreateInput> = {}) => {
         const requiredScalarData = autoGenrateProfileScalarsOrEnums();
-        const defaultData = await resolveValue(defaultDataResolver);
+        const defaultData = await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = {
-            user: isProfileuserFactory(defaultData.user) ? { create: await defaultData.user.buildCreateInput() } : defaultData.user
+            user: isProfileuserFactory(defaultData.user) ? {
+                create: await defaultData.user.buildCreateInput()
+            } : defaultData.user
         };
         const data: Prisma.ProfileCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
@@ -80,4 +85,7 @@ export function defineProfileFactory({ defaultData: defaultDataResolver }: Profi
         buildCreateInput,
         create,
     };
+}
+export function defineProfileFactory(args: ProfileFactoryDefineOptions) {
+    return defineProfileFactoryInternal(args);
 }

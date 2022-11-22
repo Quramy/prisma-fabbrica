@@ -15,7 +15,7 @@ type UserFactoryDefineInput = {
     roles?: Prisma.UserCreaterolesInput | Prisma.Enumerable<Role>;
 };
 type UserFactoryDefineOptions = {
-    defaultData: Resolver<UserFactoryDefineInput>;
+    defaultData?: Resolver<UserFactoryDefineInput>;
 };
 function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
     return {
@@ -23,10 +23,10 @@ function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
         role: "USER"
     };
 }
-export function defineUserFactory({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
+function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
     const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const requiredScalarData = autoGenrateUserScalarsOrEnums();
-        const defaultData = await resolveValue(defaultDataResolver);
+        const defaultData = await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = {};
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
@@ -40,4 +40,7 @@ export function defineUserFactory({ defaultData: defaultDataResolver }: UserFact
         buildCreateInput,
         create,
     };
+}
+export function defineUserFactory(args: UserFactoryDefineOptions = {}) {
+    return defineUserFactoryInternal(args);
 }
