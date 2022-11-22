@@ -14,7 +14,7 @@ async function main() {
     const schemaPath = path.resolve(fixturesDir, fixtureDir, "schema.prisma");
     if (!existsSync(schemaPath)) continue;
     const { stdout } = await exec(`npx prisma generate --schema=${schemaPath}`);
-    process.stdout.write(stdout)
+    process.stdout.write(stdout);
     const schemaContents = await fs.readFile(schemaPath, "utf8");
     const dmmfDocument = await getDMMF({
       datamodel: schemaContents,
