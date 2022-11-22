@@ -1,8 +1,8 @@
-import { setup } from "../../setup";
+import { initialize } from "../../initialize";
 
 beforeAll(() => {
   if (typeof jestPrisma === "object") {
-    setup({
+    initialize({
       client: () => jestPrisma.client,
     });
   }

@@ -3,9 +3,10 @@
 exports[`getSourceFile generates TypeScript AST 1`] = `
 "import { Prisma } from "@prisma/client";
 import type { PrismaClient } from "@prisma/client";
-import { getClient } from "@quramy/prisma-fabbrica";
+import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
 import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
+export { initialize } from "@quramy/prisma-fabbrica";
 type UserScalarOrEnumFields = {
     id: number;
     name: string;
