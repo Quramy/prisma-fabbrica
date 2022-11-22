@@ -58,9 +58,10 @@ export const header = (importSpecifierToPrismaClient: string) =>
   template.sourceFile`
     import { Prisma } from ${() => ast.createStringLiteral(importSpecifierToPrismaClient)};
     import type { PrismaClient } from ${() => ast.createStringLiteral(importSpecifierToPrismaClient)};
-    import { getClient } from "@quramy/prisma-fabbrica";
+    import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
     import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
     import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
+    export { initialize } from "@quramy/prisma-fabbrica";
   `();
 
 export const importStatement = (specifier: string, moduleSpecifer: string) =>

@@ -1,9 +1,9 @@
 import { setClient, PrismaClientLike } from "./clientHolder";
 
-export type SetupOptions = {
+export type InitializeOptions = {
   readonly client: () => PrismaClientLike;
 };
 
-export function setup(options: SetupOptions) {
+export function initialize(options: InitializeOptions) {
   setClient(options.client);
 }

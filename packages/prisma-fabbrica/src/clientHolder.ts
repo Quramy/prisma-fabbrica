@@ -5,8 +5,8 @@ export type PrismaClientLike = {
 
 let _client: () => PrismaClientLike;
 
-export function setClient<T extends PrismaClientLike>(client: () => T) {
-  _client = client;
+export function setClient<T extends PrismaClientLike>(client: T | (() => T)) {
+  _client = typeof client === "function" ? client : () => client;
 }
 
 export function getClient<T extends PrismaClientLike>() {
