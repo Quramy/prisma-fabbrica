@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./__generated__/client"
+}
+
+generator fabbrica {
+  provider = "prisma-fabbrica"
+  output   = "./__generated__/fabbrica.ts"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id      String @id
+  name    String
+  profile Profile?
+}
+
+model Profile {
+  id      String @id
+  user    User @relation(fields: [userId], references: [id])
+  userId  String @unique
+}
