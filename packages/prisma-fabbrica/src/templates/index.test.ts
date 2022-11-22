@@ -58,7 +58,7 @@ describe(getSourceFile, () => {
         }
       `,
     });
-    const sourceFile = getSourceFile({ document: dmmf, importSpecifierToPrismaClient: "@prisma/client" });
+    const sourceFile = getSourceFile({ document: dmmf });
     expect(printNode(sourceFile)).toMatchSnapshot();
   });
 });

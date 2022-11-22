@@ -1,16 +1,19 @@
-import { Prisma } from "./client";
-import type { PrismaClient } from "./client";
+import { Role } from "./../client";
+import { Prisma } from "./../client";
+import type { PrismaClient } from "./../client";
 import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
 import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
 export { initialize } from "@quramy/prisma-fabbrica";
 type UserScalarOrEnumFields = {
     id: string;
-    name: string;
+    role: Role;
 };
 type UserFactoryDefineInput = {
     id?: string;
-    name?: string;
+    role?: Role;
+    roleDefault?: Role;
+    roles?: Prisma.UserCreaterolesInput | Prisma.Enumerable<Role>;
 };
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput>;
@@ -18,7 +21,7 @@ type UserFactoryDefineOptions = {
 function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
     return {
         id: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false }),
-        name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
+        role: "USER"
     };
 }
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {

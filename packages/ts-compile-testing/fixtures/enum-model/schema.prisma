@@ -5,7 +5,7 @@ generator client {
 
 generator fabbrica {
   provider = "prisma-fabbrica"
-  output   = "./__generated__/fabbrica.ts"
+  output   = "./__generated__/fabbrica"
 }
 
 datasource db {
