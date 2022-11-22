@@ -66,7 +66,8 @@ export const header = (prismaClientModuleSpecifier: string) =>
 
 export const importStatement = (specifier: string, prismaClientModuleSpecifier: string) =>
   template.statement`
-    import { ${() => ast.createIdentifier(specifier)} } from ${() => ast.createStringLiteral(prismaClientModuleSpecifier)};
+    import { ${() => ast.createIdentifier(specifier)} } from ${() =>
+    ast.createStringLiteral(prismaClientModuleSpecifier)};
   `();
 
 export const scalarFieldType = (
