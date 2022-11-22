@@ -2,11 +2,25 @@ import { DMMF } from "@prisma/generator-helper";
 import ts from "typescript";
 import { template } from "talt";
 
+type StripCreate<T extends string> = T extends `create${infer S}` ? Uncapitalize<S> : T;
+
 function camelize(pascal: string) {
   return pascal[0].toLowerCase() + pascal.slice(1);
 }
 
-const ast = ts.factory;
+function pascalize(camel: string) {
+  return camel[0].toUpperCase() + camel.slice(1);
+}
+
+const ast = new Proxy(ts.factory, {
+  get(target: any, n) {
+    const name = n as string;
+    if (name.startsWith("update")) return target[name];
+    return target[`create${pascalize(name)}`];
+  },
+}) as unknown as {
+  [K in keyof ts.NodeFactory as StripCreate<K>]: ts.NodeFactory[K];
+};
 
 export function findPrsimaCreateInputTypeFromModelName(document: DMMF.Document, modelName: string) {
   const search = `${modelName}CreateInput`;
@@ -56,8 +70,8 @@ function extractFirstEnumValue(enums: DMMF.SchemaEnum[], field: DMMF.SchemaArg) 
 
 export const header = (prismaClientModuleSpecifier: string) =>
   template.sourceFile`
-    import { Prisma } from ${() => ast.createStringLiteral(prismaClientModuleSpecifier)};
-    import type { PrismaClient } from ${() => ast.createStringLiteral(prismaClientModuleSpecifier)};
+    import { Prisma } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
+    import type { PrismaClient } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
     import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
     import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
     import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
@@ -66,8 +80,7 @@ export const header = (prismaClientModuleSpecifier: string) =>
 
 export const importStatement = (specifier: string, prismaClientModuleSpecifier: string) =>
   template.statement`
-    import { ${() => ast.createIdentifier(specifier)} } from ${() =>
-    ast.createStringLiteral(prismaClientModuleSpecifier)};
+    import { ${() => ast.identifier(specifier)} } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
   `();
 
 export const scalarFieldType = (
@@ -80,14 +93,14 @@ export const scalarFieldType = (
   }
   switch (inputType.type) {
     case "Boolean":
-      return ast.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword);
+      return ast.keywordTypeNode(ts.SyntaxKind.BooleanKeyword);
     case "String":
-      return ast.createKeywordTypeNode(ts.SyntaxKind.StringKeyword);
+      return ast.keywordTypeNode(ts.SyntaxKind.StringKeyword);
     case "Int":
     case "Float":
-      return ast.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword);
+      return ast.keywordTypeNode(ts.SyntaxKind.NumberKeyword);
     case "BigInt":
-      return ast.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword);
+      return ast.keywordTypeNode(ts.SyntaxKind.BigIntKeyword);
     case "Decimal":
       return template.typeNode`Prisma.Decimal`();
     case "DateTime":
@@ -97,7 +110,7 @@ export const scalarFieldType = (
     case "JSON":
       // FIXME Is the folloing type right?
       // return template.typeNode`Prisma.Json`();
-      return ast.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword);
+      return ast.keywordTypeNode(ts.SyntaxKind.AnyKeyword);
     default:
       throw new Error(`Unknown scalar type "${inputType.type}" for ${modelName}.${fieldName} .`);
   }
@@ -108,47 +121,47 @@ export const argInputType = (modelName: string, fieldName: string, inputType: DM
     if (inputType.location === "scalar") {
       return scalarFieldType(modelName, fieldName, inputType);
     } else if (inputType.location === "enumTypes") {
-      return ast.createTypeReferenceNode(ast.createIdentifier(inputType.type as string));
+      return ast.typeReferenceNode(ast.identifier(inputType.type as string));
     } else if (inputType.location === "outputObjectTypes" || inputType.location === "inputObjectTypes") {
-      return ast.createTypeReferenceNode(
-        template.expression<ts.Identifier>`Prisma.${() => ast.createIdentifier(inputType.type as string)}`(),
+      return ast.typeReferenceNode(
+        template.expression<ts.Identifier>`Prisma.${() => ast.identifier(inputType.type as string)}`(),
       );
     } else {
       // FIXME inputType.location === "fieldRefTypes"
-      return ast.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword);
+      return ast.keywordTypeNode(ts.SyntaxKind.UnknownKeyword);
     }
   };
   return inputType.isList
-    ? ast.createTypeReferenceNode(template.expression<ts.Identifier>`Prisma.Enumerable<${fieldType}>`())
+    ? ast.typeReferenceNode(template.expression<ts.Identifier>`Prisma.Enumerable<${fieldType}>`())
     : fieldType();
 };
 
 export const modelScalarOrEnumFields = (modelName: string, inputType: DMMF.InputType) =>
   template.statement<ts.TypeAliasDeclaration>`
     type MODEL_SCALAR_OR_ENUM_FIELDS = ${() =>
-      ast.createTypeLiteralNode(
+      ast.typeLiteralNode(
         filterRequiredScalarOrEnumFields(inputType).map(field =>
-          ast.createPropertySignature(
+          ast.propertySignature(
             undefined,
             field.name,
             undefined,
-            ast.createUnionTypeNode(
+            ast.unionTypeNode(
               field.inputTypes.map(childInputType => argInputType(modelName, field.name, childInputType)),
             ),
           ),
         ),
       )}
   `({
-    MODEL_SCALAR_OR_ENUM_FIELDS: ast.createIdentifier(`${modelName}ScalarOrEnumFields`),
+    MODEL_SCALAR_OR_ENUM_FIELDS: ast.identifier(`${modelName}ScalarOrEnumFields`),
   });
 
 export const modelBelongsToRelationFactory = (fieldType: DMMF.SchemaArg, model: DMMF.Model) => {
   const targetModel = model.fields.find(f => f.name === fieldType.name)!;
   return template.statement<ts.TypeAliasDeclaration>`
-    type ${() => ast.createIdentifier(`${model.name}${fieldType.name}Factory`)} = {
-      _factoryFor: ${() => ast.createLiteralTypeNode(ast.createStringLiteral(targetModel.type))};
+    type ${() => ast.identifier(`${model.name}${fieldType.name}Factory`)} = {
+      _factoryFor: ${() => ast.literalTypeNode(ast.stringLiteral(targetModel.type))};
       buildCreateInput: () => PromiseLike<Prisma.${() =>
-        ast.createIdentifier(fieldType.inputTypes[0].type as string)}["create"]>;
+        ast.identifier(fieldType.inputTypes[0].type as string)}["create"]>;
     };
   `();
 };
@@ -156,15 +169,15 @@ export const modelBelongsToRelationFactory = (fieldType: DMMF.SchemaArg, model: 
 export const modelFactoryDefineInput = (modelName: string, inputType: DMMF.InputType) =>
   template.statement<ts.TypeAliasDeclaration>`
     type MODEL_FACTORY_DEFINE_INPUT = ${() =>
-      ast.createTypeLiteralNode(
+      ast.typeLiteralNode(
         inputType.fields.map(field =>
-          ast.createPropertySignature(
+          ast.propertySignature(
             undefined,
             field.name,
-            !field.isRequired || isScalarOrEnumField(field) ? ast.createToken(ts.SyntaxKind.QuestionToken) : undefined,
-            ast.createUnionTypeNode([
+            !field.isRequired || isScalarOrEnumField(field) ? ast.token(ts.SyntaxKind.QuestionToken) : undefined,
+            ast.unionTypeNode([
               ...(field.isRequired && isInputObjectTypeField(field)
-                ? [ast.createTypeReferenceNode(ast.createIdentifier(`${modelName}${field.name}Factory`))]
+                ? [ast.typeReferenceNode(ast.identifier(`${modelName}${field.name}Factory`))]
                 : []),
               ...field.inputTypes.map(childInputType => argInputType(modelName, field.name, childInputType)),
             ]),
@@ -172,7 +185,7 @@ export const modelFactoryDefineInput = (modelName: string, inputType: DMMF.Input
         ),
       )};
   `({
-    MODEL_FACTORY_DEFINE_INPUT: ast.createIdentifier(`${modelName}FactoryDefineInput`),
+    MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${modelName}FactoryDefineInput`),
   });
 
 export const modelFactoryDefineOptions = (modelName: string, isOpionalDefaultData: boolean) =>
@@ -182,30 +195,28 @@ export const modelFactoryDefineOptions = (modelName: string, isOpionalDefaultDat
           defaultData?: Resolver<MODEL_FACTORY_DEFINE_INPUT>;
         };
       `({
-        MODEL_FACTORY_DEFINE_OPTIONS: ast.createIdentifier(`${modelName}FactoryDefineOptions`),
-        MODEL_FACTORY_DEFINE_INPUT: ast.createIdentifier(`${modelName}FactoryDefineInput`),
+        MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${modelName}FactoryDefineOptions`),
+        MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${modelName}FactoryDefineInput`),
       })
     : template.statement<ts.TypeAliasDeclaration>`
         type MODEL_FACTORY_DEFINE_OPTIONS = {
           defaultData: Resolver<MODEL_FACTORY_DEFINE_INPUT>;
         };
       `({
-        MODEL_FACTORY_DEFINE_OPTIONS: ast.createIdentifier(`${modelName}FactoryDefineOptions`),
-        MODEL_FACTORY_DEFINE_INPUT: ast.createIdentifier(`${modelName}FactoryDefineInput`),
+        MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${modelName}FactoryDefineOptions`),
+        MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${modelName}FactoryDefineInput`),
       });
 
 export const isModelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF.Model) => {
   const targetModel = model.fields.find(f => f.name === fieldType.name)!;
   return template.statement<ts.FunctionDeclaration>`
-    function ${() => ast.createIdentifier(`is${model.name}${fieldType.name}Factory`)}(
+    function ${() => ast.identifier(`is${model.name}${fieldType.name}Factory`)}(
       x: MODEL_BELONGS_TO_RELATION_FACTORY | ${() => argInputType(model.name, fieldType.name, fieldType.inputTypes[0])}
     ): x is MODEL_BELONGS_TO_RELATION_FACTORY {
-      return (x as any)._factoryFor === ${() => ast.createStringLiteral(targetModel.type)};
+      return (x as any)._factoryFor === ${() => ast.stringLiteral(targetModel.type)};
     }
   `({
-    MODEL_BELONGS_TO_RELATION_FACTORY: ast.createTypeReferenceNode(
-      ast.createIdentifier(`${model.name}${fieldType.name}Factory`),
-    ),
+    MODEL_BELONGS_TO_RELATION_FACTORY: ast.typeReferenceNode(ast.identifier(`${model.name}${fieldType.name}Factory`)),
   });
 };
 
@@ -218,31 +229,29 @@ export const autoGenrateModelScalarsOrEnums = (
   template.statement<ts.FunctionDeclaration>`
     function AUTO_GENRATE_MODEL_SCALARS_OR_ENUMS(): MODEL_SCALAR_OR_ENUM_FIELDS {
       return ${() =>
-        ast.createObjectLiteralExpression(
+        ast.objectLiteralExpression(
           filterRequiredScalarOrEnumFields(inputType).map(field =>
-            ast.createPropertyAssignment(
-              ast.createIdentifier(field.name),
+            ast.propertyAssignment(
+              ast.identifier(field.name),
               field.inputTypes[0].location === "scalar"
                 ? template.expression`
                     scalarFieldValueGenerator.SCALAR_TYPE({ modelName: MODEL_NAME, fieldName: FIELD_NAME, isId: IS_ID, isUnique: IS_UNIQUE })
                   `({
-                    SCALAR_TYPE: ast.createIdentifier(field.inputTypes[0].type as string),
-                    MODEL_NAME: ast.createStringLiteral(modelName),
-                    FIELD_NAME: ast.createStringLiteral(field.name),
-                    IS_ID: model.fields.find(f => f.name === field.name)!.isId ? ast.createTrue() : ast.createFalse(),
-                    IS_UNIQUE: model.fields.find(f => f.name === field.name)!.isUnique
-                      ? ast.createTrue()
-                      : ast.createFalse(),
+                    SCALAR_TYPE: ast.identifier(field.inputTypes[0].type as string),
+                    MODEL_NAME: ast.stringLiteral(modelName),
+                    FIELD_NAME: ast.stringLiteral(field.name),
+                    IS_ID: model.fields.find(f => f.name === field.name)!.isId ? ast.true() : ast.false(),
+                    IS_UNIQUE: model.fields.find(f => f.name === field.name)!.isUnique ? ast.true() : ast.false(),
                   })
-                : ast.createStringLiteral(extractFirstEnumValue(enums, field)),
+                : ast.stringLiteral(extractFirstEnumValue(enums, field)),
             ),
           ),
           true,
         )};
     }
   `({
-    AUTO_GENRATE_MODEL_SCALARS_OR_ENUMS: ast.createIdentifier(`autoGenrate${modelName}ScalarsOrEnums`),
-    MODEL_SCALAR_OR_ENUM_FIELDS: ast.createIdentifier(`${modelName}ScalarOrEnumFields`),
+    AUTO_GENRATE_MODEL_SCALARS_OR_ENUMS: ast.identifier(`autoGenrate${modelName}ScalarsOrEnums`),
+    MODEL_SCALAR_OR_ENUM_FIELDS: ast.identifier(`${modelName}ScalarOrEnumFields`),
   });
 
 export const defineModelFactoryInernal = (modelName: string, inputType: DMMF.InputType) =>
@@ -256,17 +265,17 @@ export const defineModelFactoryInernal = (modelName: string, inputType: DMMF.Inp
         const requiredScalarData = AUTO_GENRATE_MODEL_SCALARS_OR_ENUMS()
         const defaultData= await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = ${() =>
-          ast.createObjectLiteralExpression(
+          ast.objectLiteralExpression(
             filterRequiredInputObjectTypeField(inputType).map(field =>
-              ast.createPropertyAssignment(
-                ast.createIdentifier(field.name),
+              ast.propertyAssignment(
+                ast.identifier(field.name),
                 template.expression`
                   IS_MODEL_BELONGS_TO_RELATION_FACTORY(defaultData.FIELD_NAME) ? {
                     create: await defaultData.FIELD_NAME.buildCreateInput()
                   } : defaultData.FIELD_NAME
                 `({
-                  IS_MODEL_BELONGS_TO_RELATION_FACTORY: ast.createIdentifier(`is${modelName}${field.name}Factory`),
-                  FIELD_NAME: ast.createIdentifier(field.name),
+                  IS_MODEL_BELONGS_TO_RELATION_FACTORY: ast.identifier(`is${modelName}${field.name}Factory`),
+                  FIELD_NAME: ast.identifier(field.name),
                 }),
               ),
             ),
@@ -282,17 +291,17 @@ export const defineModelFactoryInernal = (modelName: string, inputType: DMMF.Inp
         return await getClient<PrismaClient>().MODEL_KEY.create({ data });
       };
       return {
-        _factoryFor: ${() => ast.createStringLiteral(modelName)} as const,
+        _factoryFor: ${() => ast.stringLiteral(modelName)} as const,
         buildCreateInput,
         create,
       };
     }
   `({
-    MODEL_KEY: ast.createIdentifier(camelize(modelName)),
-    DEFINE_MODEL_FACTORY_INERNAL: ast.createIdentifier(`define${modelName}FactoryInternal`),
-    MODEL_FACTORY_DEFINE_OPTIONS: ast.createIdentifier(`${modelName}FactoryDefineOptions`),
-    MODEL_CREATE_INPUT: ast.createIdentifier(`${modelName}CreateInput`),
-    AUTO_GENRATE_MODEL_SCALARS_OR_ENUMS: ast.createIdentifier(`autoGenrate${modelName}ScalarsOrEnums`),
+    MODEL_KEY: ast.identifier(camelize(modelName)),
+    DEFINE_MODEL_FACTORY_INERNAL: ast.identifier(`define${modelName}FactoryInternal`),
+    MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${modelName}FactoryDefineOptions`),
+    MODEL_CREATE_INPUT: ast.identifier(`${modelName}CreateInput`),
+    AUTO_GENRATE_MODEL_SCALARS_OR_ENUMS: ast.identifier(`autoGenrate${modelName}ScalarsOrEnums`),
   });
 
 export const defineModelFactory = (modelName: string, inputType: DMMF.InputType) =>
@@ -302,18 +311,18 @@ export const defineModelFactory = (modelName: string, inputType: DMMF.InputType)
           return DEFINE_MODEL_FACTORY_INERNAL(args);
         }
       `({
-        DEFINE_MODEL_FACTORY: ast.createIdentifier(`define${modelName}Factory`),
-        DEFINE_MODEL_FACTORY_INERNAL: ast.createIdentifier(`define${modelName}FactoryInternal`),
-        MODEL_FACTORY_DEFINE_OPTIONS: ast.createIdentifier(`${modelName}FactoryDefineOptions`),
+        DEFINE_MODEL_FACTORY: ast.identifier(`define${modelName}Factory`),
+        DEFINE_MODEL_FACTORY_INERNAL: ast.identifier(`define${modelName}FactoryInternal`),
+        MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${modelName}FactoryDefineOptions`),
       })
     : template.statement<ts.FunctionDeclaration>`
         export function DEFINE_MODEL_FACTORY(args: MODEL_FACTORY_DEFINE_OPTIONS = {}) {
           return DEFINE_MODEL_FACTORY_INERNAL(args);
         }
       `({
-        DEFINE_MODEL_FACTORY: ast.createIdentifier(`define${modelName}Factory`),
-        DEFINE_MODEL_FACTORY_INERNAL: ast.createIdentifier(`define${modelName}FactoryInternal`),
-        MODEL_FACTORY_DEFINE_OPTIONS: ast.createIdentifier(`${modelName}FactoryDefineOptions`),
+        DEFINE_MODEL_FACTORY: ast.identifier(`define${modelName}Factory`),
+        DEFINE_MODEL_FACTORY_INERNAL: ast.identifier(`define${modelName}FactoryInternal`),
+        MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${modelName}FactoryDefineOptions`),
       });
 
 export function getSourceFile({
