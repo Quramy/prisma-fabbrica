@@ -1,8 +1,6 @@
 import { defineUserFactory, definePostFactory } from "./__generated__/fabbrica";
 
-const UserFactory = defineUserFactory({
-  defaultData: {},
-});
+const UserFactory = defineUserFactory();
 
 const PostFactory = definePostFactory({
   defaultData: {

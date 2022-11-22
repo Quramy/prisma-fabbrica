@@ -13,7 +13,7 @@ type UserFactoryDefineInput = {
     posts?: Prisma.PostCreateNestedManyWithoutAuthorInput;
 };
 type UserFactoryDefineOptions = {
-    defaultData: Resolver<UserFactoryDefineInput>;
+    defaultData?: Resolver<UserFactoryDefineInput>;
 };
 function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
     return {
@@ -21,10 +21,10 @@ function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
     };
 }
-export function defineUserFactory({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
+function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
     const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const requiredScalarData = autoGenrateUserScalarsOrEnums();
-        const defaultData = await resolveValue(defaultDataResolver);
+        const defaultData = await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = {};
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
@@ -38,6 +38,9 @@ export function defineUserFactory({ defaultData: defaultDataResolver }: UserFact
         buildCreateInput,
         create,
     };
+}
+export function defineUserFactory(args: UserFactoryDefineOptions = {}) {
+    return defineUserFactoryInternal(args);
 }
 type PostScalarOrEnumFields = {
     id: string;
@@ -64,12 +67,14 @@ function autoGenratePostScalarsOrEnums(): PostScalarOrEnumFields {
         title: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false })
     };
 }
-export function definePostFactory({ defaultData: defaultDataResolver }: PostFactoryDefineOptions) {
+function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFactoryDefineOptions) {
     const buildCreateInput = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
         const requiredScalarData = autoGenratePostScalarsOrEnums();
-        const defaultData = await resolveValue(defaultDataResolver);
+        const defaultData = await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = {
-            author: isPostauthorFactory(defaultData.author) ? { create: await defaultData.author.buildCreateInput() } : defaultData.author
+            author: isPostauthorFactory(defaultData.author) ? {
+                create: await defaultData.author.buildCreateInput()
+            } : defaultData.author
         };
         const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
@@ -83,4 +88,7 @@ export function definePostFactory({ defaultData: defaultDataResolver }: PostFact
         buildCreateInput,
         create,
     };
+}
+export function definePostFactory(args: PostFactoryDefineOptions) {
+    return definePostFactoryInternal(args);
 }

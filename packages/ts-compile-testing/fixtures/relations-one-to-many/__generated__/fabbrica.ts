@@ -14,7 +14,7 @@ type UserFactoryDefineInput = {
     reviews?: Prisma.ReviewCreateNestedManyWithoutReviewerInput;
 };
 type UserFactoryDefineOptions = {
-    defaultData: Resolver<UserFactoryDefineInput>;
+    defaultData?: Resolver<UserFactoryDefineInput>;
 };
 function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
     return {
@@ -22,10 +22,10 @@ function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
     };
 }
-export function defineUserFactory({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
+function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
     const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const requiredScalarData = autoGenrateUserScalarsOrEnums();
-        const defaultData = await resolveValue(defaultDataResolver);
+        const defaultData = await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = {};
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
@@ -40,6 +40,9 @@ export function defineUserFactory({ defaultData: defaultDataResolver }: UserFact
         create,
     };
 }
+export function defineUserFactory(args: UserFactoryDefineOptions = {}) {
+    return defineUserFactoryInternal(args);
+}
 type PostScalarOrEnumFields = {
     id: string;
     title: string;
@@ -51,7 +54,7 @@ type PostFactoryDefineInput = {
     reviews?: Prisma.ReviewCreateNestedManyWithoutPostInput;
 };
 type PostFactoryDefineOptions = {
-    defaultData: Resolver<PostFactoryDefineInput>;
+    defaultData?: Resolver<PostFactoryDefineInput>;
 };
 function autoGenratePostScalarsOrEnums(): PostScalarOrEnumFields {
     return {
@@ -59,10 +62,10 @@ function autoGenratePostScalarsOrEnums(): PostScalarOrEnumFields {
         title: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false })
     };
 }
-export function definePostFactory({ defaultData: defaultDataResolver }: PostFactoryDefineOptions) {
+function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFactoryDefineOptions) {
     const buildCreateInput = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
         const requiredScalarData = autoGenratePostScalarsOrEnums();
-        const defaultData = await resolveValue(defaultDataResolver);
+        const defaultData = await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = {};
         const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
@@ -76,6 +79,9 @@ export function definePostFactory({ defaultData: defaultDataResolver }: PostFact
         buildCreateInput,
         create,
     };
+}
+export function definePostFactory(args: PostFactoryDefineOptions = {}) {
+    return definePostFactoryInternal(args);
 }
 type ReviewScalarOrEnumFields = {
     id: string;
@@ -110,13 +116,17 @@ function autoGenrateReviewScalarsOrEnums(): ReviewScalarOrEnumFields {
         body: scalarFieldValueGenerator.String({ modelName: "Review", fieldName: "body", isId: false, isUnique: false })
     };
 }
-export function defineReviewFactory({ defaultData: defaultDataResolver }: ReviewFactoryDefineOptions) {
+function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: ReviewFactoryDefineOptions) {
     const buildCreateInput = async (inputData: Partial<Prisma.ReviewCreateInput> = {}) => {
         const requiredScalarData = autoGenrateReviewScalarsOrEnums();
-        const defaultData = await resolveValue(defaultDataResolver);
+        const defaultData = await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = {
-            post: isReviewpostFactory(defaultData.post) ? { create: await defaultData.post.buildCreateInput() } : defaultData.post,
-            reviewer: isReviewreviewerFactory(defaultData.reviewer) ? { create: await defaultData.reviewer.buildCreateInput() } : defaultData.reviewer
+            post: isReviewpostFactory(defaultData.post) ? {
+                create: await defaultData.post.buildCreateInput()
+            } : defaultData.post,
+            reviewer: isReviewreviewerFactory(defaultData.reviewer) ? {
+                create: await defaultData.reviewer.buildCreateInput()
+            } : defaultData.reviewer
         };
         const data: Prisma.ReviewCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
@@ -130,4 +140,7 @@ export function defineReviewFactory({ defaultData: defaultDataResolver }: Review
         buildCreateInput,
         create,
     };
+}
+export function defineReviewFactory(args: ReviewFactoryDefineOptions) {
+    return defineReviewFactoryInternal(args);
 }
