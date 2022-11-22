@@ -138,7 +138,7 @@ export const modelScalarOrEnumFields = (modelName: string, inputType: DMMF.Input
     MODEL_SCALAR_OR_ENUM_FIELDS: ts.factory.createIdentifier(`${modelName}ScalarOrEnumFields`),
   });
 
-export const modelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF.Model) => {
+export const modelBelongsToRelationFactory = (fieldType: DMMF.SchemaArg, model: DMMF.Model) => {
   const targetModel = model.fields.find(f => f.name === fieldType.name)!;
   return template.statement<ts.TypeAliasDeclaration>`
     type ${() => ts.factory.createIdentifier(`${model.name}${fieldType.name}Factory`)} = {
@@ -187,12 +187,12 @@ export const isModelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF
   const targetModel = model.fields.find(f => f.name === fieldType.name)!;
   return template.statement<ts.FunctionDeclaration>`
     function ${() => ts.factory.createIdentifier(`is${model.name}${fieldType.name}Factory`)}(
-      x: MODEL_ASSOCIATION_FACTORY | ${() => argInputType(model.name, fieldType.name, fieldType.inputTypes[0])}
-    ): x is MODEL_ASSOCIATION_FACTORY {
+      x: MODEL_BELONGS_TO_RELATION_FACTORY | ${() => argInputType(model.name, fieldType.name, fieldType.inputTypes[0])}
+    ): x is MODEL_BELONGS_TO_RELATION_FACTORY {
       return (x as any)._factoryFor === ${() => ts.factory.createStringLiteral(targetModel.type)};
     }
   `({
-    MODEL_ASSOCIATION_FACTORY: ts.factory.createTypeReferenceNode(
+    MODEL_BELONGS_TO_RELATION_FACTORY: ts.factory.createTypeReferenceNode(
       ts.factory.createIdentifier(`${model.name}${fieldType.name}Factory`),
     ),
   });
@@ -252,9 +252,13 @@ export const defineModelFactory = (modelName: string, inputType: DMMF.InputType)
               ts.factory.createPropertyAssignment(
                 ts.factory.createIdentifier(field.name),
                 template.expression`
-                  IS_MODEL_ASSOCIATION_FACTORY(defaultData.FIELD_NAME) ? { create: await defaultData.FIELD_NAME.buildCreateInput() } : defaultData.FIELD_NAME
+                  IS_MODEL_BELONGS_TO_RELATION_FACTORY(defaultData.FIELD_NAME) ? {
+                    create: await defaultData.FIELD_NAME.buildCreateInput()
+                  } : defaultData.FIELD_NAME
                 `({
-                  IS_MODEL_ASSOCIATION_FACTORY: ts.factory.createIdentifier(`is${modelName}${field.name}Factory`),
+                  IS_MODEL_BELONGS_TO_RELATION_FACTORY: ts.factory.createIdentifier(
+                    `is${modelName}${field.name}Factory`,
+                  ),
                   FIELD_NAME: ts.factory.createIdentifier(field.name),
                 }),
               ),
@@ -305,7 +309,7 @@ export function getSourceFile({
     ...document.datamodel.models.flatMap(model => [
       modelScalarOrEnumFields(model.name, findPrsimaCreateInputTypeFromModelName(document, model.name)),
       ...filterRequiredInputObjectTypeField(findPrsimaCreateInputTypeFromModelName(document, model.name)).map(
-        fieldType => modelAssociationFactory(fieldType, model),
+        fieldType => modelBelongsToRelationFactory(fieldType, model),
       ),
       modelFactoryDefineInput(model.name, findPrsimaCreateInputTypeFromModelName(document, model.name)),
       modelFactoryDefineOptions(model.name),
