@@ -1,0 +1,3 @@
+*.test.js
+*.test.d.ts
+__snapshots__
