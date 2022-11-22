@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./__generated__/client"
+}
+
+generator fabbrica {
+  provider = "prisma-fabbrica"
+  output   = "./__generated__/fabbrica.ts"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String @id
+  role         Role
+  roleDefault  Role @default(USER)
+  roles        Role[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
