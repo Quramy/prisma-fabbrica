@@ -12,6 +12,7 @@ type UserFactoryDefineInput = {
     id?: string;
     role?: Role;
     roleDefault?: Role;
+    roles?: Prisma.UserCreaterolesInput | Prisma.Enumerable<Role>;
 };
 type UserFactoryDefineOptions = {
     defaultData: Resolver<UserFactoryDefineInput>;

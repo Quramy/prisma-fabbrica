@@ -12,37 +12,29 @@ export function findPrsimaCreateInputTypeFromModelName(document: DMMF.Document, 
   return inputType;
 }
 
-export function filterScalarFields(inputType: DMMF.InputType) {
-  return inputType.fields.filter(
-    field =>
-      field.inputTypes.length > 0 && field.inputTypes.every(childInputType => childInputType.location === "scalar"),
+function filterRequiredFields(inputType: DMMF.InputType) {
+  return inputType.fields.filter(field => field.isRequired);
+}
+
+function isScalarOrEnumField(field: DMMF.SchemaArg) {
+  return (
+    field.inputTypes.length === 1 &&
+    field.inputTypes.every(cit => cit.location === "enumTypes" || cit.location === "scalar")
   );
 }
 
-export function filterNonNullScalarFields(inputType: DMMF.InputType) {
-  return filterScalarFields(inputType).filter(field => !field.isNullable);
+function filterRequiredScalarOrEnumFields(inputType: DMMF.InputType) {
+  return filterRequiredFields(inputType).filter(isScalarOrEnumField);
 }
 
-export function filterEnumFields(inputType: DMMF.InputType) {
+function filterEnumFields(inputType: DMMF.InputType) {
   return inputType.fields.filter(
     field =>
       field.inputTypes.length > 0 && field.inputTypes.every(childInputType => childInputType.location === "enumTypes"),
   );
 }
 
-export function filterNonNullEnumFields(inputType: DMMF.InputType) {
-  return filterEnumFields(inputType).filter(field => field.isRequired);
-}
-
-export function filterObjectTypeFields(inputType: DMMF.InputType) {
-  return inputType.fields.filter(
-    field =>
-      field.inputTypes.length > 0 &&
-      field.inputTypes.every(childInputType => childInputType.location === "inputObjectTypes"),
-  );
-}
-
-export function extractFirstEnumValue(enums: DMMF.SchemaEnum[], field: DMMF.SchemaArg) {
+function extractFirstEnumValue(enums: DMMF.SchemaEnum[], field: DMMF.SchemaArg) {
   const typeName = field.inputTypes[0].type;
   const found = enums.find(e => e.name === field.inputTypes[0].type);
   if (!found) {
@@ -99,27 +91,41 @@ export const scalarFieldType = (
   }
 };
 
+export const argInputType = (modelName: string, fieldName: string, inputType: DMMF.SchemaArgInputType): ts.TypeNode => {
+  const fieldType = () => {
+    if (inputType.location === "scalar") {
+      return scalarFieldType(modelName, fieldName, inputType);
+    } else if (inputType.location === "enumTypes") {
+      return ts.factory.createTypeReferenceNode(ts.factory.createIdentifier(inputType.type as string));
+    } else if (inputType.location === "outputObjectTypes" || inputType.location === "inputObjectTypes") {
+      return ts.factory.createTypeReferenceNode(
+        template.expression<ts.Identifier>`Prisma.${() => ts.factory.createIdentifier(inputType.type as string)}`(),
+      );
+    } else {
+      // FIXME inputType.location === "fieldRefTypes"
+      return ts.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword);
+    }
+  };
+  return inputType.isList
+    ? ts.factory.createTypeReferenceNode(template.expression<ts.Identifier>`Prisma.Enumerable<${fieldType}>`())
+    : fieldType();
+};
+
 export const modelScalarOrEnumFields = (modelName: string, inputType: DMMF.InputType) =>
   template.statement<ts.TypeAliasDeclaration>`
     type MODEL_SCALAR_OR_ENUM_FIELDS = ${() =>
-      ts.factory.createTypeLiteralNode([
-        ...filterNonNullScalarFields(inputType).map(field =>
+      ts.factory.createTypeLiteralNode(
+        filterRequiredScalarOrEnumFields(inputType).map(field =>
           ts.factory.createPropertySignature(
             undefined,
             field.name,
             undefined,
-            scalarFieldType(modelName, field.name, field.inputTypes[0]),
+            ts.factory.createUnionTypeNode(
+              field.inputTypes.map(childInputType => argInputType(modelName, field.name, childInputType)),
+            ),
           ),
         ),
-        ...filterNonNullEnumFields(inputType).map(field =>
-          ts.factory.createPropertySignature(
-            undefined,
-            field.name,
-            undefined,
-            ts.factory.createTypeReferenceNode(ts.factory.createIdentifier(field.inputTypes[0].type as string)),
-          ),
-        ),
-      ])}
+      )}
   `({
     MODEL_SCALAR_OR_ENUM_FIELDS: ts.factory.createIdentifier(`${modelName}ScalarOrEnumFields`),
   });
@@ -127,35 +133,20 @@ export const modelScalarOrEnumFields = (modelName: string, inputType: DMMF.Input
 export const modelFactoryDefineInput = (modelName: string, inputType: DMMF.InputType) =>
   template.statement<ts.TypeAliasDeclaration>`
     type MODEL_FACTORY_DEFINE_INPUT = ${() =>
-      ts.factory.createTypeLiteralNode([
-        ...filterScalarFields(inputType).map(field =>
+      ts.factory.createTypeLiteralNode(
+        inputType.fields.map(field =>
           ts.factory.createPropertySignature(
             undefined,
             field.name,
-            ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-            scalarFieldType(modelName, field.name, field.inputTypes[0]),
-          ),
-        ),
-        ...filterEnumFields(inputType).map(field =>
-          ts.factory.createPropertySignature(
-            undefined,
-            field.name,
-            ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-            ts.factory.createTypeReferenceNode(ts.factory.createIdentifier(field.inputTypes[0].type as string)),
-          ),
-        ),
-        ...filterObjectTypeFields(inputType).map(field =>
-          ts.factory.createPropertySignature(
-            undefined,
-            field.name,
-            !field.isRequired ? ts.factory.createToken(ts.SyntaxKind.QuestionToken) : undefined,
-            ts.factory.createTypeReferenceNode(
-              template.expression<ts.Identifier>`Prisma.${() =>
-                ts.factory.createIdentifier(field.inputTypes[0].type as string)}`(),
+            !field.isRequired || isScalarOrEnumField(field)
+              ? ts.factory.createToken(ts.SyntaxKind.QuestionToken)
+              : undefined,
+            ts.factory.createUnionTypeNode(
+              field.inputTypes.map(childInputType => argInputType(modelName, field.name, childInputType)),
             ),
           ),
         ),
-      ])};
+      )};
   `({
     MODEL_FACTORY_DEFINE_INPUT: ts.factory.createIdentifier(`${modelName}FactoryDefineInput`),
   });
@@ -180,12 +171,13 @@ export const autoGenrateModelScalarsOrEnums = (
     function AUTO_GENRATE_MODEL_SCALARS_OR_ENUMS(): MODEL_SCALAR_OR_ENUM_FIELDS {
       return ${() =>
         ts.factory.createObjectLiteralExpression(
-          [
-            ...filterNonNullScalarFields(inputType).map(field =>
-              ts.factory.createPropertyAssignment(
-                ts.factory.createIdentifier(field.name),
-                template.expression`scalarFieldValueGenerator.SCALAR_TYPE({ modelName: MODEL_NAME, fieldName: FIELD_NAME, isId: IS_ID, isUnique: IS_UNIQUE })`(
-                  {
+          filterRequiredScalarOrEnumFields(inputType).map(field =>
+            ts.factory.createPropertyAssignment(
+              ts.factory.createIdentifier(field.name),
+              field.inputTypes[0].location === "scalar"
+                ? template.expression`
+                    scalarFieldValueGenerator.SCALAR_TYPE({ modelName: MODEL_NAME, fieldName: FIELD_NAME, isId: IS_ID, isUnique: IS_UNIQUE })
+                  `({
                     SCALAR_TYPE: ts.factory.createIdentifier(field.inputTypes[0].type as string),
                     MODEL_NAME: ts.factory.createStringLiteral(modelName),
                     FIELD_NAME: ts.factory.createStringLiteral(field.name),
@@ -195,17 +187,10 @@ export const autoGenrateModelScalarsOrEnums = (
                     IS_UNIQUE: model.fields.find(f => f.name === field.name)!.isUnique
                       ? ts.factory.createTrue()
                       : ts.factory.createFalse(),
-                  },
-                ),
-              ),
+                  })
+                : ts.factory.createStringLiteral(extractFirstEnumValue(enums, field)),
             ),
-            ...filterNonNullEnumFields(inputType).map(field =>
-              ts.factory.createPropertyAssignment(
-                ts.factory.createIdentifier(field.name),
-                ts.factory.createStringLiteral(extractFirstEnumValue(enums, field)),
-              ),
-            ),
-          ],
+          ),
           true,
         )};
     }
@@ -255,7 +240,7 @@ export function getSourceFile({
   const enums = [
     ...new Set(
       document.schema.inputObjectTypes.prisma
-        .filter(x => x.name.endsWith("CreateInput"))
+        .filter(iOT => iOT.name.endsWith("CreateInput"))
         .flatMap(filterEnumFields)
         .map(field => field.inputTypes[0].type as string),
     ),

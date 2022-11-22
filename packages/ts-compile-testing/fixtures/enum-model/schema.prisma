@@ -17,6 +17,7 @@ model User {
   id           String @id
   role         Role
   roleDefault  Role @default(USER)
+  roles        Role[]
 }
 
 enum Role {
