@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./__generated__/client"
+}
+
+generator fabbrica {
+  provider = "prisma-fabbrica"
+  output   = "./__generated__/fabbrica.ts"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id      String @id
+  name    String
+  posts   Post[]
+  reviews Review[]
+}
+
+model Post {
+  id          String  @id
+  title       String
+  author      User?   @relation(fields: [authorId], references: [id])
+  authorId    String?
+  reviews     Review[]
+}
+
+model Review {
+  id          String  @id
+  body        String
+  post        Post    @relation(fields: [postId], references: [id])
+  postId      String
+  reviewer    User    @relation(fields: [reviewerId], references: [id])
+  reviewerId  String
+}

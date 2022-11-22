@@ -1,4 +1,4 @@
-import { defineUserFactory, definePostFactory } from "./__generated__/fabbrica.mod";
+import { defineUserFactory, definePostFactory } from "./__generated__/fabbrica";
 
 const UserFactory = defineUserFactory({
   defaultData: {},
@@ -33,17 +33,6 @@ describe("factories", () => {
       const created = await prisma.post.findFirst({ include: { author: true } });
       expect(created?.id).not.toBeFalsy();
       expect(created?.author.id).not.toBeFalsy();
-    });
-  });
-
-  describe("PostFactory", () => {
-    it("creates record with association", async () => {
-      const user = await UserFactory.createForConnect({ name: "quramy" });
-      await PostFactory.create({ author: { connect: user } });
-      await PostFactory.create({ author: { connect: user } });
-      await PostFactory.create({ author: { connect: user } });
-      const userWithPosts = await prisma.user.findFirst({ where: { name: "quramy" }, include: { posts: true } });
-      expect(userWithPosts?.posts.length).toBe(3);
     });
   });
 });

@@ -23,8 +23,16 @@ function isScalarOrEnumField(field: DMMF.SchemaArg) {
   );
 }
 
+function isInputObjectTypeField(field: DMMF.SchemaArg) {
+  return field.inputTypes.length === 1 && field.inputTypes.every(cit => cit.location === "inputObjectTypes");
+}
+
 function filterRequiredScalarOrEnumFields(inputType: DMMF.InputType) {
   return filterRequiredFields(inputType).filter(isScalarOrEnumField);
+}
+
+function filterRequiredInputObjectTypeField(inputType: DMMF.InputType) {
+  return filterRequiredFields(inputType).filter(isInputObjectTypeField);
 }
 
 function filterEnumFields(inputType: DMMF.InputType) {
@@ -130,6 +138,17 @@ export const modelScalarOrEnumFields = (modelName: string, inputType: DMMF.Input
     MODEL_SCALAR_OR_ENUM_FIELDS: ts.factory.createIdentifier(`${modelName}ScalarOrEnumFields`),
   });
 
+export const modelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF.Model) => {
+  const targetModel = model.fields.find(f => f.name === fieldType.name)!;
+  return template.statement<ts.TypeAliasDeclaration>`
+    type ${() => ts.factory.createIdentifier(`${model.name}${fieldType.name}Factory`)} = {
+      _factoryFor: ${() => ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral(targetModel.type))};
+      buildCreateInput: () => PromiseLike<Prisma.${() =>
+        ts.factory.createIdentifier(fieldType.inputTypes[0].type as string)}["create"]>;
+    };
+  `();
+};
+
 export const modelFactoryDefineInput = (modelName: string, inputType: DMMF.InputType) =>
   template.statement<ts.TypeAliasDeclaration>`
     type MODEL_FACTORY_DEFINE_INPUT = ${() =>
@@ -141,9 +160,12 @@ export const modelFactoryDefineInput = (modelName: string, inputType: DMMF.Input
             !field.isRequired || isScalarOrEnumField(field)
               ? ts.factory.createToken(ts.SyntaxKind.QuestionToken)
               : undefined,
-            ts.factory.createUnionTypeNode(
-              field.inputTypes.map(childInputType => argInputType(modelName, field.name, childInputType)),
-            ),
+            ts.factory.createUnionTypeNode([
+              ...(field.isRequired && isInputObjectTypeField(field)
+                ? [ts.factory.createTypeReferenceNode(ts.factory.createIdentifier(`${modelName}${field.name}Factory`))]
+                : []),
+              ...field.inputTypes.map(childInputType => argInputType(modelName, field.name, childInputType)),
+            ]),
           ),
         ),
       )};
@@ -160,6 +182,21 @@ export const modelFactoryDefineOptions = (modelName: string) =>
     MODEL_FACTORY_DEFINE_OPTIONS: ts.factory.createIdentifier(`${modelName}FactoryDefineOptions`),
     MODEL_FACTORY_DEFINE_INPUT: ts.factory.createIdentifier(`${modelName}FactoryDefineInput`),
   });
+
+export const isModelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF.Model) => {
+  const targetModel = model.fields.find(f => f.name === fieldType.name)!;
+  return template.statement<ts.FunctionDeclaration>`
+    function ${() => ts.factory.createIdentifier(`is${model.name}${fieldType.name}Factory`)}(
+      x: MODEL_ASSOCIATION_FACTORY | ${() => argInputType(model.name, fieldType.name, fieldType.inputTypes[0])}
+    ): x is MODEL_ASSOCIATION_FACTORY {
+      return (x as any)._factoryFor === ${() => ts.factory.createStringLiteral(targetModel.type)};
+    }
+  `({
+    MODEL_ASSOCIATION_FACTORY: ts.factory.createTypeReferenceNode(
+      ts.factory.createIdentifier(`${model.name}${fieldType.name}Factory`),
+    ),
+  });
+};
 
 export const autoGenrateModelScalarsOrEnums = (
   modelName: string,
@@ -199,7 +236,7 @@ export const autoGenrateModelScalarsOrEnums = (
     MODEL_SCALAR_OR_ENUM_FIELDS: ts.factory.createIdentifier(`${modelName}ScalarOrEnumFields`),
   });
 
-export const defineModelFactory = (modelName: string) =>
+export const defineModelFactory = (modelName: string, inputType: DMMF.InputType) =>
   template.statement<ts.FunctionDeclaration>`
     export function DEFINE_MODEL_FACTORY({
       defaultData: defaultDataResolver
@@ -209,7 +246,22 @@ export const defineModelFactory = (modelName: string) =>
       ) => {
         const requiredScalarData = AUTO_GENRATE_MODEL_SCALARS_OR_ENUMS()
         const defaultData= await resolveValue(defaultDataResolver);
-        const data = { ...requiredScalarData, ...defaultData, ...inputData};
+        const defaultAssociations = ${() =>
+          ts.factory.createObjectLiteralExpression(
+            filterRequiredInputObjectTypeField(inputType).map(field =>
+              ts.factory.createPropertyAssignment(
+                ts.factory.createIdentifier(field.name),
+                template.expression`
+                  IS_MODEL_ASSOCIATION_FACTORY(defaultData.FIELD_NAME) ? { create: await defaultData.FIELD_NAME.buildCreateInput() } : defaultData.FIELD_NAME
+                `({
+                  IS_MODEL_ASSOCIATION_FACTORY: ts.factory.createIdentifier(`is${modelName}${field.name}Factory`),
+                  FIELD_NAME: ts.factory.createIdentifier(field.name),
+                }),
+              ),
+            ),
+            true,
+          )};
+        const data: Prisma.MODEL_CREATE_INPUT = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData};
         return data;
       };
       const create = async (
@@ -252,15 +304,21 @@ export function getSourceFile({
     ...header(importSpecifierToPrismaClient).statements,
     ...document.datamodel.models.flatMap(model => [
       modelScalarOrEnumFields(model.name, findPrsimaCreateInputTypeFromModelName(document, model.name)),
+      ...filterRequiredInputObjectTypeField(findPrsimaCreateInputTypeFromModelName(document, model.name)).map(
+        fieldType => modelAssociationFactory(fieldType, model),
+      ),
       modelFactoryDefineInput(model.name, findPrsimaCreateInputTypeFromModelName(document, model.name)),
       modelFactoryDefineOptions(model.name),
+      ...filterRequiredInputObjectTypeField(findPrsimaCreateInputTypeFromModelName(document, model.name)).map(
+        fieldType => isModelAssociationFactory(fieldType, model),
+      ),
       autoGenrateModelScalarsOrEnums(
         model.name,
         findPrsimaCreateInputTypeFromModelName(document, model.name),
         model,
         document.schema.enumTypes.model ?? [],
       ),
-      defineModelFactory(model.name),
+      defineModelFactory(model.name, findPrsimaCreateInputTypeFromModelName(document, model.name)),
     ]),
   ];
 

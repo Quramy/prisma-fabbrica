@@ -27,7 +27,8 @@ export function defineUserFactory({ defaultData: defaultDataResolver }: UserFact
     const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const requiredScalarData = autoGenrateUserScalarsOrEnums();
         const defaultData = await resolveValue(defaultDataResolver);
-        const data = { ...requiredScalarData, ...defaultData, ...inputData };
+        const defaultAssociations = {};
+        const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
     const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
