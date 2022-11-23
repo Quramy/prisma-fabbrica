@@ -9,6 +9,7 @@
     "clean": "npm run clean --workspaces && rimraf \"*.tsbuildinfo\"",
     "bootstrap": "npm run build:lib && npm run bootstrap --workspace examples/example-prj",
     "build:lib": "tsc -b tsconfig.build.json",
+    "build:readme": "markdown-toc -i README.md --maxdepth 3 --no-firlsth1",
     "postbuild:lib": "cd node_modules/.bin; rm -f prisma-fabbrica; ln -s ../../packages/prisma-fabbrica/bin.js prisma-fabbrica",
     "migrate:test": "npm run migrate:test:ci --workspace examples/example-prj",
     "test:ci": "npm run test:ci --workspaces",
@@ -31,5 +32,8 @@
   "workspaces": [
     "packages/*",
     "examples/*"
-  ]
+  ],
+  "dependencies": {
+    "markdown-toc": "^1.2.0"
+  }
 }

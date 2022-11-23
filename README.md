@@ -2,6 +2,20 @@
 
 Factory helper for Prisma.
 
+<!-- toc -->
+
+- [Getting started](#getting-started)
+- [Usage of factories](#usage-of-factories)
+  - [Field default values](#field-default-values)
+  - [Required relation](#required-relation)
+  - [Connection helper](#connection-helper)
+- [Generator configuration](#generator-configuration)
+- [Tips](#tips)
+  - [Works with jest-prisma](#works-with-jest-prisma)
+- [License](#license)
+
+<!-- tocstop -->
+
 ## Getting started
 
 ```sh
