@@ -55,7 +55,7 @@ async function seed() {
   await UserFactory.create({ name: "Alice" });
   await UserFactory.create({ id: "user002", name: "Bob" });
 
-  console.log(await prisma.user.count()); // 3
+  console.log(await prisma.user.count()); // -> 3
 }
 
 seed();
@@ -156,6 +156,27 @@ const PostFactory = definePostFactory({
     },
   }),
 });
+```
+
+### Connection helper
+
+Required relation rules can be overwritten when `.create` method. `createForConnect` can be used to connect.
+
+```ts
+const UserFactory = defineUserFactory();
+
+const PostFactory = definePostFactory({
+  defaultData: {
+    author: UserFactory,
+  },
+});
+
+const author = await UserFactory.createForConnect();
+await PostFactory.create({ author: { connect: author } });
+await PostFactory.create({ author: { connect: author } });
+
+const { posts } = await prisma.user.findUnique({ where: author, include: { posts: true } });
+console.log(posts.length); // -> 2
 ```
 
 ## Tips
