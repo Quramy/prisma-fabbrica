@@ -9,7 +9,7 @@ const gen_1 = __importDefault(require("@quramy/prisma-fabbrica/lib/scalar/gen"))
 const helpers_1 = require("@quramy/prisma-fabbrica/lib/helpers");
 var prisma_fabbrica_1 = require("@quramy/prisma-fabbrica");
 Object.defineProperty(exports, "initialize", { enumerable: true, get: function () { return prisma_fabbrica_1.initialize; } });
-function autoGenrateUserScalarsOrEnums() {
+function autoGenerateUserScalarsOrEnums() {
     return {
         id: gen_1.default.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false }),
         name: gen_1.default.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
@@ -17,20 +17,26 @@ function autoGenrateUserScalarsOrEnums() {
 }
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
     const buildCreateInput = async (inputData = {}) => {
-        const requiredScalarData = autoGenrateUserScalarsOrEnums();
+        const requiredScalarData = autoGenerateUserScalarsOrEnums();
         const defaultData = await (0, helpers_1.resolveValue)(defaultDataResolver ?? {});
         const defaultAssociations = {};
         const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const pickForConnect = (inputData) => ({
+        id: inputData.id
+    });
     const create = async (inputData = {}) => {
         const data = await buildCreateInput(inputData);
         return await (0, clientHolder_1.getClient)().user.create({ data });
     };
+    const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "User",
         buildCreateInput,
+        pickForConnect,
         create,
+        createForConnect,
     };
 }
 function defineUserFactory(args = {}) {
@@ -40,7 +46,7 @@ exports.defineUserFactory = defineUserFactory;
 function isPostauthorFactory(x) {
     return x._factoryFor === "User";
 }
-function autoGenratePostScalarsOrEnums() {
+function autoGeneratePostScalarsOrEnums() {
     return {
         id: gen_1.default.String({ modelName: "Post", fieldName: "id", isId: true, isUnique: false }),
         title: gen_1.default.String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false })
@@ -48,7 +54,7 @@ function autoGenratePostScalarsOrEnums() {
 }
 function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
     const buildCreateInput = async (inputData = {}) => {
-        const requiredScalarData = autoGenratePostScalarsOrEnums();
+        const requiredScalarData = autoGeneratePostScalarsOrEnums();
         const defaultData = await (0, helpers_1.resolveValue)(defaultDataResolver ?? {});
         const defaultAssociations = {
             author: isPostauthorFactory(defaultData.author) ? {
@@ -58,14 +64,20 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const pickForConnect = (inputData) => ({
+        id: inputData.id
+    });
     const create = async (inputData = {}) => {
         const data = await buildCreateInput(inputData);
         return await (0, clientHolder_1.getClient)().post.create({ data });
     };
+    const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Post",
         buildCreateInput,
+        pickForConnect,
         create,
+        createForConnect,
     };
 }
 function definePostFactory(args) {

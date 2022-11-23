@@ -1,5 +1,6 @@
 import { User } from "./../client";
-import { Profile } from "./../client";
+import { ComplexIdModel } from "./../client";
+import { Role } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
 import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
@@ -8,12 +9,13 @@ import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
 export { initialize } from "@quramy/prisma-fabbrica";
 type UserScalarOrEnumFields = {
     id: string;
-    name: string;
+    role: Role;
 };
 type UserFactoryDefineInput = {
     id?: string;
-    name?: string;
-    profile?: Prisma.ProfileCreateNestedOneWithoutUserInput;
+    role?: Role;
+    roleDefault?: Role;
+    roles?: Prisma.UserCreaterolesInput | Prisma.Enumerable<Role>;
 };
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput>;
@@ -21,7 +23,7 @@ type UserFactoryDefineOptions = {
 function autoGenerateUserScalarsOrEnums(): UserScalarOrEnumFields {
     return {
         id: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false }),
-        name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
+        role: "USER"
     };
 }
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
@@ -51,56 +53,48 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
 export function defineUserFactory(args: UserFactoryDefineOptions = {}) {
     return defineUserFactoryInternal(args);
 }
-type ProfileScalarOrEnumFields = {
-    id: string;
+type ComplexIdModelScalarOrEnumFields = {
+    firstName: string;
+    lastName: string;
 };
-type ProfileuserFactory = {
-    _factoryFor: "User";
-    buildCreateInput: () => PromiseLike<Prisma.UserCreateNestedOneWithoutProfileInput["create"]>;
+type ComplexIdModelFactoryDefineInput = {
+    firstName?: string;
+    lastName?: string;
 };
-type ProfileFactoryDefineInput = {
-    id?: string;
-    user: ProfileuserFactory | Prisma.UserCreateNestedOneWithoutProfileInput;
+type ComplexIdModelFactoryDefineOptions = {
+    defaultData?: Resolver<ComplexIdModelFactoryDefineInput>;
 };
-type ProfileFactoryDefineOptions = {
-    defaultData: Resolver<ProfileFactoryDefineInput>;
-};
-function isProfileuserFactory(x: ProfileuserFactory | Prisma.UserCreateNestedOneWithoutProfileInput): x is ProfileuserFactory {
-    return (x as any)._factoryFor === "User";
-}
-function autoGenerateProfileScalarsOrEnums(): ProfileScalarOrEnumFields {
+function autoGenerateComplexIdModelScalarsOrEnums(): ComplexIdModelScalarOrEnumFields {
     return {
-        id: scalarFieldValueGenerator.String({ modelName: "Profile", fieldName: "id", isId: true, isUnique: false })
+        firstName: scalarFieldValueGenerator.String({ modelName: "ComplexIdModel", fieldName: "firstName", isId: true, isUnique: false }),
+        lastName: scalarFieldValueGenerator.String({ modelName: "ComplexIdModel", fieldName: "lastName", isId: true, isUnique: false })
     };
 }
-function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: ProfileFactoryDefineOptions) {
-    const buildCreateInput = async (inputData: Partial<Prisma.ProfileCreateInput> = {}) => {
-        const requiredScalarData = autoGenerateProfileScalarsOrEnums();
+function defineComplexIdModelFactoryInternal({ defaultData: defaultDataResolver }: ComplexIdModelFactoryDefineOptions) {
+    const buildCreateInput = async (inputData: Partial<Prisma.ComplexIdModelCreateInput> = {}) => {
+        const requiredScalarData = autoGenerateComplexIdModelScalarsOrEnums();
         const defaultData = await resolveValue(defaultDataResolver ?? {});
-        const defaultAssociations = {
-            user: isProfileuserFactory(defaultData.user) ? {
-                create: await defaultData.user.buildCreateInput()
-            } : defaultData.user
-        };
-        const data: Prisma.ProfileCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+        const defaultAssociations = {};
+        const data: Prisma.ComplexIdModelCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const pickForConnect = (inputData: Profile) => ({
-        id: inputData.id
+    const pickForConnect = (inputData: ComplexIdModel) => ({
+        firstName: inputData.firstName,
+        lastName: inputData.lastName
     });
-    const create = async (inputData: Partial<Prisma.ProfileCreateInput> = {}) => {
+    const create = async (inputData: Partial<Prisma.ComplexIdModelCreateInput> = {}) => {
         const data = await buildCreateInput(inputData);
-        return await getClient<PrismaClient>().profile.create({ data });
+        return await getClient<PrismaClient>().complexIdModel.create({ data });
     };
-    const createForConnect = (inputData: Partial<Prisma.ProfileCreateInput> = {}) => create(inputData).then(pickForConnect);
+    const createForConnect = (inputData: Partial<Prisma.ComplexIdModelCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
-        _factoryFor: "Profile" as const,
+        _factoryFor: "ComplexIdModel" as const,
         buildCreateInput,
         pickForConnect,
         create,
         createForConnect,
     };
 }
-export function defineProfileFactory(args: ProfileFactoryDefineOptions) {
-    return defineProfileFactoryInternal(args);
+export function defineComplexIdModelFactory(args: ComplexIdModelFactoryDefineOptions = {}) {
+    return defineComplexIdModelFactoryInternal(args);
 }

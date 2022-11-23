@@ -1,3 +1,4 @@
+import { User } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
 import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
@@ -15,7 +16,7 @@ type UserFactoryDefineInput = {
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput>;
 };
-function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
+function autoGenerateUserScalarsOrEnums(): UserScalarOrEnumFields {
     return {
         id: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false }),
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
@@ -23,20 +24,26 @@ function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
 }
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
     const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
-        const requiredScalarData = autoGenrateUserScalarsOrEnums();
+        const requiredScalarData = autoGenerateUserScalarsOrEnums();
         const defaultData = await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = {};
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const pickForConnect = (inputData: User) => ({
+        id: inputData.id
+    });
     const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const data = await buildCreateInput(inputData);
         return await getClient<PrismaClient>().user.create({ data });
     };
+    const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "User" as const,
         buildCreateInput,
+        pickForConnect,
         create,
+        createForConnect,
     };
 }
 export function defineUserFactory(args: UserFactoryDefineOptions = {}) {

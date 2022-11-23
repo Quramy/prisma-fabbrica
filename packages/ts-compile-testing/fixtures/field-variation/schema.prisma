@@ -25,3 +25,9 @@ enum Role {
   USER
   ADMIN
 }
+
+model ComplexIdModel {
+  firstName String
+  lastName  String
+  @@id([firstName, lastName])
+}

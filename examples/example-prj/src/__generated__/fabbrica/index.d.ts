@@ -1,33 +1,47 @@
+import { User } from "@prisma/client";
+import { Post } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import { Resolver } from "@quramy/prisma-fabbrica/lib/helpers";
 export { initialize } from "@quramy/prisma-fabbrica";
-declare type UserFactoryDefineInput = {
+type UserFactoryDefineInput = {
     id?: string;
     name?: string;
     posts?: Prisma.PostCreateNestedManyWithoutAuthorInput;
 };
-declare type UserFactoryDefineOptions = {
+type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput>;
 };
 export declare function defineUserFactory(args?: UserFactoryDefineOptions): {
     _factoryFor: "User";
     buildCreateInput: (inputData?: Partial<Prisma.UserCreateInput>) => Promise<Prisma.UserCreateInput>;
-    create: (inputData?: Partial<Prisma.UserCreateInput>) => Promise<import(".prisma/client").User>;
+    pickForConnect: (inputData: User) => {
+        id: string;
+    };
+    create: (inputData?: Partial<Prisma.UserCreateInput>) => Promise<User>;
+    createForConnect: (inputData?: Partial<Prisma.UserCreateInput>) => Promise<{
+        id: string;
+    }>;
 };
-declare type PostauthorFactory = {
+type PostauthorFactory = {
     _factoryFor: "User";
     buildCreateInput: () => PromiseLike<Prisma.UserCreateNestedOneWithoutPostsInput["create"]>;
 };
-declare type PostFactoryDefineInput = {
+type PostFactoryDefineInput = {
     id?: string;
     title?: string;
     author: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput;
 };
-declare type PostFactoryDefineOptions = {
+type PostFactoryDefineOptions = {
     defaultData: Resolver<PostFactoryDefineInput>;
 };
 export declare function definePostFactory(args: PostFactoryDefineOptions): {
     _factoryFor: "Post";
     buildCreateInput: (inputData?: Partial<Prisma.PostCreateInput>) => Promise<Prisma.PostCreateInput>;
-    create: (inputData?: Partial<Prisma.PostCreateInput>) => Promise<import(".prisma/client").Post>;
+    pickForConnect: (inputData: Post) => {
+        id: string;
+    };
+    create: (inputData?: Partial<Prisma.PostCreateInput>) => Promise<Post>;
+    createForConnect: (inputData?: Partial<Prisma.PostCreateInput>) => Promise<{
+        id: string;
+    }>;
 };
