@@ -7,7 +7,8 @@
   "scripts": {
     "prepare": "husky install",
     "clean": "npm run clean --workspaces && rimraf \"*.tsbuildinfo\"",
-    "bootstrap": "npm run build:lib && npm run bootstrap --workspace examples/example-prj",
+    "bootstrap": "npm run build && npm run bootstrap --workspace examples/example-prj",
+    "build": "npm run build:lib && npm run build:readme",
     "build:lib": "tsc -b tsconfig.build.json",
     "build:readme": "markdown-toc -i README.md --maxdepth 3 --no-firlsth1",
     "postbuild:lib": "cd node_modules/.bin; rm -f prisma-fabbrica; ln -s ../../packages/prisma-fabbrica/bin.js prisma-fabbrica",
