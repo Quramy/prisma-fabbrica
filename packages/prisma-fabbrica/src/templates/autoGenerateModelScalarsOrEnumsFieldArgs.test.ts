@@ -1,10 +1,7 @@
 import { getDMMF } from "@prisma/internals";
 import { printNode } from "talt";
 
-import {
-  autoGenerateModelScalarsOrEnumsFieldArgs,
-  findPrsimaCreateInputTypeFromModelName,
-} from ".";
+import { autoGenerateModelScalarsOrEnumsFieldArgs, findPrsimaCreateInputTypeFromModelName } from ".";
 
 describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
   it.each([
@@ -167,4 +164,3 @@ describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
     expect(printNode(autoGenerateModelScalarsOrEnumsFieldArgs(model, field, enums))).toBe(expected.trim());
   });
 });
-
