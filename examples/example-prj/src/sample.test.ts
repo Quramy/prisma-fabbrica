@@ -26,11 +26,20 @@ describe("factories", () => {
   });
 
   describe("PostFactory", () => {
-    it("creates required association", async () => {
+    it("creates required relation field without parameters", async () => {
       await PostFactory.create();
       const created = await prisma.post.findFirst({ include: { author: true } });
       expect(created?.id).not.toBeFalsy();
       expect(created?.author.id).not.toBeFalsy();
+    });
+
+    it("creates records using connection created by other factory", async () => {
+      const user = await UserFactory.createForConnect({ name: "quramy" });
+      await PostFactory.create({ author: { connect: user } });
+      await PostFactory.create({ author: { connect: user } });
+      await PostFactory.create({ author: { connect: user } });
+      const userWithPosts = await prisma.user.findFirst({ where: { name: "quramy" }, include: { posts: true } });
+      expect(userWithPosts?.posts.length).toBe(3);
     });
   });
 });

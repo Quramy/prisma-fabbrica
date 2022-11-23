@@ -23,14 +23,20 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const pickForConnect = (inputData) => ({
+        id: inputData.id
+    });
     const create = async (inputData = {}) => {
         const data = await buildCreateInput(inputData);
         return await (0, clientHolder_1.getClient)().user.create({ data });
     };
+    const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "User",
         buildCreateInput,
+        pickForConnect,
         create,
+        createForConnect,
     };
 }
 function defineUserFactory(args = {}) {
@@ -58,14 +64,20 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const pickForConnect = (inputData) => ({
+        id: inputData.id
+    });
     const create = async (inputData = {}) => {
         const data = await buildCreateInput(inputData);
         return await (0, clientHolder_1.getClient)().post.create({ data });
     };
+    const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Post",
         buildCreateInput,
+        pickForConnect,
         create,
+        createForConnect,
     };
 }
 function definePostFactory(args) {

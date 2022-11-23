@@ -1,3 +1,6 @@
+import { User } from "./../client";
+import { Post } from "./../client";
+import { Review } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
 import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
@@ -31,14 +34,20 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const pickForConnect = (inputData: User) => ({
+        id: inputData.id
+    });
     const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const data = await buildCreateInput(inputData);
         return await getClient<PrismaClient>().user.create({ data });
     };
+    const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "User" as const,
         buildCreateInput,
+        pickForConnect,
         create,
+        createForConnect,
     };
 }
 export function defineUserFactory(args: UserFactoryDefineOptions = {}) {
@@ -71,14 +80,20 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const pickForConnect = (inputData: Post) => ({
+        id: inputData.id
+    });
     const create = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
         const data = await buildCreateInput(inputData);
         return await getClient<PrismaClient>().post.create({ data });
     };
+    const createForConnect = (inputData: Partial<Prisma.PostCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Post" as const,
         buildCreateInput,
+        pickForConnect,
         create,
+        createForConnect,
     };
 }
 export function definePostFactory(args: PostFactoryDefineOptions = {}) {
@@ -132,14 +147,20 @@ function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: Revie
         const data: Prisma.ReviewCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const pickForConnect = (inputData: Review) => ({
+        id: inputData.id
+    });
     const create = async (inputData: Partial<Prisma.ReviewCreateInput> = {}) => {
         const data = await buildCreateInput(inputData);
         return await getClient<PrismaClient>().review.create({ data });
     };
+    const createForConnect = (inputData: Partial<Prisma.ReviewCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Review" as const,
         buildCreateInput,
+        pickForConnect,
         create,
+        createForConnect,
     };
 }
 export function defineReviewFactory(args: ReviewFactoryDefineOptions) {

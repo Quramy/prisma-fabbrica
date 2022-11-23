@@ -1,3 +1,5 @@
+import { Post } from "./../client";
+import { Category } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
 import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
@@ -30,14 +32,20 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const pickForConnect = (inputData: Post) => ({
+        id: inputData.id
+    });
     const create = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
         const data = await buildCreateInput(inputData);
         return await getClient<PrismaClient>().post.create({ data });
     };
+    const createForConnect = (inputData: Partial<Prisma.PostCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Post" as const,
         buildCreateInput,
+        pickForConnect,
         create,
+        createForConnect,
     };
 }
 export function definePostFactory(args: PostFactoryDefineOptions = {}) {
@@ -69,14 +77,20 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: Cat
         const data: Prisma.CategoryCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const pickForConnect = (inputData: Category) => ({
+        id: inputData.id
+    });
     const create = async (inputData: Partial<Prisma.CategoryCreateInput> = {}) => {
         const data = await buildCreateInput(inputData);
         return await getClient<PrismaClient>().category.create({ data });
     };
+    const createForConnect = (inputData: Partial<Prisma.CategoryCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Category" as const,
         buildCreateInput,
+        pickForConnect,
         create,
+        createForConnect,
     };
 }
 export function defineCategoryFactory(args: CategoryFactoryDefineOptions = {}) {

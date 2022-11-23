@@ -1,3 +1,5 @@
+import { User } from "./../client";
+import { ComplexIdModel } from "./../client";
 import { Role } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
@@ -32,14 +34,20 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const pickForConnect = (inputData: User) => ({
+        id: inputData.id
+    });
     const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const data = await buildCreateInput(inputData);
         return await getClient<PrismaClient>().user.create({ data });
     };
+    const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "User" as const,
         buildCreateInput,
+        pickForConnect,
         create,
+        createForConnect,
     };
 }
 export function defineUserFactory(args: UserFactoryDefineOptions = {}) {
@@ -70,14 +78,21 @@ function defineComplexIdModelFactoryInternal({ defaultData: defaultDataResolver 
         const data: Prisma.ComplexIdModelCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const pickForConnect = (inputData: ComplexIdModel) => ({
+        firstName: inputData.firstName,
+        lastName: inputData.lastName
+    });
     const create = async (inputData: Partial<Prisma.ComplexIdModelCreateInput> = {}) => {
         const data = await buildCreateInput(inputData);
         return await getClient<PrismaClient>().complexIdModel.create({ data });
     };
+    const createForConnect = (inputData: Partial<Prisma.ComplexIdModelCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "ComplexIdModel" as const,
         buildCreateInput,
+        pickForConnect,
         create,
+        createForConnect,
     };
 }
 export function defineComplexIdModelFactory(args: ComplexIdModelFactoryDefineOptions = {}) {

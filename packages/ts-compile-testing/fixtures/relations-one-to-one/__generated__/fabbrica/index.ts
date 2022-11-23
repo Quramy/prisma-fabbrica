@@ -1,3 +1,5 @@
+import { User } from "./../client";
+import { Profile } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
 import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
@@ -30,14 +32,20 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const pickForConnect = (inputData: User) => ({
+        id: inputData.id
+    });
     const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const data = await buildCreateInput(inputData);
         return await getClient<PrismaClient>().user.create({ data });
     };
+    const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "User" as const,
         buildCreateInput,
+        pickForConnect,
         create,
+        createForConnect,
     };
 }
 export function defineUserFactory(args: UserFactoryDefineOptions = {}) {
@@ -77,14 +85,20 @@ function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: Prof
         const data: Prisma.ProfileCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const pickForConnect = (inputData: Profile) => ({
+        id: inputData.id
+    });
     const create = async (inputData: Partial<Prisma.ProfileCreateInput> = {}) => {
         const data = await buildCreateInput(inputData);
         return await getClient<PrismaClient>().profile.create({ data });
     };
+    const createForConnect = (inputData: Partial<Prisma.ProfileCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Profile" as const,
         buildCreateInput,
+        pickForConnect,
         create,
+        createForConnect,
     };
 }
 export function defineProfileFactory(args: ProfileFactoryDefineOptions) {
