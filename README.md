@@ -179,6 +179,23 @@ const { posts } = await prisma.user.findUnique({ where: author, include: { posts
 console.log(posts.length); // -> 2
 ```
 
+## Generator configuration
+
+The following options are available:
+
+```graphql
+generator fabbrica {
+  provider    = "prisma-fabbrica"
+  output      = "../src/__generated__/fabbrica"
+  tsconfig    = "../tsconfig.json"
+  noTranspile = false
+}
+```
+
+- `output`: Directory path to generate files.
+- `tsconfig`: TypeScript configuration file path. prisma-fabbrica uses it's `compilerOptions` when generating `.js` and `.d.ts` files. If missing tsconfig json file, fallback to `--target es2020 --module commonjs`.
+- `noTranspile`: If set `true`, this generator only generates raw `.ts` file and stop to transpile to `.js` and `.d.ts` .
+
 ## Tips
 
 ### Works with jest-prisma
