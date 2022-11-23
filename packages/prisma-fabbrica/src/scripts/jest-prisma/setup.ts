@@ -3,7 +3,7 @@ import { initialize } from "../../initialize";
 beforeAll(() => {
   if (typeof jestPrisma === "object") {
     initialize({
-      client: () => jestPrisma.client,
+      prisma: () => jestPrisma.client,
     });
   }
 });
