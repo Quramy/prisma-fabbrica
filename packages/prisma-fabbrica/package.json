@@ -1,7 +1,7 @@
 {
   "name": "@quramy/prisma-fabbrica",
   "version": "0.1.0",
-  "description": "",
+  "description": " Prisma generator for model factories",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "files": [
@@ -40,5 +40,10 @@
     "factory"
   ],
   "author": "Quramy",
+  "homepage": "https://github.com/Quramy/prisma-fabbrica",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Quramy/prisma-fabbrica.git"
+  },
   "license": "MIT"
 }
