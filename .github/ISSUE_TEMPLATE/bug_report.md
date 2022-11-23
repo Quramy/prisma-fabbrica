@@ -12,29 +12,23 @@ A clear and concise description of what the bug is.
 **To Reproduce**
 Steps to reproduce the behavior:
 
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
-
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Your Schema**
 
-**Desktop (please complete the following information):**
+```
+// Paste schema.prisma file.
+```
 
-- OS: [e.g. iOS]
-- Browser [e.g. chrome, safari]
-- Version [e.g. 22]
+**Environment (please complete the following information):**
 
-**Smartphone (please complete the following information):**
-
-- Device: [e.g. iPhone6]
-- OS: [e.g. iOS8.1]
-- Browser [e.g. stock browser, safari]
-- Version [e.g. 22]
+- Database kind [e.g. PostgreSQL ]
+- Node.js version [e.g. 16.0]
+- `@prisma/client` version [e.g. 4.2]
+- TypeScript version [e.g. 4.8.3]
 
 **Additional context**
 Add any other context about the problem here.
+
+Please put gist URL including generated .js and .d.ts if you can :pray:
