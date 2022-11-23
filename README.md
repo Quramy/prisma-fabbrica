@@ -61,7 +61,7 @@ async function seed() {
 seed();
 ```
 
-Note: The factories uses Prisma client instance passed by `initialize` function.
+Note: The factories use Prisma client instance passed by `initialize` function.
 
 ## Usage of factories
 
@@ -102,6 +102,60 @@ const UserFactory = defineUserFactory({
 })
 
 await UserFactory.create()
+```
+
+### Required relation
+
+Sometimes, creating a model requires other model existence. For example, the following model `Post` belongs to other model `User`.
+
+```graphql
+model User {
+  id    String @id
+  name  String
+  posts Post[]
+}
+
+model Post {
+  id       String @id
+  title    String
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
+}
+```
+
+You should tell how to connect `author` field when define Post factory.
+
+#### Using related model factory (recommended)
+
+The easiest way is to give `UserFactory` when `definePostFactory` like this:
+
+```ts
+const UserFactory = defineUserFactory();
+
+const PostFactory = definePostFactory({
+  defaultData: {
+    author: UserFactory,
+  },
+});
+```
+
+The above `PostFactory` creates `User` model for each `PostFactory.create()` calling,
+
+#### Manual create or connect
+
+Similar to using `prisma.post.create`, you can also use `connect` / `craete` / `createOrConnect` options.
+
+```ts
+const PostFactory = definePostFactory({
+  defaultData: async () => ({
+    author: {
+      connect: {
+        id: (await prisma.user.findFirst()!).id,
+      },
+      // Alternatively, create or createOrConnect options are allowed.
+    },
+  }),
+});
 ```
 
 ## Tips
