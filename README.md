@@ -63,6 +63,47 @@ seed();
 
 Note: The factories uses Prisma client instance passed by `initialize` function.
 
+## Usage of factories
+
+### Field default values
+
+Factory by defined with `defineUserFactory` automatically fills scalar fields.
+
+For example, the following `User` model has some required field, `id`, `email`, `firstName` and `lastName` .
+
+```graphql
+model User {
+  id          Int @id
+  email       String @unique
+  firstName   String
+  lastName    String
+  middleName  String?
+  createdAt   DateTime @default(now())
+}
+```
+
+```ts
+const UserFactory = defineUserFactory();
+
+await UserFactory.create(); // Insert record with auto filled id, email, firstName and lastName values
+```
+
+See https://github.com/Quramy/prisma-fabbrica/blob/main/packages/prisma-fabbrica/src/scalar/gen.ts if you want auto filling rule details.
+
+Note: prisma-fabbrica auto filling does not affect fields with `@default()` function.
+
+Default filling rule also can be overwritten.
+
+```ts
+const UserFactory = defineUserFactory({
+  defaultData: async () => {
+    email: await generateRandomEmailAddress(),
+  }
+})
+
+await UserFactory.create()
+```
+
 ## Tips
 
 ### Works with jest-prisma
