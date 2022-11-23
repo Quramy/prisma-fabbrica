@@ -38,6 +38,7 @@ describe("factories", () => {
       await PostFactory.create({ author: { connect: user } });
       await PostFactory.create({ author: { connect: user } });
       await PostFactory.create({ author: { connect: user } });
+      expect(prisma.user.count()).resolves.toBe(1);
       const userWithPosts = await prisma.user.findFirst({ where: { name: "quramy" }, include: { posts: true } });
       expect(userWithPosts?.posts.length).toBe(3);
     });
