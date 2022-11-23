@@ -1,5 +1,7 @@
 import { defineUserFactory, definePostFactory } from "./__generated__/fabbrica";
 
+const prisma = jestPrisma.client;
+
 const UserFactory = defineUserFactory();
 
 const PostFactory = definePostFactory({
@@ -7,8 +9,6 @@ const PostFactory = definePostFactory({
     author: UserFactory,
   },
 });
-
-const prisma = jestPrisma.client;
 
 describe("factories", () => {
   describe("UserFactory", () => {
