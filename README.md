@@ -1,6 +1,12 @@
 # prisma-fabbrica
 
-Factory helper for Prisma.
+[![github actions](https://github.com/Quramy/prisma-fabbrica/workflows/build/badge.svg)](https://github.com/Quramy/talt/actions)
+[![npm version](https://badge.fury.io/js/@quramy%2Fprisma-fabbrica.svg)](https://badge.fury.io/js/@quramy%2Fprisma-fabbrica)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/Quramy/prisma-fabbrica/main/LICENSE)
+
+Prisma generator for model factories.
+
+## ToC
 
 <!-- toc -->
 
