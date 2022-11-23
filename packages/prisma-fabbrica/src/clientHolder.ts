@@ -3,7 +3,11 @@ export type PrismaClientLike = {
   $disconnect: () => PromiseLike<unknown>;
 };
 
-let _client: () => PrismaClientLike;
+let _client: undefined | (() => PrismaClientLike);
+
+export function resetClient() {
+  _client = undefined;
+}
 
 export function setClient<T extends PrismaClientLike>(client: T | (() => T)) {
   _client = typeof client === "function" ? client : () => client;

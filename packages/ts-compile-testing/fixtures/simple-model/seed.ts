@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { initialize, defineUserFactory } from "./__generated__/fabbrica";
 
 const prisma = new PrismaClient();
-initialize({ client: prisma });
+initialize({ prisma });
 
 async function seed() {
   const UserFactory = defineUserFactory();

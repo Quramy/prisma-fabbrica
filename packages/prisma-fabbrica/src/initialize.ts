@@ -1,9 +1,13 @@
-import { setClient, PrismaClientLike } from "./clientHolder";
+import { resetClient, setClient, PrismaClientLike } from "./clientHolder";
 
 export type InitializeOptions = {
-  readonly client: PrismaClientLike | (() => PrismaClientLike);
+  readonly prisma: PrismaClientLike | (() => PrismaClientLike);
 };
 
+export function reset() {
+  resetClient();
+}
+
 export function initialize(options: InitializeOptions) {
-  setClient(options.client);
+  setClient(options.prisma);
 }
