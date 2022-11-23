@@ -15,7 +15,7 @@ type UserFactoryDefineInput = {
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput>;
 };
-function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
+function autoGenerateUserScalarsOrEnums(): UserScalarOrEnumFields {
     return {
         id: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false }),
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
@@ -23,7 +23,7 @@ function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
 }
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
     const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
-        const requiredScalarData = autoGenrateUserScalarsOrEnums();
+        const requiredScalarData = autoGenerateUserScalarsOrEnums();
         const defaultData = await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = {};
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };

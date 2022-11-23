@@ -16,7 +16,7 @@ type UserFactoryDefineInput = {
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput>;
 };
-function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
+function autoGenerateUserScalarsOrEnums(): UserScalarOrEnumFields {
     return {
         id: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false }),
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
@@ -24,7 +24,7 @@ function autoGenrateUserScalarsOrEnums(): UserScalarOrEnumFields {
 }
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
     const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
-        const requiredScalarData = autoGenrateUserScalarsOrEnums();
+        const requiredScalarData = autoGenerateUserScalarsOrEnums();
         const defaultData = await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = {};
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
@@ -60,14 +60,14 @@ type ProfileFactoryDefineOptions = {
 function isProfileuserFactory(x: ProfileuserFactory | Prisma.UserCreateNestedOneWithoutProfileInput): x is ProfileuserFactory {
     return (x as any)._factoryFor === "User";
 }
-function autoGenrateProfileScalarsOrEnums(): ProfileScalarOrEnumFields {
+function autoGenerateProfileScalarsOrEnums(): ProfileScalarOrEnumFields {
     return {
         id: scalarFieldValueGenerator.String({ modelName: "Profile", fieldName: "id", isId: true, isUnique: false })
     };
 }
 function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: ProfileFactoryDefineOptions) {
     const buildCreateInput = async (inputData: Partial<Prisma.ProfileCreateInput> = {}) => {
-        const requiredScalarData = autoGenrateProfileScalarsOrEnums();
+        const requiredScalarData = autoGenerateProfileScalarsOrEnums();
         const defaultData = await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = {
             user: isProfileuserFactory(defaultData.user) ? {

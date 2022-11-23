@@ -220,38 +220,47 @@ export const isModelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF
   });
 };
 
-export const autoGenrateModelScalarsOrEnums = (
-  modelName: string,
-  inputType: DMMF.InputType,
+export const autoGenerateModelScalarsOrEnumsFieldArgs = (
   model: DMMF.Model,
+  field: DMMF.SchemaArg,
+  enums: DMMF.SchemaEnum[],
+) =>
+  field.inputTypes[0].location === "scalar"
+    ? template.expression`
+        scalarFieldValueGenerator.SCALAR_TYPE({ modelName: MODEL_NAME, fieldName: FIELD_NAME, isId: IS_ID, isUnique: IS_UNIQUE })
+      `({
+        SCALAR_TYPE: ast.identifier(field.inputTypes[0].type as string),
+        MODEL_NAME: ast.stringLiteral(model.name),
+        FIELD_NAME: ast.stringLiteral(field.name),
+        IS_ID:
+          model.fields.find(f => f.name === field.name)!.isId || model.primaryKey?.fields.includes(field.name)
+            ? ast.true()
+            : ast.false(),
+        IS_UNIQUE: model.fields.find(f => f.name === field.name)!.isUnique ? ast.true() : ast.false(),
+      })
+    : ast.stringLiteral(extractFirstEnumValue(enums, field));
+
+export const autoGenerateModelScalarsOrEnums = (
+  model: DMMF.Model,
+  inputType: DMMF.InputType,
   enums: DMMF.SchemaEnum[],
 ) =>
   template.statement<ts.FunctionDeclaration>`
-    function AUTO_GENRATE_MODEL_SCALARS_OR_ENUMS(): MODEL_SCALAR_OR_ENUM_FIELDS {
+    function AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS(): MODEL_SCALAR_OR_ENUM_FIELDS {
       return ${() =>
         ast.objectLiteralExpression(
           filterRequiredScalarOrEnumFields(inputType).map(field =>
             ast.propertyAssignment(
               ast.identifier(field.name),
-              field.inputTypes[0].location === "scalar"
-                ? template.expression`
-                    scalarFieldValueGenerator.SCALAR_TYPE({ modelName: MODEL_NAME, fieldName: FIELD_NAME, isId: IS_ID, isUnique: IS_UNIQUE })
-                  `({
-                    SCALAR_TYPE: ast.identifier(field.inputTypes[0].type as string),
-                    MODEL_NAME: ast.stringLiteral(modelName),
-                    FIELD_NAME: ast.stringLiteral(field.name),
-                    IS_ID: model.fields.find(f => f.name === field.name)!.isId ? ast.true() : ast.false(),
-                    IS_UNIQUE: model.fields.find(f => f.name === field.name)!.isUnique ? ast.true() : ast.false(),
-                  })
-                : ast.stringLiteral(extractFirstEnumValue(enums, field)),
+              autoGenerateModelScalarsOrEnumsFieldArgs(model, field, enums),
             ),
           ),
           true,
         )};
     }
   `({
-    AUTO_GENRATE_MODEL_SCALARS_OR_ENUMS: ast.identifier(`autoGenrate${modelName}ScalarsOrEnums`),
-    MODEL_SCALAR_OR_ENUM_FIELDS: ast.identifier(`${modelName}ScalarOrEnumFields`),
+    AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS: ast.identifier(`autoGenerate${model.name}ScalarsOrEnums`),
+    MODEL_SCALAR_OR_ENUM_FIELDS: ast.identifier(`${model.name}ScalarOrEnumFields`),
   });
 
 export const defineModelFactoryInernal = (modelName: string, inputType: DMMF.InputType) =>
@@ -262,7 +271,7 @@ export const defineModelFactoryInernal = (modelName: string, inputType: DMMF.Inp
       const buildCreateInput = async (
         inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
       ) => {
-        const requiredScalarData = AUTO_GENRATE_MODEL_SCALARS_OR_ENUMS()
+        const requiredScalarData = AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS()
         const defaultData= await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = ${() =>
           ast.objectLiteralExpression(
@@ -301,7 +310,7 @@ export const defineModelFactoryInernal = (modelName: string, inputType: DMMF.Inp
     DEFINE_MODEL_FACTORY_INERNAL: ast.identifier(`define${modelName}FactoryInternal`),
     MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${modelName}FactoryDefineOptions`),
     MODEL_CREATE_INPUT: ast.identifier(`${modelName}CreateInput`),
-    AUTO_GENRATE_MODEL_SCALARS_OR_ENUMS: ast.identifier(`autoGenrate${modelName}ScalarsOrEnums`),
+    AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS: ast.identifier(`autoGenerate${modelName}ScalarsOrEnums`),
   });
 
 export const defineModelFactory = (modelName: string, inputType: DMMF.InputType) =>
@@ -355,7 +364,7 @@ export function getSourceFile({
         ...filterRequiredInputObjectTypeField(createInputType).map(fieldType =>
           isModelAssociationFactory(fieldType, model),
         ),
-        autoGenrateModelScalarsOrEnums(model.name, createInputType, model, document.schema.enumTypes.model ?? []),
+        autoGenerateModelScalarsOrEnums(model, createInputType, document.schema.enumTypes.model ?? []),
         defineModelFactoryInernal(model.name, createInputType),
         defineModelFactory(model.name, createInputType),
       ]),

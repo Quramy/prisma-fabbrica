@@ -22,7 +22,7 @@ const scalarFieldValueGenerator: ScalarFieldValueGenerator = {
   },
   DateTime: () => new Date(),
   Bytes: () => Buffer.from([0x80, 0xff]),
-  JSON: () => ({
+  Json: () => ({
     key: "value",
   }),
 };

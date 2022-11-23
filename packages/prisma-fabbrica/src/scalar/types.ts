@@ -14,5 +14,5 @@ export interface ScalarFieldValueGenerator {
   Decimal: (options: ScalarFieldGenerateOptions) => unknown;
   DateTime: (options: ScalarFieldGenerateOptions) => Date;
   Bytes: (options: ScalarFieldGenerateOptions) => Buffer;
-  JSON: (options: ScalarFieldGenerateOptions) => any;
+  Json: (options: ScalarFieldGenerateOptions) => any;
 }
