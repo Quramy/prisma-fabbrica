@@ -15,6 +15,7 @@ Prisma generator for model factories.
   - [Field default values](#field-default-values)
   - [Required relation](#required-relation)
   - [Connection helper](#connection-helper)
+  - [Build input data only](#build-input-data-only)
 - [Generator configuration](#generator-configuration)
 - [Tips](#tips)
   - [Works with jest-prisma](#works-with-jest-prisma)
@@ -197,6 +198,44 @@ await PostFactory.create({ author: { connect: author } });
 
 const { posts } = await prisma.user.findUnique({ where: author, include: { posts: true } });
 console.log(posts.length); // -> 2
+```
+
+### Build input data only
+
+`.buildCreateInput` method in factories provides data set to create the model, but never insert.
+
+```ts
+await UserFactory.create();
+
+// The above code is equivalent to the bellow:
+const data = await UserFactory.buildCreateInput();
+await prisma.user.create({ data });
+```
+
+For example, you can use `.buildCreateInput` method in other model's factory definition:
+
+```ts
+const UserFactory = defineUserFactory();
+
+const PostFactory = definePostFactory({
+  defaultData: async () => ({
+    author: {
+      connectOrCreate: {
+        where: {
+          id: "user001",
+        },
+        create: await UserFactory.buildCreateInput({
+          id: "user001",
+        }),
+      },
+    },
+  }),
+});
+
+await PostFactory.create();
+await PostFactory.create();
+
+console.log(await prisma.user.count()); // -> 1
 ```
 
 ## Generator configuration
