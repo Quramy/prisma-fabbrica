@@ -4,6 +4,10 @@ import { template } from "talt";
 
 type StripCreate<T extends string> = T extends `create${infer S}` ? Uncapitalize<S> : T;
 
+function byName<T extends { readonly name: string }>(name: string | { readonly name: string }) {
+  return (x: T) => x.name === (typeof name === "string" ? name : name.name);
+}
+
 function camelize(pascal: string) {
   return pascal[0].toLowerCase() + pascal.slice(1);
 }
@@ -59,7 +63,7 @@ function filterRequiredInputObjectTypeField(inputType: DMMF.InputType) {
 function filterBelongsToField(model: DMMF.Model, inputType: DMMF.InputType) {
   return inputType.fields
     .filter(isInputObjectTypeField)
-    .filter(field => model.fields.find(f => f.name === field.name)?.isList === false);
+    .filter(field => model.fields.find(byName(field))?.isList === false);
 }
 
 function filterEnumFields(inputType: DMMF.InputType) {
@@ -71,7 +75,7 @@ function filterEnumFields(inputType: DMMF.InputType) {
 
 function extractFirstEnumValue(enums: DMMF.SchemaEnum[], field: DMMF.SchemaArg) {
   const typeName = field.inputTypes[0].type;
-  const found = enums.find(e => e.name === field.inputTypes[0].type);
+  const found = enums.find(byName(typeName));
   if (!found) {
     throw new Error(`Not found enum ${typeName}`);
   }
@@ -164,7 +168,7 @@ export const modelScalarOrEnumFields = (model: DMMF.Model, inputType: DMMF.Input
   });
 
 export const modelBelongsToRelationFactory = (fieldType: DMMF.SchemaArg, model: DMMF.Model) => {
-  const targetModel = model.fields.find(f => f.name === fieldType.name)!;
+  const targetModel = model.fields.find(byName(fieldType))!;
   return template.statement<ts.TypeAliasDeclaration>`
     type ${() => ast.identifier(`${model.name}${fieldType.name}Factory`)} = {
       _factoryFor: ${() => ast.literalTypeNode(ast.stringLiteral(targetModel.type))};
@@ -184,7 +188,7 @@ export const modelFactoryDefineInput = (model: DMMF.Model, inputType: DMMF.Input
             field.name,
             !field.isRequired || isScalarOrEnumField(field) ? ast.token(ts.SyntaxKind.QuestionToken) : undefined,
             ast.unionTypeNode([
-              ...((field.isRequired || model.fields.find(f => f.name === field.name)!.isList === false) &&
+              ...((field.isRequired || model.fields.find(byName(field))!.isList === false) &&
               isInputObjectTypeField(field)
                 ? [ast.typeReferenceNode(ast.identifier(`${model.name}${field.name}Factory`))]
                 : []),
@@ -217,7 +221,7 @@ export const modelFactoryDefineOptions = (modelName: string, isOpionalDefaultDat
       });
 
 export const isModelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF.Model) => {
-  const targetModel = model.fields.find(f => f.name === fieldType.name)!;
+  const targetModel = model.fields.find(byName(fieldType))!;
   return template.statement<ts.FunctionDeclaration>`
     function ${() => ast.identifier(`is${model.name}${fieldType.name}Factory`)}(
       x: MODEL_BELONGS_TO_RELATION_FACTORY | ${() =>
@@ -243,10 +247,10 @@ export const autoGenerateModelScalarsOrEnumsFieldArgs = (
         MODEL_NAME: ast.stringLiteral(model.name),
         FIELD_NAME: ast.stringLiteral(field.name),
         IS_ID:
-          model.fields.find(f => f.name === field.name)!.isId || model.primaryKey?.fields.includes(field.name)
+          model.fields.find(byName(field))!.isId || model.primaryKey?.fields.includes(field.name)
             ? ast.true()
             : ast.false(),
-        IS_UNIQUE: model.fields.find(f => f.name === field.name)!.isUnique ? ast.true() : ast.false(),
+        IS_UNIQUE: model.fields.find(byName(field))!.isUnique ? ast.true() : ast.false(),
       })
     : ast.stringLiteral(extractFirstEnumValue(enums, field));
 
