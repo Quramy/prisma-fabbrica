@@ -1,8 +1,7 @@
 import { DMMF } from "@prisma/generator-helper";
 import ts from "typescript";
 import { template } from "talt";
-import { camelize } from "../helpers/stringConverter";
-import { ast } from "../helpers/astShorthand";
+import { camelize, ast } from "../helpers";
 
 function byName<T extends { readonly name: string }>(name: string | { readonly name: string }) {
   return (x: T) => x.name === (typeof name === "string" ? name : name.name);
