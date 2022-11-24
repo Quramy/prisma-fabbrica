@@ -44,7 +44,7 @@ function defineUserFactory(args = {}) {
 }
 exports.defineUserFactory = defineUserFactory;
 function isPostauthorFactory(x) {
-    return x._factoryFor === "User";
+    return x?._factoryFor === "User";
 }
 function autoGeneratePostScalarsOrEnums() {
     return {
