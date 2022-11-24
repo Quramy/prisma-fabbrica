@@ -84,3 +84,4 @@ function definePostFactory(args) {
     return definePostFactoryInternal(args);
 }
 exports.definePostFactory = definePostFactory;
+//# sourceMappingURL=index.js.map

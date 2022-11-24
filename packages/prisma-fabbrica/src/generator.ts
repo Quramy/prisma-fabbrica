@@ -28,6 +28,9 @@ function compile(fileName: string, content: string, options: ts.CompilerOptions)
   program.emit();
   const js = fileMap.get(fileName.replace(".ts", ".js"))!;
   const dts = fileMap.get(fileName.replace(".ts", ".d.ts"))!;
+  if (!js || !dts) {
+    throw new Error('prisma-fabbrica: Failed to TypeScript transpilation. Please try "noTranspile = true"');
+  }
   return { js, dts };
 }
 
@@ -43,7 +46,7 @@ generatorHandler({
       logger.error("No prisma client generator.");
       return;
     }
-    const noTranspile = options.generator.config.noTranspile ?? false;
+    const noTranspile = options.generator.config.noTranspile === "true" ?? false;
     const outputDirname = options.generator.output?.value;
     const clientGeneratorOutputPath = clientGeneratorConfig.output?.value;
     if (!clientGeneratorOutputPath || !outputDirname) {
@@ -76,8 +79,12 @@ generatorHandler({
       const compileOptions = readTsConfig(tsconfigPath);
       const output = compile(path.join(outputDirname, "index.ts"), contents, {
         ...compileOptions,
-        declaration: true,
         noEmit: false,
+        skipLibCheck: true,
+        incremental: false,
+        outDir: undefined,
+        outFile: undefined,
+        declaration: true,
       });
       await Promise.all([
         fs.writeFile(path.join(outputDirname, "index.js"), output.js, "utf8"),
