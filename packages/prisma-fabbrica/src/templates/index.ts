@@ -1,30 +1,12 @@
 import { DMMF } from "@prisma/generator-helper";
 import ts from "typescript";
 import { template } from "talt";
-
-type StripCreate<T extends string> = T extends `create${infer S}` ? Uncapitalize<S> : T;
+import { camelize } from "../helpers/stringConverter";
+import { ast } from "../helpers/astShorthand";
 
 function byName<T extends { readonly name: string }>(name: string | { readonly name: string }) {
   return (x: T) => x.name === (typeof name === "string" ? name : name.name);
 }
-
-function camelize(pascal: string) {
-  return pascal[0].toLowerCase() + pascal.slice(1);
-}
-
-function pascalize(camel: string) {
-  return camel[0].toUpperCase() + camel.slice(1);
-}
-
-const ast = new Proxy(ts.factory, {
-  get(target: any, n) {
-    const name = n as string;
-    if (name.startsWith("update")) return target[name];
-    return target[`create${pascalize(name)}`];
-  },
-}) as unknown as {
-  [K in keyof ts.NodeFactory as StripCreate<K>]: ts.NodeFactory[K];
-};
 
 export function findPrsimaCreateInputTypeFromModelName(document: DMMF.Document, modelName: string) {
   const search = `${modelName}CreateInput`;
@@ -264,10 +246,7 @@ export const autoGenerateModelScalarsOrEnums = (
       return ${() =>
         ast.objectLiteralExpression(
           filterRequiredScalarOrEnumFields(inputType).map(field =>
-            ast.propertyAssignment(
-              ast.identifier(field.name),
-              autoGenerateModelScalarsOrEnumsFieldArgs(model, field, enums),
-            ),
+            ast.propertyAssignment(field.name, autoGenerateModelScalarsOrEnumsFieldArgs(model, field, enums)),
           ),
           true,
         )};
