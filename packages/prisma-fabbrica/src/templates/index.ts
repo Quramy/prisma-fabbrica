@@ -56,6 +56,12 @@ function filterRequiredInputObjectTypeField(inputType: DMMF.InputType) {
   return filterRequiredFields(inputType).filter(isInputObjectTypeField);
 }
 
+function filterBelongsToField(model: DMMF.Model, inputType: DMMF.InputType) {
+  return inputType.fields
+    .filter(isInputObjectTypeField)
+    .filter(field => model.fields.find(f => f.name === field.name)?.isList === false);
+}
+
 function filterEnumFields(inputType: DMMF.InputType) {
   return inputType.fields.filter(
     field =>
@@ -178,7 +184,8 @@ export const modelFactoryDefineInput = (model: DMMF.Model, inputType: DMMF.Input
             field.name,
             !field.isRequired || isScalarOrEnumField(field) ? ast.token(ts.SyntaxKind.QuestionToken) : undefined,
             ast.unionTypeNode([
-              ...(field.isRequired && isInputObjectTypeField(field)
+              ...((field.isRequired || model.fields.find(f => f.name === field.name)!.isList === false) &&
+              isInputObjectTypeField(field)
                 ? [ast.typeReferenceNode(ast.identifier(`${model.name}${field.name}Factory`))]
                 : []),
               ...field.inputTypes.map(childInputType => argInputType(model, field.name, childInputType)),
@@ -213,9 +220,10 @@ export const isModelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF
   const targetModel = model.fields.find(f => f.name === fieldType.name)!;
   return template.statement<ts.FunctionDeclaration>`
     function ${() => ast.identifier(`is${model.name}${fieldType.name}Factory`)}(
-      x: MODEL_BELONGS_TO_RELATION_FACTORY | ${() => argInputType(model, fieldType.name, fieldType.inputTypes[0])}
+      x: MODEL_BELONGS_TO_RELATION_FACTORY | ${() =>
+        argInputType(model, fieldType.name, fieldType.inputTypes[0])} | undefined
     ): x is MODEL_BELONGS_TO_RELATION_FACTORY {
-      return (x as any)._factoryFor === ${() => ast.stringLiteral(targetModel.type)};
+      return (x as any)?._factoryFor === ${() => ast.stringLiteral(targetModel.type)};
     }
   `({
     MODEL_BELONGS_TO_RELATION_FACTORY: ast.typeReferenceNode(`${model.name}${fieldType.name}Factory`),
@@ -277,7 +285,7 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
         const defaultData= await resolveValue(defaultDataResolver ?? {});
         const defaultAssociations = ${() =>
           ast.objectLiteralExpression(
-            filterRequiredInputObjectTypeField(inputType).map(field =>
+            filterBelongsToField(model, inputType).map(field =>
               ast.propertyAssignment(
                 field.name,
                 template.expression`
@@ -372,14 +380,12 @@ export function getSourceFile({
       .map(model => ({ model, createInputType: findPrsimaCreateInputTypeFromModelName(document, model.name) }))
       .flatMap(({ model, createInputType }) => [
         modelScalarOrEnumFields(model, createInputType),
-        ...filterRequiredInputObjectTypeField(createInputType).map(fieldType =>
+        ...filterBelongsToField(model, createInputType).map(fieldType =>
           modelBelongsToRelationFactory(fieldType, model),
         ),
         modelFactoryDefineInput(model, createInputType),
         modelFactoryDefineOptions(model.name, filterRequiredInputObjectTypeField(createInputType).length === 0),
-        ...filterRequiredInputObjectTypeField(createInputType).map(fieldType =>
-          isModelAssociationFactory(fieldType, model),
-        ),
+        ...filterBelongsToField(model, createInputType).map(fieldType => isModelAssociationFactory(fieldType, model)),
         autoGenerateModelScalarsOrEnums(model, createInputType, document.schema.enumTypes.model ?? []),
         defineModelFactoryInernal(model, createInputType),
         defineModelFactory(model.name, createInputType),

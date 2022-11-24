@@ -57,15 +57,22 @@ type PostScalarOrEnumFields = {
     id: string;
     title: string;
 };
+type PostauthorFactory = {
+    _factoryFor: "User";
+    buildCreateInput: () => PromiseLike<Prisma.UserCreateNestedOneWithoutPostsInput["create"]>;
+};
 type PostFactoryDefineInput = {
     id?: string;
     title?: string;
-    author?: Prisma.UserCreateNestedOneWithoutPostsInput;
+    author?: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput;
     reviews?: Prisma.ReviewCreateNestedManyWithoutPostInput;
 };
 type PostFactoryDefineOptions = {
     defaultData?: Resolver<PostFactoryDefineInput>;
 };
+function isPostauthorFactory(x: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput | undefined): x is PostauthorFactory {
+    return (x as any)?._factoryFor === "User";
+}
 function autoGeneratePostScalarsOrEnums(): PostScalarOrEnumFields {
     return {
         id: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "id", isId: true, isUnique: false }),
@@ -76,7 +83,11 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
     const buildCreateInput = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
         const requiredScalarData = autoGeneratePostScalarsOrEnums();
         const defaultData = await resolveValue(defaultDataResolver ?? {});
-        const defaultAssociations = {};
+        const defaultAssociations = {
+            author: isPostauthorFactory(defaultData.author) ? {
+                create: await defaultData.author.buildCreateInput()
+            } : defaultData.author
+        };
         const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
@@ -120,11 +131,11 @@ type ReviewFactoryDefineInput = {
 type ReviewFactoryDefineOptions = {
     defaultData: Resolver<ReviewFactoryDefineInput>;
 };
-function isReviewpostFactory(x: ReviewpostFactory | Prisma.PostCreateNestedOneWithoutReviewsInput): x is ReviewpostFactory {
-    return (x as any)._factoryFor === "Post";
+function isReviewpostFactory(x: ReviewpostFactory | Prisma.PostCreateNestedOneWithoutReviewsInput | undefined): x is ReviewpostFactory {
+    return (x as any)?._factoryFor === "Post";
 }
-function isReviewreviewerFactory(x: ReviewreviewerFactory | Prisma.UserCreateNestedOneWithoutReviewsInput): x is ReviewreviewerFactory {
-    return (x as any)._factoryFor === "User";
+function isReviewreviewerFactory(x: ReviewreviewerFactory | Prisma.UserCreateNestedOneWithoutReviewsInput | undefined): x is ReviewreviewerFactory {
+    return (x as any)?._factoryFor === "User";
 }
 function autoGenerateReviewScalarsOrEnums(): ReviewScalarOrEnumFields {
     return {

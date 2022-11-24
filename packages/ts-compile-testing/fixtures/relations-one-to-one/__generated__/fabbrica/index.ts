@@ -10,14 +10,21 @@ type UserScalarOrEnumFields = {
     id: string;
     name: string;
 };
+type UserprofileFactory = {
+    _factoryFor: "Profile";
+    buildCreateInput: () => PromiseLike<Prisma.ProfileCreateNestedOneWithoutUserInput["create"]>;
+};
 type UserFactoryDefineInput = {
     id?: string;
     name?: string;
-    profile?: Prisma.ProfileCreateNestedOneWithoutUserInput;
+    profile?: UserprofileFactory | Prisma.ProfileCreateNestedOneWithoutUserInput;
 };
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput>;
 };
+function isUserprofileFactory(x: UserprofileFactory | Prisma.ProfileCreateNestedOneWithoutUserInput | undefined): x is UserprofileFactory {
+    return (x as any)?._factoryFor === "Profile";
+}
 function autoGenerateUserScalarsOrEnums(): UserScalarOrEnumFields {
     return {
         id: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false }),
@@ -28,7 +35,11 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
     const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const requiredScalarData = autoGenerateUserScalarsOrEnums();
         const defaultData = await resolveValue(defaultDataResolver ?? {});
-        const defaultAssociations = {};
+        const defaultAssociations = {
+            profile: isUserprofileFactory(defaultData.profile) ? {
+                create: await defaultData.profile.buildCreateInput()
+            } : defaultData.profile
+        };
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
@@ -65,8 +76,8 @@ type ProfileFactoryDefineInput = {
 type ProfileFactoryDefineOptions = {
     defaultData: Resolver<ProfileFactoryDefineInput>;
 };
-function isProfileuserFactory(x: ProfileuserFactory | Prisma.UserCreateNestedOneWithoutProfileInput): x is ProfileuserFactory {
-    return (x as any)._factoryFor === "User";
+function isProfileuserFactory(x: ProfileuserFactory | Prisma.UserCreateNestedOneWithoutProfileInput | undefined): x is ProfileuserFactory {
+    return (x as any)?._factoryFor === "User";
 }
 function autoGenerateProfileScalarsOrEnums(): ProfileScalarOrEnumFields {
     return {
