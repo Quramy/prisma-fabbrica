@@ -8,3 +8,8 @@ export const ReviewFactory = defineReviewFactory({
     reviewer: UserFactory,
   },
 });
+export const PostFactoryAlt = definePostFactory({
+  defaultData: {
+    author: UserFactory,
+  },
+});

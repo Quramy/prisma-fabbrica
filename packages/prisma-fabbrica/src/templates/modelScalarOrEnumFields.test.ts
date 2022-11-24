@@ -52,7 +52,7 @@ describe(modelScalarOrEnumFields, () => {
     });
     const inputType = findPrsimaCreateInputTypeFromModelName(dmmf, "TestModel");
     const source = template.statement(expected)();
-    expect(printNode(modelScalarOrEnumFields("TestModel", inputType))).toBe(printNode(source).trim());
+    expect(printNode(modelScalarOrEnumFields(dmmf.datamodel.models[0], inputType))).toBe(printNode(source).trim());
   });
 
   it("does not generate for nullable field", async () => {
@@ -70,6 +70,6 @@ describe(modelScalarOrEnumFields, () => {
         id: number;
       }
     `();
-    expect(printNode(modelScalarOrEnumFields("TestModel", inputType))).toBe(printNode(expected).trim());
+    expect(printNode(modelScalarOrEnumFields(dmmf.datamodel.models[0], inputType))).toBe(printNode(expected).trim());
   });
 });

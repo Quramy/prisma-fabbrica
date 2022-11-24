@@ -88,7 +88,7 @@ export const importStatement = (specifier: string, prismaClientModuleSpecifier: 
   `();
 
 export const scalarFieldType = (
-  modelName: string,
+  model: DMMF.Model,
   fieldName: string,
   inputType: DMMF.SchemaArgInputType,
 ): ts.TypeNode => {
@@ -116,14 +116,14 @@ export const scalarFieldType = (
       // return template.typeNode`Prisma.Json`();
       return ast.keywordTypeNode(ts.SyntaxKind.AnyKeyword);
     default:
-      throw new Error(`Unknown scalar type "${inputType.type}" for ${modelName}.${fieldName} .`);
+      throw new Error(`Unknown scalar type "${inputType.type}" for ${model.name}.${fieldName} .`);
   }
 };
 
-export const argInputType = (modelName: string, fieldName: string, inputType: DMMF.SchemaArgInputType): ts.TypeNode => {
+export const argInputType = (model: DMMF.Model, fieldName: string, inputType: DMMF.SchemaArgInputType): ts.TypeNode => {
   const fieldType = () => {
     if (inputType.location === "scalar") {
-      return scalarFieldType(modelName, fieldName, inputType);
+      return scalarFieldType(model, fieldName, inputType);
     } else if (inputType.location === "enumTypes") {
       return ast.typeReferenceNode(ast.identifier(inputType.type as string));
     } else if (inputType.location === "outputObjectTypes" || inputType.location === "inputObjectTypes") {
@@ -140,7 +140,7 @@ export const argInputType = (modelName: string, fieldName: string, inputType: DM
     : fieldType();
 };
 
-export const modelScalarOrEnumFields = (modelName: string, inputType: DMMF.InputType) =>
+export const modelScalarOrEnumFields = (model: DMMF.Model, inputType: DMMF.InputType) =>
   template.statement<ts.TypeAliasDeclaration>`
     type MODEL_SCALAR_OR_ENUM_FIELDS = ${() =>
       ast.typeLiteralNode(
@@ -149,14 +149,12 @@ export const modelScalarOrEnumFields = (modelName: string, inputType: DMMF.Input
             undefined,
             field.name,
             undefined,
-            ast.unionTypeNode(
-              field.inputTypes.map(childInputType => argInputType(modelName, field.name, childInputType)),
-            ),
+            ast.unionTypeNode(field.inputTypes.map(childInputType => argInputType(model, field.name, childInputType))),
           ),
         ),
       )}
   `({
-    MODEL_SCALAR_OR_ENUM_FIELDS: ast.identifier(`${modelName}ScalarOrEnumFields`),
+    MODEL_SCALAR_OR_ENUM_FIELDS: ast.identifier(`${model.name}ScalarOrEnumFields`),
   });
 
 export const modelBelongsToRelationFactory = (fieldType: DMMF.SchemaArg, model: DMMF.Model) => {
@@ -170,7 +168,7 @@ export const modelBelongsToRelationFactory = (fieldType: DMMF.SchemaArg, model: 
   `();
 };
 
-export const modelFactoryDefineInput = (modelName: string, inputType: DMMF.InputType) =>
+export const modelFactoryDefineInput = (model: DMMF.Model, inputType: DMMF.InputType) =>
   template.statement<ts.TypeAliasDeclaration>`
     type MODEL_FACTORY_DEFINE_INPUT = ${() =>
       ast.typeLiteralNode(
@@ -181,15 +179,15 @@ export const modelFactoryDefineInput = (modelName: string, inputType: DMMF.Input
             !field.isRequired || isScalarOrEnumField(field) ? ast.token(ts.SyntaxKind.QuestionToken) : undefined,
             ast.unionTypeNode([
               ...(field.isRequired && isInputObjectTypeField(field)
-                ? [ast.typeReferenceNode(ast.identifier(`${modelName}${field.name}Factory`))]
+                ? [ast.typeReferenceNode(ast.identifier(`${model.name}${field.name}Factory`))]
                 : []),
-              ...field.inputTypes.map(childInputType => argInputType(modelName, field.name, childInputType)),
+              ...field.inputTypes.map(childInputType => argInputType(model, field.name, childInputType)),
             ]),
           ),
         ),
       )};
   `({
-    MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${modelName}FactoryDefineInput`),
+    MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${model.name}FactoryDefineInput`),
   });
 
 export const modelFactoryDefineOptions = (modelName: string, isOpionalDefaultData: boolean) =>
@@ -215,7 +213,7 @@ export const isModelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF
   const targetModel = model.fields.find(f => f.name === fieldType.name)!;
   return template.statement<ts.FunctionDeclaration>`
     function ${() => ast.identifier(`is${model.name}${fieldType.name}Factory`)}(
-      x: MODEL_BELONGS_TO_RELATION_FACTORY | ${() => argInputType(model.name, fieldType.name, fieldType.inputTypes[0])}
+      x: MODEL_BELONGS_TO_RELATION_FACTORY | ${() => argInputType(model, fieldType.name, fieldType.inputTypes[0])}
     ): x is MODEL_BELONGS_TO_RELATION_FACTORY {
       return (x as any)._factoryFor === ${() => ast.stringLiteral(targetModel.type)};
     }
@@ -373,11 +371,11 @@ export function getSourceFile({
     ...document.datamodel.models
       .map(model => ({ model, createInputType: findPrsimaCreateInputTypeFromModelName(document, model.name) }))
       .flatMap(({ model, createInputType }) => [
-        modelScalarOrEnumFields(model.name, createInputType),
+        modelScalarOrEnumFields(model, createInputType),
         ...filterRequiredInputObjectTypeField(createInputType).map(fieldType =>
           modelBelongsToRelationFactory(fieldType, model),
         ),
-        modelFactoryDefineInput(model.name, createInputType),
+        modelFactoryDefineInput(model, createInputType),
         modelFactoryDefineOptions(model.name, filterRequiredInputObjectTypeField(createInputType).length === 0),
         ...filterRequiredInputObjectTypeField(createInputType).map(fieldType =>
           isModelAssociationFactory(fieldType, model),
