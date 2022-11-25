@@ -6,8 +6,11 @@ import { Prisma } from "@prisma/client";
 import type { PrismaClient } from "@prisma/client";
 import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
-import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
-export { initialize } from "@quramy/prisma-fabbrica";
+import { Resolver, normalizeResolver, getSequenceCounter } from "@quramy/prisma-fabbrica/lib/helpers";
+export { initialize, resetSequence } from "@quramy/prisma-fabbrica";
+type BuildDataOptions = {
+    readonly seq: number;
+};
 type UserScalarOrEnumFields = {
     id: number;
     name: string;
@@ -17,18 +20,24 @@ type UserFactoryDefineInput = {
     name?: string;
 };
 type UserFactoryDefineOptions = {
-    defaultData?: Resolver<UserFactoryDefineInput>;
+    defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
 };
-function autoGenerateUserScalarsOrEnums(): UserScalarOrEnumFields {
+function autoGenerateUserScalarsOrEnums({ seq }: {
+    readonly seq: number;
+}): UserScalarOrEnumFields {
     return {
-        id: scalarFieldValueGenerator.Int({ modelName: "User", fieldName: "id", isId: true, isUnique: false }),
-        name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
+        id: scalarFieldValueGenerator.Int({ modelName: "User", fieldName: "id", isId: true, isUnique: false, seq }),
+        name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
+    const seqKey = {};
+    const getSeq = () => getSequenceCounter(seqKey);
     const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
-        const requiredScalarData = autoGenerateUserScalarsOrEnums();
-        const defaultData = await resolveValue(defaultDataResolver ?? {});
+        const seq = getSeq();
+        const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
+        const resolveValue = normalizeResolver<UserFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+        const defaultData = await resolveValue({ seq });
         const defaultAssociations = {};
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;

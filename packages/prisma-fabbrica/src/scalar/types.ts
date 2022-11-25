@@ -3,6 +3,7 @@ export type ScalarFieldGenerateOptions = {
   readonly fieldName: string;
   readonly isUnique: boolean;
   readonly isId: boolean;
+  readonly seq: number;
 };
 
 export interface ScalarFieldValueGenerator {
