@@ -84,6 +84,8 @@ generatorHandler({
         incremental: false,
         outDir: undefined,
         outFile: undefined,
+        inlineSourceMap: undefined,
+        sourceMap: false,
         declaration: true,
       });
       await Promise.all([
