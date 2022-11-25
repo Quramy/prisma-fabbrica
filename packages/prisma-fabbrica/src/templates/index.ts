@@ -102,7 +102,7 @@ export const scalarFieldType = (
       return template.typeNode`Date`();
     case "Bytes":
       return template.typeNode`Buffer`();
-    case "JSON":
+    case "Json":
       // FIXME Is the folloing type right?
       // return template.typeNode`Prisma.Json`();
       return ast.keywordTypeNode(ts.SyntaxKind.AnyKeyword);
