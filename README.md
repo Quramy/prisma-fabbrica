@@ -13,9 +13,12 @@ Prisma generator for model factories.
 - [Getting started](#getting-started)
 - [Usage of factories](#usage-of-factories)
   - [Field default values](#field-default-values)
+  - [Use sequence for scalar fields](#use-sequence-for-scalar-fields)
+  - [Shorthand for create list](#shorthand-for-create-list)
   - [Required relation](#required-relation)
   - [Connection helper](#connection-helper)
   - [Build input data only](#build-input-data-only)
+  - [has-many / has-one relation](#has-many--has-one-relation)
 - [Generator configuration](#generator-configuration)
 - [Tips](#tips)
   - [Works with jest-prisma](#works-with-jest-prisma)
@@ -125,6 +128,50 @@ const UserFactory = defineUserFactory({
 await UserFactory.create()
 ```
 
+### Use sequence for scalar fields
+
+`seq` parameter provides sequential number which increments when called `.create()` .
+
+```ts
+const UserFactory = defineUserFactory({
+  defaultData: async ({ seq }) => ({
+    id: `user${seq.toString().padStart(3, "0")}`,
+  }),
+});
+
+await UserFactory.create(); // Insert with id: "user000"
+await UserFactory.create(); // Insert with id: "user001"
+await UserFactory.create(); // Insert with id: "user002"
+```
+
+And the sequential number can be reset via `resetSequence` .
+
+```ts
+/* your.testSetup.ts */
+
+import { resetSequence } from "./__generated__/fabbrica";
+
+beforeEach(() => resetSequence());
+```
+
+### Shorthand for create list
+
+Each factory provides `.createList` method to insert multiple records.
+
+```ts
+await UserFactory.createList(3);
+
+// The above code is equivalent to the following
+
+await Promise.all([0, 1, 2].map(() => UserFactory.create()));
+```
+
+You can also pass list data assignable to `Partial<Prisma.UserCreateInput>[]` :
+
+```ts
+await UserFactory.createList([{ id: "user01" }, { id: "user02" }]);
+```
+
 ### Required relation
 
 Sometimes, creating a model requires other model existence. For example, the following model `Post` belongs to other model `User`.
@@ -202,17 +249,17 @@ console.log(posts.length); // -> 2
 
 ### Build input data only
 
-`.buildCreateInput` method in factories provides data set to create the model, but never insert.
+`.build` method in factories provides data set to create the model, but never insert.
 
 ```ts
 await UserFactory.create();
 
 // The above code is equivalent to the bellow:
-const data = await UserFactory.buildCreateInput();
+const data = await UserFactory.build();
 await prisma.user.create({ data });
 ```
 
-For example, you can use `.buildCreateInput` method in other model's factory definition:
+For example, you can use `.build` method in other model's factory definition:
 
 ```ts
 const UserFactory = defineUserFactory();
@@ -224,7 +271,7 @@ const PostFactory = definePostFactory({
         where: {
           id: "user001",
         },
-        create: await UserFactory.buildCreateInput({
+        create: await UserFactory.build({
           id: "user001",
         }),
       },
@@ -237,6 +284,34 @@ await PostFactory.create();
 
 console.log(await prisma.user.count()); // -> 1
 ```
+
+Like `createList`, `buildList` is also available.
+
+### has-many / has-one relation
+
+Sometimes, you may want a user data whose has post record. You can use `PostFactory.build` or `PostFactory.buildList` .
+
+```ts
+await UserFactory.create({
+  posts: {
+    create: await PostFactory.buildList(2),
+  },
+});
+
+console.log(await prisma.post.count()); // -> 2
+```
+
+Note: In the above example, `PostFactory.build()` resolves JSON data such as:
+
+```ts
+{
+  id: "...",
+  title: "...",
+  author: { ... } // Derived from PostFactory defaultData
+}
+```
+
+The `author` field is not allowed in `prisma.user.create` context. So `UserFactory` automatically filters the `author` field out in `.create` method.
 
 ## Generator configuration
 

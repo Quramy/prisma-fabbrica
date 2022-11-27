@@ -10,21 +10,6 @@ const PostFactory = definePostFactory({
   },
 });
 
-const PostFactoryAlt = definePostFactory({
-  defaultData: async () => ({
-    author: {
-      connectOrCreate: {
-        where: {
-          id: "user001",
-        },
-        create: await UserFactory.buildCreateInput({
-          id: "user001",
-        }),
-      },
-    },
-  }),
-});
-
 describe("factories", () => {
   describe("UserFactory", () => {
     it("creates records without input parameters", async () => {
@@ -37,6 +22,16 @@ describe("factories", () => {
       await UserFactory.create({ id: "user001", name: "Quramy" });
       const user = await prisma.user.findUnique({ where: { id: "user001" } });
       expect(user).toEqual({ id: "user001", name: "Quramy" });
+    });
+
+    it("creates record with children relation", async () => {
+      await UserFactory.create({
+        posts: {
+          create: await PostFactory.buildList(2),
+        },
+      });
+      const created = await prisma.user.findFirst({ include: { posts: true } });
+      expect(created?.posts.length).toBe(2);
     });
   });
 
@@ -56,20 +51,6 @@ describe("factories", () => {
       expect(prisma.user.count()).resolves.toBe(1);
       const userWithPosts = await prisma.user.findFirst({ where: { name: "quramy" }, include: { posts: true } });
       expect(userWithPosts?.posts.length).toBe(3);
-    });
-  });
-
-  describe("PostFactoryAlt", () => {
-    it("creates post record", async () => {
-      await PostFactoryAlt.create();
-      await expect(prisma.user.count()).resolves.toBe(1);
-    });
-
-    it("creates related user at most one", async () => {
-      await PostFactoryAlt.create();
-      await PostFactoryAlt.create();
-      await PostFactoryAlt.create();
-      await expect(prisma.user.count()).resolves.toBe(1);
     });
   });
 });

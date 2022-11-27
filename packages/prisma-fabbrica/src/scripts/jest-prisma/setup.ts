@@ -1,4 +1,5 @@
 import { initialize } from "../../initialize";
+import { resetSequence } from "../../helpers";
 
 beforeAll(() => {
   if (typeof jestPrisma === "object") {
@@ -7,5 +8,7 @@ beforeAll(() => {
     });
   }
 });
+
+beforeEach(() => resetSequence());
 
 declare var jestPrisma: any;
