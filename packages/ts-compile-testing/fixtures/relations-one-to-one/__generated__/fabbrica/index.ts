@@ -69,6 +69,10 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const buildList = (inputData: number | Partial<Prisma.UserCreateInput>[]) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => build(data)));
+    };
     const pickForConnect = (inputData: User) => ({
         id: inputData.id
     });
@@ -76,13 +80,19 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().user.create({ data });
     };
+    const createList = (inputData: number | Partial<Prisma.UserCreateInput>[]) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => create(data)));
+    };
     const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "User" as const,
         build,
+        buildList,
         buildCreateInput: build,
         pickForConnect,
         create,
+        createList,
         createForConnect,
     };
 }
@@ -130,6 +140,10 @@ function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: Prof
         const data: Prisma.ProfileCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const buildList = (inputData: number | Partial<Prisma.ProfileCreateInput>[]) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => build(data)));
+    };
     const pickForConnect = (inputData: Profile) => ({
         id: inputData.id
     });
@@ -137,13 +151,19 @@ function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: Prof
         const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().profile.create({ data });
     };
+    const createList = (inputData: number | Partial<Prisma.ProfileCreateInput>[]) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => create(data)));
+    };
     const createForConnect = (inputData: Partial<Prisma.ProfileCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Profile" as const,
         build,
+        buildList,
         buildCreateInput: build,
         pickForConnect,
         create,
+        createList,
         createForConnect,
     };
 }

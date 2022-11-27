@@ -45,6 +45,10 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const buildList = (inputData) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => build(data)));
+    };
     const pickForConnect = (inputData) => ({
         id: inputData.id
     });
@@ -52,13 +56,19 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = await build(inputData).then(screen);
         return await (0, clientHolder_1.getClient)().user.create({ data });
     };
+    const createList = (inputData) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => create(data)));
+    };
     const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "User",
         build,
+        buildList,
         buildCreateInput: build,
         pickForConnect,
         create,
+        createList,
         createForConnect,
     };
 }
@@ -92,6 +102,10 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const buildList = (inputData) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => build(data)));
+    };
     const pickForConnect = (inputData) => ({
         id: inputData.id
     });
@@ -99,13 +113,19 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = await build(inputData).then(screen);
         return await (0, clientHolder_1.getClient)().post.create({ data });
     };
+    const createList = (inputData) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => create(data)));
+    };
     const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Post",
         build,
+        buildList,
         buildCreateInput: build,
         pickForConnect,
         create,
+        createList,
         createForConnect,
     };
 }

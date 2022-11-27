@@ -299,6 +299,13 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
         return data;
       };
 
+      const buildList = (
+        inputData: number | Partial<Prisma.MODEL_CREATE_INPUT>[]
+      ) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => build(data)));
+      }
+
       const pickForConnect = (inputData: ${() => ast.typeReferenceNode(model.name)}) => (
         ${() =>
           ast.objectLiteralExpression(
@@ -316,14 +323,23 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
         return await getClient<PrismaClient>().MODEL_KEY.create({ data });
       };
 
+      const createList = (
+        inputData: number | Partial<Prisma.MODEL_CREATE_INPUT>[]
+      ) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => create(data)));
+      }
+
       const createForConnect = (inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}) => create(inputData).then(pickForConnect);
 
       return {
         _factoryFor: ${() => ast.stringLiteral(model.name)} as const,
         build,
+        buildList,
         buildCreateInput: build,
         pickForConnect,
         create,
+        createList,
         createForConnect,
       };
     }
