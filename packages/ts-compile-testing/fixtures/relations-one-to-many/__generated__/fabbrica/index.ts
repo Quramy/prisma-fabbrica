@@ -5,8 +5,11 @@ import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
 import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
-import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
-export { initialize } from "@quramy/prisma-fabbrica";
+import { Resolver, normalizeResolver, getSequenceCounter } from "@quramy/prisma-fabbrica/lib/helpers";
+export { initialize, resetSequence } from "@quramy/prisma-fabbrica";
+type BuildDataOptions = {
+    readonly seq: number;
+};
 type UserScalarOrEnumFields = {
     id: string;
     name: string;
@@ -18,18 +21,24 @@ type UserFactoryDefineInput = {
     reviews?: Prisma.ReviewCreateNestedManyWithoutReviewerInput;
 };
 type UserFactoryDefineOptions = {
-    defaultData?: Resolver<UserFactoryDefineInput>;
+    defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
 };
-function autoGenerateUserScalarsOrEnums(): UserScalarOrEnumFields {
+function autoGenerateUserScalarsOrEnums({ seq }: {
+    readonly seq: number;
+}): UserScalarOrEnumFields {
     return {
-        id: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false }),
-        name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false })
+        id: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false, seq }),
+        name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
+    const seqKey = {};
+    const getSeq = () => getSequenceCounter(seqKey);
     const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
-        const requiredScalarData = autoGenerateUserScalarsOrEnums();
-        const defaultData = await resolveValue(defaultDataResolver ?? {});
+        const seq = getSeq();
+        const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
+        const resolveValue = normalizeResolver<UserFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+        const defaultData = await resolveValue({ seq });
         const defaultAssociations = {};
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
@@ -68,21 +77,27 @@ type PostFactoryDefineInput = {
     reviews?: Prisma.ReviewCreateNestedManyWithoutPostInput;
 };
 type PostFactoryDefineOptions = {
-    defaultData?: Resolver<PostFactoryDefineInput>;
+    defaultData?: Resolver<PostFactoryDefineInput, BuildDataOptions>;
 };
 function isPostauthorFactory(x: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput | undefined): x is PostauthorFactory {
     return (x as any)?._factoryFor === "User";
 }
-function autoGeneratePostScalarsOrEnums(): PostScalarOrEnumFields {
+function autoGeneratePostScalarsOrEnums({ seq }: {
+    readonly seq: number;
+}): PostScalarOrEnumFields {
     return {
-        id: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "id", isId: true, isUnique: false }),
-        title: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false })
+        id: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "id", isId: true, isUnique: false, seq }),
+        title: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false, seq })
     };
 }
 function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFactoryDefineOptions) {
+    const seqKey = {};
+    const getSeq = () => getSequenceCounter(seqKey);
     const buildCreateInput = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
-        const requiredScalarData = autoGeneratePostScalarsOrEnums();
-        const defaultData = await resolveValue(defaultDataResolver ?? {});
+        const seq = getSeq();
+        const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
+        const resolveValue = normalizeResolver<PostFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+        const defaultData = await resolveValue({ seq });
         const defaultAssociations = {
             author: isPostauthorFactory(defaultData.author) ? {
                 create: await defaultData.author.buildCreateInput()
@@ -129,7 +144,7 @@ type ReviewFactoryDefineInput = {
     reviewer: ReviewreviewerFactory | Prisma.UserCreateNestedOneWithoutReviewsInput;
 };
 type ReviewFactoryDefineOptions = {
-    defaultData: Resolver<ReviewFactoryDefineInput>;
+    defaultData: Resolver<ReviewFactoryDefineInput, BuildDataOptions>;
 };
 function isReviewpostFactory(x: ReviewpostFactory | Prisma.PostCreateNestedOneWithoutReviewsInput | undefined): x is ReviewpostFactory {
     return (x as any)?._factoryFor === "Post";
@@ -137,16 +152,22 @@ function isReviewpostFactory(x: ReviewpostFactory | Prisma.PostCreateNestedOneWi
 function isReviewreviewerFactory(x: ReviewreviewerFactory | Prisma.UserCreateNestedOneWithoutReviewsInput | undefined): x is ReviewreviewerFactory {
     return (x as any)?._factoryFor === "User";
 }
-function autoGenerateReviewScalarsOrEnums(): ReviewScalarOrEnumFields {
+function autoGenerateReviewScalarsOrEnums({ seq }: {
+    readonly seq: number;
+}): ReviewScalarOrEnumFields {
     return {
-        id: scalarFieldValueGenerator.String({ modelName: "Review", fieldName: "id", isId: true, isUnique: false }),
-        body: scalarFieldValueGenerator.String({ modelName: "Review", fieldName: "body", isId: false, isUnique: false })
+        id: scalarFieldValueGenerator.String({ modelName: "Review", fieldName: "id", isId: true, isUnique: false, seq }),
+        body: scalarFieldValueGenerator.String({ modelName: "Review", fieldName: "body", isId: false, isUnique: false, seq })
     };
 }
 function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: ReviewFactoryDefineOptions) {
+    const seqKey = {};
+    const getSeq = () => getSequenceCounter(seqKey);
     const buildCreateInput = async (inputData: Partial<Prisma.ReviewCreateInput> = {}) => {
-        const requiredScalarData = autoGenerateReviewScalarsOrEnums();
-        const defaultData = await resolveValue(defaultDataResolver ?? {});
+        const seq = getSeq();
+        const requiredScalarData = autoGenerateReviewScalarsOrEnums({ seq });
+        const resolveValue = normalizeResolver<ReviewFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+        const defaultData = await resolveValue({ seq });
         const defaultAssociations = {
             post: isReviewpostFactory(defaultData.post) ? {
                 create: await defaultData.post.buildCreateInput()

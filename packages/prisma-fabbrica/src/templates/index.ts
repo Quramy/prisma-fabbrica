@@ -69,8 +69,12 @@ export const header = (prismaClientModuleSpecifier: string) =>
     import type { PrismaClient } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
     import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
     import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
-    import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
-    export { initialize } from "@quramy/prisma-fabbrica";
+    import { Resolver, normalizeResolver, getSequenceCounter } from "@quramy/prisma-fabbrica/lib/helpers";
+    export { initialize, resetSequence } from "@quramy/prisma-fabbrica";
+
+    type BuildDataOptions = {
+      readonly seq: number;
+    };
   `();
 
 export const importStatement = (specifier: string, prismaClientModuleSpecifier: string) =>
@@ -186,7 +190,7 @@ export const modelFactoryDefineOptions = (modelName: string, isOpionalDefaultDat
   isOpionalDefaultData
     ? template.statement<ts.TypeAliasDeclaration>`
         type MODEL_FACTORY_DEFINE_OPTIONS = {
-          defaultData?: Resolver<MODEL_FACTORY_DEFINE_INPUT>;
+          defaultData?: Resolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions>;
         };
       `({
         MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${modelName}FactoryDefineOptions`),
@@ -194,7 +198,7 @@ export const modelFactoryDefineOptions = (modelName: string, isOpionalDefaultDat
       })
     : template.statement<ts.TypeAliasDeclaration>`
         type MODEL_FACTORY_DEFINE_OPTIONS = {
-          defaultData: Resolver<MODEL_FACTORY_DEFINE_INPUT>;
+          defaultData: Resolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions>;
         };
       `({
         MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${modelName}FactoryDefineOptions`),
@@ -222,7 +226,7 @@ export const autoGenerateModelScalarsOrEnumsFieldArgs = (
 ) =>
   field.inputTypes[0].location === "scalar"
     ? template.expression`
-        scalarFieldValueGenerator.SCALAR_TYPE({ modelName: MODEL_NAME, fieldName: FIELD_NAME, isId: IS_ID, isUnique: IS_UNIQUE })
+        scalarFieldValueGenerator.SCALAR_TYPE({ modelName: MODEL_NAME, fieldName: FIELD_NAME, isId: IS_ID, isUnique: IS_UNIQUE, seq })
       `({
         SCALAR_TYPE: ast.identifier(field.inputTypes[0].type as string),
         MODEL_NAME: ast.stringLiteral(model.name),
@@ -241,7 +245,7 @@ export const autoGenerateModelScalarsOrEnums = (
   enums: DMMF.SchemaEnum[],
 ) =>
   template.statement<ts.FunctionDeclaration>`
-    function AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS(): MODEL_SCALAR_OR_ENUM_FIELDS {
+    function AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS({ seq }: { readonly seq: number }): MODEL_SCALAR_OR_ENUM_FIELDS {
       return ${() =>
         ast.objectLiteralExpression(
           filterRequiredScalarOrEnumFields(inputType).map(field =>
@@ -260,11 +264,17 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
     function DEFINE_MODEL_FACTORY_INERNAL({
       defaultData: defaultDataResolver
     }: MODEL_FACTORY_DEFINE_OPTIONS) {
+
+      const seqKey = {};
+      const getSeq = () => getSequenceCounter(seqKey);
+
       const buildCreateInput = async (
         inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
       ) => {
-        const requiredScalarData = AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS()
-        const defaultData= await resolveValue(defaultDataResolver ?? {});
+        const seq = getSeq();
+        const requiredScalarData = AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS({ seq })
+        const resolveValue = normalizeResolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions>(defaultDataResolver ?? {});
+        const defaultData = await resolveValue({ seq });
         const defaultAssociations = ${() =>
           ast.objectLiteralExpression(
             filterBelongsToField(model, inputType).map(field =>
@@ -285,6 +295,7 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
         const data: Prisma.MODEL_CREATE_INPUT = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData};
         return data;
       };
+
       const pickForConnect = (inputData: ${() => ast.typeReferenceNode(model.name)}) => (
         ${() =>
           ast.objectLiteralExpression(
@@ -294,13 +305,16 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
             true,
           )}
       );
+
       const create = async (
         inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
       ) => {
         const data = await buildCreateInput(inputData);
         return await getClient<PrismaClient>().MODEL_KEY.create({ data });
       };
+
       const createForConnect = (inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}) => create(inputData).then(pickForConnect);
+
       return {
         _factoryFor: ${() => ast.stringLiteral(model.name)} as const,
         buildCreateInput,
@@ -312,6 +326,7 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
   `({
     MODEL_KEY: ast.identifier(camelize(model.name)),
     DEFINE_MODEL_FACTORY_INERNAL: ast.identifier(`define${model.name}FactoryInternal`),
+    MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${model.name}FactoryDefineInput`),
     MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
     MODEL_CREATE_INPUT: ast.identifier(`${model.name}CreateInput`),
     AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS: ast.identifier(`autoGenerate${model.name}ScalarsOrEnums`),

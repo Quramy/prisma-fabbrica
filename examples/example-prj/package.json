@@ -7,8 +7,8 @@
     "clean": "echo nothing to do",
     "migrate:test:ci": "DATABASE_URL=\"file:./test.db\" prisma migrate dev",
     "generate": "prisma generate",
-    "test": "jest",
-    "test:ci": "DATABASE_URL=\"file:./test.db\" jest"
+    "test": "DATABASE_URL=\"file:./test.db\" jest --maxWorkers=1",
+    "test:ci": "DATABASE_URL=\"file:./test.db\" jest --maxWorkers=1"
   },
   "devDependencies": {
     "@quramy/jest-prisma-node": "1.1.2",

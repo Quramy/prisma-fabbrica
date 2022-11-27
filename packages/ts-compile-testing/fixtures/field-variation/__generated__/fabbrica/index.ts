@@ -5,8 +5,11 @@ import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
 import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
-import { Resolver, resolveValue } from "@quramy/prisma-fabbrica/lib/helpers";
-export { initialize } from "@quramy/prisma-fabbrica";
+import { Resolver, normalizeResolver, getSequenceCounter } from "@quramy/prisma-fabbrica/lib/helpers";
+export { initialize, resetSequence } from "@quramy/prisma-fabbrica";
+type BuildDataOptions = {
+    readonly seq: number;
+};
 type UserScalarOrEnumFields = {
     id: string;
     role: Role;
@@ -18,18 +21,24 @@ type UserFactoryDefineInput = {
     roles?: Prisma.UserCreaterolesInput | Prisma.Enumerable<Role>;
 };
 type UserFactoryDefineOptions = {
-    defaultData?: Resolver<UserFactoryDefineInput>;
+    defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
 };
-function autoGenerateUserScalarsOrEnums(): UserScalarOrEnumFields {
+function autoGenerateUserScalarsOrEnums({ seq }: {
+    readonly seq: number;
+}): UserScalarOrEnumFields {
     return {
-        id: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false }),
+        id: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false, seq }),
         role: "USER"
     };
 }
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
+    const seqKey = {};
+    const getSeq = () => getSequenceCounter(seqKey);
     const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
-        const requiredScalarData = autoGenerateUserScalarsOrEnums();
-        const defaultData = await resolveValue(defaultDataResolver ?? {});
+        const seq = getSeq();
+        const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
+        const resolveValue = normalizeResolver<UserFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+        const defaultData = await resolveValue({ seq });
         const defaultAssociations = {};
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
@@ -62,18 +71,24 @@ type ComplexIdModelFactoryDefineInput = {
     lastName?: string;
 };
 type ComplexIdModelFactoryDefineOptions = {
-    defaultData?: Resolver<ComplexIdModelFactoryDefineInput>;
+    defaultData?: Resolver<ComplexIdModelFactoryDefineInput, BuildDataOptions>;
 };
-function autoGenerateComplexIdModelScalarsOrEnums(): ComplexIdModelScalarOrEnumFields {
+function autoGenerateComplexIdModelScalarsOrEnums({ seq }: {
+    readonly seq: number;
+}): ComplexIdModelScalarOrEnumFields {
     return {
-        firstName: scalarFieldValueGenerator.String({ modelName: "ComplexIdModel", fieldName: "firstName", isId: true, isUnique: false }),
-        lastName: scalarFieldValueGenerator.String({ modelName: "ComplexIdModel", fieldName: "lastName", isId: true, isUnique: false })
+        firstName: scalarFieldValueGenerator.String({ modelName: "ComplexIdModel", fieldName: "firstName", isId: true, isUnique: false, seq }),
+        lastName: scalarFieldValueGenerator.String({ modelName: "ComplexIdModel", fieldName: "lastName", isId: true, isUnique: false, seq })
     };
 }
 function defineComplexIdModelFactoryInternal({ defaultData: defaultDataResolver }: ComplexIdModelFactoryDefineOptions) {
+    const seqKey = {};
+    const getSeq = () => getSequenceCounter(seqKey);
     const buildCreateInput = async (inputData: Partial<Prisma.ComplexIdModelCreateInput> = {}) => {
-        const requiredScalarData = autoGenerateComplexIdModelScalarsOrEnums();
-        const defaultData = await resolveValue(defaultDataResolver ?? {});
+        const seq = getSeq();
+        const requiredScalarData = autoGenerateComplexIdModelScalarsOrEnums({ seq });
+        const resolveValue = normalizeResolver<ComplexIdModelFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+        const defaultData = await resolveValue({ seq });
         const defaultAssociations = {};
         const data: Prisma.ComplexIdModelCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;

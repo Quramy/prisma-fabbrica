@@ -2,14 +2,17 @@ import { User } from "@prisma/client";
 import { Post } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import { Resolver } from "@quramy/prisma-fabbrica/lib/helpers";
-export { initialize } from "@quramy/prisma-fabbrica";
+export { initialize, resetSequence } from "@quramy/prisma-fabbrica";
+type BuildDataOptions = {
+    readonly seq: number;
+};
 type UserFactoryDefineInput = {
     id?: string;
     name?: string;
     posts?: Prisma.PostCreateNestedManyWithoutAuthorInput;
 };
 type UserFactoryDefineOptions = {
-    defaultData?: Resolver<UserFactoryDefineInput>;
+    defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
 };
 export declare function defineUserFactory(args?: UserFactoryDefineOptions): {
     _factoryFor: "User";
@@ -32,7 +35,7 @@ type PostFactoryDefineInput = {
     author: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput;
 };
 type PostFactoryDefineOptions = {
-    defaultData: Resolver<PostFactoryDefineInput>;
+    defaultData: Resolver<PostFactoryDefineInput, BuildDataOptions>;
 };
 export declare function definePostFactory(args: PostFactoryDefineOptions): {
     _factoryFor: "Post";

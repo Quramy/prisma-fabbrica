@@ -9,9 +9,9 @@ const scalarFieldValueGenerator: ScalarFieldValueGenerator = {
     }
     return `${fieldName} field`;
   },
-  Int: ({ isId, isUnique }) => {
+  Int: ({ isId, isUnique, seq }) => {
     if (isId || isUnique) {
-      return Date.now();
+      return seq;
     }
     return 10;
   },
