@@ -23,6 +23,16 @@ describe("factories", () => {
       const user = await prisma.user.findUnique({ where: { id: "user001" } });
       expect(user).toEqual({ id: "user001", name: "Quramy" });
     });
+
+    it("creates record with children relation", async () => {
+      await UserFactory.create({
+        posts: {
+          create: [await PostFactory.buildCreateInput()],
+        },
+      });
+      const created = await prisma.user.findFirst({ include: { posts: true } });
+      expect(created?.posts.length).toBe(1);
+    });
   });
 
   describe("PostFactory", () => {

@@ -2,12 +2,17 @@ import { User } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
 import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
+import { ModelWithFields, createScreener } from "@quramy/prisma-fabbrica/lib/relations";
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
 import { Resolver, normalizeResolver, getSequenceCounter } from "@quramy/prisma-fabbrica/lib/helpers";
 export { initialize, resetSequence } from "@quramy/prisma-fabbrica";
 type BuildDataOptions = {
     readonly seq: number;
 };
+const modelFieldDefinitions: ModelWithFields[] = [{
+        name: "User",
+        fields: []
+    }];
 type UserScalarOrEnumFields = {
     id: string;
     name: string;
@@ -30,6 +35,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
+    const screen = createScreener("User", modelFieldDefinitions);
     const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
@@ -43,7 +49,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         id: inputData.id
     });
     const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
-        const data = await buildCreateInput(inputData);
+        const data = await buildCreateInput(inputData).then(screen);
         return await getClient<PrismaClient>().user.create({ data });
     };
     const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);

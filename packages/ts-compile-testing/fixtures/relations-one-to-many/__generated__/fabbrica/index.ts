@@ -4,12 +4,47 @@ import { Review } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
 import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
+import { ModelWithFields, createScreener } from "@quramy/prisma-fabbrica/lib/relations";
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
 import { Resolver, normalizeResolver, getSequenceCounter } from "@quramy/prisma-fabbrica/lib/helpers";
 export { initialize, resetSequence } from "@quramy/prisma-fabbrica";
 type BuildDataOptions = {
     readonly seq: number;
 };
+const modelFieldDefinitions: ModelWithFields[] = [{
+        name: "User",
+        fields: [{
+                name: "posts",
+                type: "Post",
+                relationName: "PostToUser"
+            }, {
+                name: "reviews",
+                type: "Review",
+                relationName: "ReviewToUser"
+            }]
+    }, {
+        name: "Post",
+        fields: [{
+                name: "author",
+                type: "User",
+                relationName: "PostToUser"
+            }, {
+                name: "reviews",
+                type: "Review",
+                relationName: "PostToReview"
+            }]
+    }, {
+        name: "Review",
+        fields: [{
+                name: "post",
+                type: "Post",
+                relationName: "PostToReview"
+            }, {
+                name: "reviewer",
+                type: "User",
+                relationName: "ReviewToUser"
+            }]
+    }];
 type UserScalarOrEnumFields = {
     id: string;
     name: string;
@@ -34,6 +69,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
+    const screen = createScreener("User", modelFieldDefinitions);
     const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
@@ -47,7 +83,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         id: inputData.id
     });
     const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
-        const data = await buildCreateInput(inputData);
+        const data = await buildCreateInput(inputData).then(screen);
         return await getClient<PrismaClient>().user.create({ data });
     };
     const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
@@ -93,6 +129,7 @@ function autoGeneratePostScalarsOrEnums({ seq }: {
 function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFactoryDefineOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
+    const screen = createScreener("Post", modelFieldDefinitions);
     const buildCreateInput = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
@@ -110,7 +147,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         id: inputData.id
     });
     const create = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
-        const data = await buildCreateInput(inputData);
+        const data = await buildCreateInput(inputData).then(screen);
         return await getClient<PrismaClient>().post.create({ data });
     };
     const createForConnect = (inputData: Partial<Prisma.PostCreateInput> = {}) => create(inputData).then(pickForConnect);
@@ -163,6 +200,7 @@ function autoGenerateReviewScalarsOrEnums({ seq }: {
 function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: ReviewFactoryDefineOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
+    const screen = createScreener("Review", modelFieldDefinitions);
     const buildCreateInput = async (inputData: Partial<Prisma.ReviewCreateInput> = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGenerateReviewScalarsOrEnums({ seq });
@@ -183,7 +221,7 @@ function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: Revie
         id: inputData.id
     });
     const create = async (inputData: Partial<Prisma.ReviewCreateInput> = {}) => {
-        const data = await buildCreateInput(inputData);
+        const data = await buildCreateInput(inputData).then(screen);
         return await getClient<PrismaClient>().review.create({ data });
     };
     const createForConnect = (inputData: Partial<Prisma.ReviewCreateInput> = {}) => create(inputData).then(pickForConnect);
