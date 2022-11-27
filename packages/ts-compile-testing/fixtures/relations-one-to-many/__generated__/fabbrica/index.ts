@@ -55,8 +55,12 @@ type UserFactoryDefineInput = {
     posts?: Prisma.PostCreateNestedManyWithoutAuthorInput;
     reviews?: Prisma.ReviewCreateNestedManyWithoutReviewerInput;
 };
+type UserFactoryTraitOptions = {
+    data: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions>;
+};
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
+    traits?: Record<string, UserFactoryTraitOptions>;
 };
 function autoGenerateUserScalarsOrEnums({ seq }: {
     readonly seq: number;
@@ -66,7 +70,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
-function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
+function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>({ defaultData: defaultDataResolver }: TOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("User", modelFieldDefinitions);
@@ -106,8 +110,8 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         createForConnect,
     };
 }
-export function defineUserFactory(args: UserFactoryDefineOptions = {}) {
-    return defineUserFactoryInternal(args);
+export function defineUserFactory<TOptions extends UserFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>(args?: TOptions) {
+    return defineUserFactoryInternal<TOptions, TTraitKey>(args ?? ({} as TOptions));
 }
 type PostScalarOrEnumFields = {
     id: string;
@@ -123,8 +127,12 @@ type PostFactoryDefineInput = {
     author?: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput;
     reviews?: Prisma.ReviewCreateNestedManyWithoutPostInput;
 };
+type PostFactoryTraitOptions = {
+    data: Resolver<Partial<PostFactoryDefineInput>, BuildDataOptions>;
+};
 type PostFactoryDefineOptions = {
     defaultData?: Resolver<PostFactoryDefineInput, BuildDataOptions>;
+    traits?: Record<string, PostFactoryTraitOptions>;
 };
 function isPostauthorFactory(x: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput | undefined): x is PostauthorFactory {
     return (x as any)?._factoryFor === "User";
@@ -137,7 +145,7 @@ function autoGeneratePostScalarsOrEnums({ seq }: {
         title: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false, seq })
     };
 }
-function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFactoryDefineOptions) {
+function definePostFactoryInternal<TOptions extends PostFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>({ defaultData: defaultDataResolver }: TOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("Post", modelFieldDefinitions);
@@ -181,8 +189,8 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         createForConnect,
     };
 }
-export function definePostFactory(args: PostFactoryDefineOptions = {}) {
-    return definePostFactoryInternal(args);
+export function definePostFactory<TOptions extends PostFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>(args?: TOptions) {
+    return definePostFactoryInternal<TOptions, TTraitKey>(args ?? ({} as TOptions));
 }
 type ReviewScalarOrEnumFields = {
     id: string;
@@ -202,8 +210,12 @@ type ReviewFactoryDefineInput = {
     post: ReviewpostFactory | Prisma.PostCreateNestedOneWithoutReviewsInput;
     reviewer: ReviewreviewerFactory | Prisma.UserCreateNestedOneWithoutReviewsInput;
 };
+type ReviewFactoryTraitOptions = {
+    data: Resolver<Partial<ReviewFactoryDefineInput>, BuildDataOptions>;
+};
 type ReviewFactoryDefineOptions = {
     defaultData: Resolver<ReviewFactoryDefineInput, BuildDataOptions>;
+    traits?: ReviewFactoryTraitOptions;
 };
 function isReviewpostFactory(x: ReviewpostFactory | Prisma.PostCreateNestedOneWithoutReviewsInput | undefined): x is ReviewpostFactory {
     return (x as any)?._factoryFor === "Post";
@@ -219,7 +231,7 @@ function autoGenerateReviewScalarsOrEnums({ seq }: {
         body: scalarFieldValueGenerator.String({ modelName: "Review", fieldName: "body", isId: false, isUnique: false, seq })
     };
 }
-function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: ReviewFactoryDefineOptions) {
+function defineReviewFactoryInternal<TOptions extends ReviewFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>({ defaultData: defaultDataResolver }: TOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("Review", modelFieldDefinitions);
@@ -266,6 +278,6 @@ function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: Revie
         createForConnect,
     };
 }
-export function defineReviewFactory(args: ReviewFactoryDefineOptions) {
-    return defineReviewFactoryInternal(args);
+export function defineReviewFactory<TOptions extends ReviewFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>(args: TOptions) {
+    return defineReviewFactoryInternal<TOptions, TTraitKey>(args);
 }

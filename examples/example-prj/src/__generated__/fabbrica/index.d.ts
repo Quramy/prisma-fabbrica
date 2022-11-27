@@ -11,10 +11,14 @@ type UserFactoryDefineInput = {
     name?: string;
     posts?: Prisma.PostCreateNestedManyWithoutAuthorInput;
 };
+type UserFactoryTraitOptions = {
+    data: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions>;
+};
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
+    traits?: Record<string, UserFactoryTraitOptions>;
 };
-export declare function defineUserFactory(args?: UserFactoryDefineOptions): {
+export declare function defineUserFactory<TOptions extends UserFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>(args?: TOptions): {
     _factoryFor: "User";
     build: (inputData?: Partial<Prisma.UserCreateInput>) => Promise<Prisma.UserCreateInput>;
     buildList: (inputData: number | Partial<Prisma.UserCreateInput>[]) => Promise<Prisma.UserCreateInput[]>;
@@ -37,10 +41,14 @@ type PostFactoryDefineInput = {
     title?: string;
     author: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput;
 };
+type PostFactoryTraitOptions = {
+    data: Resolver<Partial<PostFactoryDefineInput>, BuildDataOptions>;
+};
 type PostFactoryDefineOptions = {
     defaultData: Resolver<PostFactoryDefineInput, BuildDataOptions>;
+    traits?: PostFactoryTraitOptions;
 };
-export declare function definePostFactory(args: PostFactoryDefineOptions): {
+export declare function definePostFactory<TOptions extends PostFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>(args: TOptions): {
     _factoryFor: "Post";
     build: (inputData?: Partial<Prisma.PostCreateInput>) => Promise<Prisma.PostCreateInput>;
     buildList: (inputData: number | Partial<Prisma.PostCreateInput>[]) => Promise<Prisma.PostCreateInput[]>;

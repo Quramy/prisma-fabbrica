@@ -72,8 +72,8 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
         createForConnect,
     };
 }
-function defineUserFactory(args = {}) {
-    return defineUserFactoryInternal(args);
+function defineUserFactory(args) {
+    return defineUserFactoryInternal(args ?? {});
 }
 exports.defineUserFactory = defineUserFactory;
 function isPostauthorFactory(x) {

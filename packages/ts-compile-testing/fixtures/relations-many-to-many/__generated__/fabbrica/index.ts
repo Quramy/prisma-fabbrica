@@ -34,8 +34,12 @@ type PostFactoryDefineInput = {
     title?: string;
     categories?: Prisma.CategoryCreateNestedManyWithoutPostsInput;
 };
+type PostFactoryTraitOptions = {
+    data: Resolver<Partial<PostFactoryDefineInput>, BuildDataOptions>;
+};
 type PostFactoryDefineOptions = {
     defaultData?: Resolver<PostFactoryDefineInput, BuildDataOptions>;
+    traits?: Record<string, PostFactoryTraitOptions>;
 };
 function autoGeneratePostScalarsOrEnums({ seq }: {
     readonly seq: number;
@@ -45,7 +49,7 @@ function autoGeneratePostScalarsOrEnums({ seq }: {
         title: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false, seq })
     };
 }
-function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFactoryDefineOptions) {
+function definePostFactoryInternal<TOptions extends PostFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>({ defaultData: defaultDataResolver }: TOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("Post", modelFieldDefinitions);
@@ -85,8 +89,8 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         createForConnect,
     };
 }
-export function definePostFactory(args: PostFactoryDefineOptions = {}) {
-    return definePostFactoryInternal(args);
+export function definePostFactory<TOptions extends PostFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>(args?: TOptions) {
+    return definePostFactoryInternal<TOptions, TTraitKey>(args ?? ({} as TOptions));
 }
 type CategoryScalarOrEnumFields = {
     id: string;
@@ -97,8 +101,12 @@ type CategoryFactoryDefineInput = {
     name?: string;
     posts?: Prisma.PostCreateNestedManyWithoutCategoriesInput;
 };
+type CategoryFactoryTraitOptions = {
+    data: Resolver<Partial<CategoryFactoryDefineInput>, BuildDataOptions>;
+};
 type CategoryFactoryDefineOptions = {
     defaultData?: Resolver<CategoryFactoryDefineInput, BuildDataOptions>;
+    traits?: Record<string, CategoryFactoryTraitOptions>;
 };
 function autoGenerateCategoryScalarsOrEnums({ seq }: {
     readonly seq: number;
@@ -108,7 +116,7 @@ function autoGenerateCategoryScalarsOrEnums({ seq }: {
         name: scalarFieldValueGenerator.String({ modelName: "Category", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
-function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: CategoryFactoryDefineOptions) {
+function defineCategoryFactoryInternal<TOptions extends CategoryFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>({ defaultData: defaultDataResolver }: TOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("Category", modelFieldDefinitions);
@@ -148,6 +156,6 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: Cat
         createForConnect,
     };
 }
-export function defineCategoryFactory(args: CategoryFactoryDefineOptions = {}) {
-    return defineCategoryFactoryInternal(args);
+export function defineCategoryFactory<TOptions extends CategoryFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>(args?: TOptions) {
+    return defineCategoryFactoryInternal<TOptions, TTraitKey>(args ?? ({} as TOptions));
 }
