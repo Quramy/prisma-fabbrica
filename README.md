@@ -125,6 +125,32 @@ const UserFactory = defineUserFactory({
 await UserFactory.create()
 ```
 
+### Use sequence for scalar fields
+
+`seq` parameter provides sequential number which increments when called `.create()` .
+
+```ts
+const UserFactory = defineUserFactory({
+  defaultData: async ({ seq }) => ({
+    id: `user${seq.toString().padStart(3, "0")}`,
+  }),
+});
+
+await UserFactory.create(); // Insert with id: "user000"
+await UserFactory.create(); // Insert with id: "user001"
+await UserFactory.create(); // Insert with id: "user002"
+```
+
+And the sequential number can be reset via `resetSequence` .
+
+```ts
+/* your.testSetup.ts */
+
+import { resetSequence } from "./__generated__/fabbrica";
+
+beforeEach(() => resetSequence());
+```
+
 ### Required relation
 
 Sometimes, creating a model requires other model existence. For example, the following model `Post` belongs to other model `User`.

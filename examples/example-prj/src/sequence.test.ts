@@ -4,7 +4,7 @@ const prisma = jestPrisma.client;
 
 const UserFactory = defineUserFactory({
   defaultData: async ({ seq }) => ({
-    id: "user" + `${seq}`.padStart(3, "0"),
+    id: `user${seq.toString().padStart(3, "0")}`,
   }),
 });
 
