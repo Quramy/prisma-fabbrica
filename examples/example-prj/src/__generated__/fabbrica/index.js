@@ -36,7 +36,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
     const seqKey = {};
     const getSeq = () => (0, helpers_1.getSequenceCounter)(seqKey);
     const screen = (0, relations_1.createScreener)("User", modelFieldDefinitions);
-    const buildCreateInput = async (inputData = {}) => {
+    const build = async (inputData = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
         const resolveValue = (0, helpers_1.normalizeResolver)(defaultDataResolver ?? {});
@@ -45,19 +45,30 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const buildList = (inputData) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => build(data)));
+    };
     const pickForConnect = (inputData) => ({
         id: inputData.id
     });
     const create = async (inputData = {}) => {
-        const data = await buildCreateInput(inputData).then(screen);
+        const data = await build(inputData).then(screen);
         return await (0, clientHolder_1.getClient)().user.create({ data });
+    };
+    const createList = (inputData) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => create(data)));
     };
     const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "User",
-        buildCreateInput,
+        build,
+        buildList,
+        buildCreateInput: build,
         pickForConnect,
         create,
+        createList,
         createForConnect,
     };
 }
@@ -78,32 +89,43 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
     const seqKey = {};
     const getSeq = () => (0, helpers_1.getSequenceCounter)(seqKey);
     const screen = (0, relations_1.createScreener)("Post", modelFieldDefinitions);
-    const buildCreateInput = async (inputData = {}) => {
+    const build = async (inputData = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
         const resolveValue = (0, helpers_1.normalizeResolver)(defaultDataResolver ?? {});
         const defaultData = await resolveValue({ seq });
         const defaultAssociations = {
             author: isPostauthorFactory(defaultData.author) ? {
-                create: await defaultData.author.buildCreateInput()
+                create: await defaultData.author.build()
             } : defaultData.author
         };
         const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
+    const buildList = (inputData) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => build(data)));
+    };
     const pickForConnect = (inputData) => ({
         id: inputData.id
     });
     const create = async (inputData = {}) => {
-        const data = await buildCreateInput(inputData).then(screen);
+        const data = await build(inputData).then(screen);
         return await (0, clientHolder_1.getClient)().post.create({ data });
+    };
+    const createList = (inputData) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => create(data)));
     };
     const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Post",
-        buildCreateInput,
+        build,
+        buildList,
+        buildCreateInput: build,
         pickForConnect,
         create,
+        createList,
         createForConnect,
     };
 }

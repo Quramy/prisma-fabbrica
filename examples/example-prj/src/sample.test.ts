@@ -27,11 +27,11 @@ describe("factories", () => {
     it("creates record with children relation", async () => {
       await UserFactory.create({
         posts: {
-          create: [await PostFactory.buildCreateInput()],
+          create: await PostFactory.buildList(2),
         },
       });
       const created = await prisma.user.findFirst({ include: { posts: true } });
-      expect(created?.posts.length).toBe(1);
+      expect(created?.posts.length).toBe(2);
     });
   });
 

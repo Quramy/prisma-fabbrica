@@ -11,7 +11,7 @@ const PostFactory = definePostFactory({
         where: {
           id: "user001",
         },
-        create: await UserFactory.buildCreateInput({
+        create: await UserFactory.build({
           id: "user001",
         }),
       },
@@ -27,9 +27,7 @@ describe("factories", () => {
     });
 
     it("creates related user at most one", async () => {
-      await PostFactory.create();
-      await PostFactory.create();
-      await PostFactory.create();
+      await PostFactory.createList(3);
       await expect(prisma.user.count()).resolves.toBe(1);
     });
   });
