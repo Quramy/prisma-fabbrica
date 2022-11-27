@@ -36,7 +36,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("User", modelFieldDefinitions);
-    const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
+    const build = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
         const resolveValue = normalizeResolver<UserFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
@@ -49,13 +49,14 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         id: inputData.id
     });
     const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
-        const data = await buildCreateInput(inputData).then(screen);
+        const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().user.create({ data });
     };
     const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "User" as const,
-        buildCreateInput,
+        build,
+        buildCreateInput: build,
         pickForConnect,
         create,
         createForConnect,

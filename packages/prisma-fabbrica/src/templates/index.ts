@@ -160,8 +160,7 @@ export const modelBelongsToRelationFactory = (fieldType: DMMF.SchemaArg, model: 
   return template.statement<ts.TypeAliasDeclaration>`
     type ${() => ast.identifier(`${model.name}${fieldType.name}Factory`)} = {
       _factoryFor: ${() => ast.literalTypeNode(ast.stringLiteral(targetModel.type))};
-      buildCreateInput: () => PromiseLike<Prisma.${() =>
-        ast.identifier(fieldType.inputTypes[0].type as string)}["create"]>;
+      build: () => PromiseLike<Prisma.${() => ast.identifier(fieldType.inputTypes[0].type as string)}["create"]>;
     };
   `();
 };
@@ -272,7 +271,7 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
       const getSeq = () => getSequenceCounter(seqKey);
       const screen = createScreener(${() => ast.stringLiteral(model.name)}, modelFieldDefinitions);
 
-      const buildCreateInput = async (
+      const build = async (
         inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
       ) => {
         const seq = getSeq();
@@ -286,7 +285,7 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
                 field.name,
                 template.expression`
                   IS_MODEL_BELONGS_TO_RELATION_FACTORY(defaultData.FIELD_NAME) ? {
-                    create: await defaultData.FIELD_NAME.buildCreateInput()
+                    create: await defaultData.FIELD_NAME.build()
                   } : defaultData.FIELD_NAME
                 `({
                   IS_MODEL_BELONGS_TO_RELATION_FACTORY: ast.identifier(`is${model.name}${field.name}Factory`),
@@ -313,7 +312,7 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
       const create = async (
         inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
       ) => {
-        const data = await buildCreateInput(inputData).then(screen);
+        const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().MODEL_KEY.create({ data });
       };
 
@@ -321,7 +320,8 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
 
       return {
         _factoryFor: ${() => ast.stringLiteral(model.name)} as const,
-        buildCreateInput,
+        build,
+        buildCreateInput: build,
         pickForConnect,
         create,
         createForConnect,

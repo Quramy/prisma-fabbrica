@@ -49,7 +49,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("Post", modelFieldDefinitions);
-    const buildCreateInput = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
+    const build = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
         const resolveValue = normalizeResolver<PostFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
@@ -62,13 +62,14 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         id: inputData.id
     });
     const create = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
-        const data = await buildCreateInput(inputData).then(screen);
+        const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().post.create({ data });
     };
     const createForConnect = (inputData: Partial<Prisma.PostCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Post" as const,
-        buildCreateInput,
+        build,
+        buildCreateInput: build,
         pickForConnect,
         create,
         createForConnect,
@@ -101,7 +102,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: Cat
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("Category", modelFieldDefinitions);
-    const buildCreateInput = async (inputData: Partial<Prisma.CategoryCreateInput> = {}) => {
+    const build = async (inputData: Partial<Prisma.CategoryCreateInput> = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGenerateCategoryScalarsOrEnums({ seq });
         const resolveValue = normalizeResolver<CategoryFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
@@ -114,13 +115,14 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: Cat
         id: inputData.id
     });
     const create = async (inputData: Partial<Prisma.CategoryCreateInput> = {}) => {
-        const data = await buildCreateInput(inputData).then(screen);
+        const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().category.create({ data });
     };
     const createForConnect = (inputData: Partial<Prisma.CategoryCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Category" as const,
-        buildCreateInput,
+        build,
+        buildCreateInput: build,
         pickForConnect,
         create,
         createForConnect,

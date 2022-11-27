@@ -230,17 +230,17 @@ console.log(posts.length); // -> 2
 
 ### Build input data only
 
-`.buildCreateInput` method in factories provides data set to create the model, but never insert.
+`.build` method in factories provides data set to create the model, but never insert.
 
 ```ts
 await UserFactory.create();
 
 // The above code is equivalent to the bellow:
-const data = await UserFactory.buildCreateInput();
+const data = await UserFactory.build();
 await prisma.user.create({ data });
 ```
 
-For example, you can use `.buildCreateInput` method in other model's factory definition:
+For example, you can use `.build` method in other model's factory definition:
 
 ```ts
 const UserFactory = defineUserFactory();
@@ -252,7 +252,7 @@ const PostFactory = definePostFactory({
         where: {
           id: "user001",
         },
-        create: await UserFactory.buildCreateInput({
+        create: await UserFactory.build({
           id: "user001",
         }),
       },
@@ -268,19 +268,19 @@ console.log(await prisma.user.count()); // -> 1
 
 ### has-many / has-one relation
 
-Sometimes, you may want a user data whose has post record. You can use `PostFactory.buildCreateInput` too.
+Sometimes, you may want a user data whose has post record. You can use `PostFactory.build` too.
 
 ```ts
 await UserFactory.create({
   posts: {
-    create: [await PostFactory.buildCreateInput()],
+    create: [await PostFactory.build()],
   },
 });
 
 console.log(await prisma.post.count()); // -> 1
 ```
 
-Note: In the above example, `PostFactory.buildCreateInput()` resolves JSON data such as:
+Note: In the above example, `PostFactory.build()` resolves JSON data such as:
 
 ```ts
 {

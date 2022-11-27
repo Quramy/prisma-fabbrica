@@ -16,6 +16,7 @@ type UserFactoryDefineOptions = {
 };
 export declare function defineUserFactory(args?: UserFactoryDefineOptions): {
     _factoryFor: "User";
+    build: (inputData?: Partial<Prisma.UserCreateInput>) => Promise<Prisma.UserCreateInput>;
     buildCreateInput: (inputData?: Partial<Prisma.UserCreateInput>) => Promise<Prisma.UserCreateInput>;
     pickForConnect: (inputData: User) => {
         id: string;
@@ -27,7 +28,7 @@ export declare function defineUserFactory(args?: UserFactoryDefineOptions): {
 };
 type PostauthorFactory = {
     _factoryFor: "User";
-    buildCreateInput: () => PromiseLike<Prisma.UserCreateNestedOneWithoutPostsInput["create"]>;
+    build: () => PromiseLike<Prisma.UserCreateNestedOneWithoutPostsInput["create"]>;
 };
 type PostFactoryDefineInput = {
     id?: string;
@@ -39,6 +40,7 @@ type PostFactoryDefineOptions = {
 };
 export declare function definePostFactory(args: PostFactoryDefineOptions): {
     _factoryFor: "Post";
+    build: (inputData?: Partial<Prisma.PostCreateInput>) => Promise<Prisma.PostCreateInput>;
     buildCreateInput: (inputData?: Partial<Prisma.PostCreateInput>) => Promise<Prisma.PostCreateInput>;
     pickForConnect: (inputData: Post) => {
         id: string;

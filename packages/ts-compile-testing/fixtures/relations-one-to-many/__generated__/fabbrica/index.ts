@@ -70,7 +70,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("User", modelFieldDefinitions);
-    const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
+    const build = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
         const resolveValue = normalizeResolver<UserFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
@@ -83,13 +83,14 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         id: inputData.id
     });
     const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
-        const data = await buildCreateInput(inputData).then(screen);
+        const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().user.create({ data });
     };
     const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "User" as const,
-        buildCreateInput,
+        build,
+        buildCreateInput: build,
         pickForConnect,
         create,
         createForConnect,
@@ -104,7 +105,7 @@ type PostScalarOrEnumFields = {
 };
 type PostauthorFactory = {
     _factoryFor: "User";
-    buildCreateInput: () => PromiseLike<Prisma.UserCreateNestedOneWithoutPostsInput["create"]>;
+    build: () => PromiseLike<Prisma.UserCreateNestedOneWithoutPostsInput["create"]>;
 };
 type PostFactoryDefineInput = {
     id?: string;
@@ -130,14 +131,14 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("Post", modelFieldDefinitions);
-    const buildCreateInput = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
+    const build = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
         const resolveValue = normalizeResolver<PostFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
         const defaultData = await resolveValue({ seq });
         const defaultAssociations = {
             author: isPostauthorFactory(defaultData.author) ? {
-                create: await defaultData.author.buildCreateInput()
+                create: await defaultData.author.build()
             } : defaultData.author
         };
         const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
@@ -147,13 +148,14 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         id: inputData.id
     });
     const create = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
-        const data = await buildCreateInput(inputData).then(screen);
+        const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().post.create({ data });
     };
     const createForConnect = (inputData: Partial<Prisma.PostCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Post" as const,
-        buildCreateInput,
+        build,
+        buildCreateInput: build,
         pickForConnect,
         create,
         createForConnect,
@@ -168,11 +170,11 @@ type ReviewScalarOrEnumFields = {
 };
 type ReviewpostFactory = {
     _factoryFor: "Post";
-    buildCreateInput: () => PromiseLike<Prisma.PostCreateNestedOneWithoutReviewsInput["create"]>;
+    build: () => PromiseLike<Prisma.PostCreateNestedOneWithoutReviewsInput["create"]>;
 };
 type ReviewreviewerFactory = {
     _factoryFor: "User";
-    buildCreateInput: () => PromiseLike<Prisma.UserCreateNestedOneWithoutReviewsInput["create"]>;
+    build: () => PromiseLike<Prisma.UserCreateNestedOneWithoutReviewsInput["create"]>;
 };
 type ReviewFactoryDefineInput = {
     id?: string;
@@ -201,17 +203,17 @@ function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: Revie
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("Review", modelFieldDefinitions);
-    const buildCreateInput = async (inputData: Partial<Prisma.ReviewCreateInput> = {}) => {
+    const build = async (inputData: Partial<Prisma.ReviewCreateInput> = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGenerateReviewScalarsOrEnums({ seq });
         const resolveValue = normalizeResolver<ReviewFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
         const defaultData = await resolveValue({ seq });
         const defaultAssociations = {
             post: isReviewpostFactory(defaultData.post) ? {
-                create: await defaultData.post.buildCreateInput()
+                create: await defaultData.post.build()
             } : defaultData.post,
             reviewer: isReviewreviewerFactory(defaultData.reviewer) ? {
-                create: await defaultData.reviewer.buildCreateInput()
+                create: await defaultData.reviewer.build()
             } : defaultData.reviewer
         };
         const data: Prisma.ReviewCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
@@ -221,13 +223,14 @@ function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: Revie
         id: inputData.id
     });
     const create = async (inputData: Partial<Prisma.ReviewCreateInput> = {}) => {
-        const data = await buildCreateInput(inputData).then(screen);
+        const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().review.create({ data });
     };
     const createForConnect = (inputData: Partial<Prisma.ReviewCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Review" as const,
-        buildCreateInput,
+        build,
+        buildCreateInput: build,
         pickForConnect,
         create,
         createForConnect,
