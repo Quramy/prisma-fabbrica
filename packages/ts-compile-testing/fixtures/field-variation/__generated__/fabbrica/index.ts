@@ -4,12 +4,20 @@ import { Role } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
 import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
+import { ModelWithFields, createScreener } from "@quramy/prisma-fabbrica/lib/relations";
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
 import { Resolver, normalizeResolver, getSequenceCounter } from "@quramy/prisma-fabbrica/lib/helpers";
 export { initialize, resetSequence } from "@quramy/prisma-fabbrica";
 type BuildDataOptions = {
     readonly seq: number;
 };
+const modelFieldDefinitions: ModelWithFields[] = [{
+        name: "User",
+        fields: []
+    }, {
+        name: "ComplexIdModel",
+        fields: []
+    }];
 type UserScalarOrEnumFields = {
     id: string;
     role: Role;
@@ -34,6 +42,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
+    const screen = createScreener("User", modelFieldDefinitions);
     const buildCreateInput = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
@@ -47,7 +56,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         id: inputData.id
     });
     const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
-        const data = await buildCreateInput(inputData);
+        const data = await buildCreateInput(inputData).then(screen);
         return await getClient<PrismaClient>().user.create({ data });
     };
     const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
@@ -84,6 +93,7 @@ function autoGenerateComplexIdModelScalarsOrEnums({ seq }: {
 function defineComplexIdModelFactoryInternal({ defaultData: defaultDataResolver }: ComplexIdModelFactoryDefineOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
+    const screen = createScreener("ComplexIdModel", modelFieldDefinitions);
     const buildCreateInput = async (inputData: Partial<Prisma.ComplexIdModelCreateInput> = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGenerateComplexIdModelScalarsOrEnums({ seq });
@@ -98,7 +108,7 @@ function defineComplexIdModelFactoryInternal({ defaultData: defaultDataResolver 
         lastName: inputData.lastName
     });
     const create = async (inputData: Partial<Prisma.ComplexIdModelCreateInput> = {}) => {
-        const data = await buildCreateInput(inputData);
+        const data = await buildCreateInput(inputData).then(screen);
         return await getClient<PrismaClient>().complexIdModel.create({ data });
     };
     const createForConnect = (inputData: Partial<Prisma.ComplexIdModelCreateInput> = {}) => create(inputData).then(pickForConnect);

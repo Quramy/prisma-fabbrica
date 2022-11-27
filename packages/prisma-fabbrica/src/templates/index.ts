@@ -1,11 +1,8 @@
 import { DMMF } from "@prisma/generator-helper";
 import ts from "typescript";
 import { template } from "talt";
-import { camelize, ast } from "../helpers";
-
-function byName<T extends { readonly name: string }>(name: string | { readonly name: string }) {
-  return (x: T) => x.name === (typeof name === "string" ? name : name.name);
-}
+import { camelize, ast, byName, createJSONLiteral } from "../helpers";
+import { createFieldDefinitions } from "../relations";
 
 export function findPrsimaCreateInputTypeFromModelName(document: DMMF.Document, modelName: string) {
   const search = `${modelName}CreateInput`;
@@ -68,6 +65,7 @@ export const header = (prismaClientModuleSpecifier: string) =>
     import { Prisma } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
     import type { PrismaClient } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
     import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
+    import { ModelWithFields, createScreener } from "@quramy/prisma-fabbrica/lib/relations";
     import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
     import { Resolver, normalizeResolver, getSequenceCounter } from "@quramy/prisma-fabbrica/lib/helpers";
     export { initialize, resetSequence } from "@quramy/prisma-fabbrica";
@@ -81,6 +79,11 @@ export const importStatement = (specifier: string, prismaClientModuleSpecifier: 
   template.statement`
     import { ${() => ast.identifier(specifier)} } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
   `();
+
+export const modelFieldDefinitions = (models: DMMF.Model[]) =>
+  template.statement`
+  const modelFieldDefinitions: ModelWithFields[] = ${() => createJSONLiteral(createFieldDefinitions(models))}
+`();
 
 export const scalarFieldType = (
   model: DMMF.Model,
@@ -267,6 +270,7 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
 
       const seqKey = {};
       const getSeq = () => getSequenceCounter(seqKey);
+      const screen = createScreener(${() => ast.stringLiteral(model.name)}, modelFieldDefinitions);
 
       const buildCreateInput = async (
         inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
@@ -309,7 +313,7 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
       const create = async (
         inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
       ) => {
-        const data = await buildCreateInput(inputData);
+        const data = await buildCreateInput(inputData).then(screen);
         return await getClient<PrismaClient>().MODEL_KEY.create({ data });
       };
 
@@ -373,6 +377,7 @@ export function getSourceFile({
     ...modelNames.map(modelName => importStatement(modelName, prismaClientModuleSpecifier)),
     ...enums.map(enumName => importStatement(enumName, prismaClientModuleSpecifier)),
     ...header(prismaClientModuleSpecifier).statements,
+    modelFieldDefinitions(document.datamodel.models),
     ...document.datamodel.models
       .map(model => ({ model, createInputType: findPrsimaCreateInputTypeFromModelName(document, model.name) }))
       .flatMap(({ model, createInputType }) => [

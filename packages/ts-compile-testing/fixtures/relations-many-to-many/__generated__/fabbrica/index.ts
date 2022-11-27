@@ -3,12 +3,28 @@ import { Category } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
 import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
+import { ModelWithFields, createScreener } from "@quramy/prisma-fabbrica/lib/relations";
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
 import { Resolver, normalizeResolver, getSequenceCounter } from "@quramy/prisma-fabbrica/lib/helpers";
 export { initialize, resetSequence } from "@quramy/prisma-fabbrica";
 type BuildDataOptions = {
     readonly seq: number;
 };
+const modelFieldDefinitions: ModelWithFields[] = [{
+        name: "Post",
+        fields: [{
+                name: "categories",
+                type: "Category",
+                relationName: "CategoryToPost"
+            }]
+    }, {
+        name: "Category",
+        fields: [{
+                name: "posts",
+                type: "Post",
+                relationName: "CategoryToPost"
+            }]
+    }];
 type PostScalarOrEnumFields = {
     id: string;
     title: string;
@@ -32,6 +48,7 @@ function autoGeneratePostScalarsOrEnums({ seq }: {
 function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFactoryDefineOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
+    const screen = createScreener("Post", modelFieldDefinitions);
     const buildCreateInput = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
@@ -45,7 +62,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         id: inputData.id
     });
     const create = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
-        const data = await buildCreateInput(inputData);
+        const data = await buildCreateInput(inputData).then(screen);
         return await getClient<PrismaClient>().post.create({ data });
     };
     const createForConnect = (inputData: Partial<Prisma.PostCreateInput> = {}) => create(inputData).then(pickForConnect);
@@ -83,6 +100,7 @@ function autoGenerateCategoryScalarsOrEnums({ seq }: {
 function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: CategoryFactoryDefineOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
+    const screen = createScreener("Category", modelFieldDefinitions);
     const buildCreateInput = async (inputData: Partial<Prisma.CategoryCreateInput> = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGenerateCategoryScalarsOrEnums({ seq });
@@ -96,7 +114,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: Cat
         id: inputData.id
     });
     const create = async (inputData: Partial<Prisma.CategoryCreateInput> = {}) => {
-        const data = await buildCreateInput(inputData);
+        const data = await buildCreateInput(inputData).then(screen);
         return await getClient<PrismaClient>().category.create({ data });
     };
     const createForConnect = (inputData: Partial<Prisma.CategoryCreateInput> = {}) => create(inputData).then(pickForConnect);

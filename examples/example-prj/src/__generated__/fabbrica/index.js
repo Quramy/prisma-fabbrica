@@ -5,11 +5,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.definePostFactory = exports.defineUserFactory = exports.resetSequence = exports.initialize = void 0;
 const clientHolder_1 = require("@quramy/prisma-fabbrica/lib/clientHolder");
+const relations_1 = require("@quramy/prisma-fabbrica/lib/relations");
 const gen_1 = __importDefault(require("@quramy/prisma-fabbrica/lib/scalar/gen"));
 const helpers_1 = require("@quramy/prisma-fabbrica/lib/helpers");
 var prisma_fabbrica_1 = require("@quramy/prisma-fabbrica");
 Object.defineProperty(exports, "initialize", { enumerable: true, get: function () { return prisma_fabbrica_1.initialize; } });
 Object.defineProperty(exports, "resetSequence", { enumerable: true, get: function () { return prisma_fabbrica_1.resetSequence; } });
+const modelFieldDefinitions = [{
+        name: "User",
+        fields: [{
+                name: "posts",
+                type: "Post",
+                relationName: "PostToUser"
+            }]
+    }, {
+        name: "Post",
+        fields: [{
+                name: "author",
+                type: "User",
+                relationName: "PostToUser"
+            }]
+    }];
 function autoGenerateUserScalarsOrEnums({ seq }) {
     return {
         id: gen_1.default.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false, seq }),
@@ -19,6 +35,7 @@ function autoGenerateUserScalarsOrEnums({ seq }) {
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
     const seqKey = {};
     const getSeq = () => (0, helpers_1.getSequenceCounter)(seqKey);
+    const screen = (0, relations_1.createScreener)("User", modelFieldDefinitions);
     const buildCreateInput = async (inputData = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
@@ -32,7 +49,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
         id: inputData.id
     });
     const create = async (inputData = {}) => {
-        const data = await buildCreateInput(inputData);
+        const data = await buildCreateInput(inputData).then(screen);
         return await (0, clientHolder_1.getClient)().user.create({ data });
     };
     const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
@@ -60,6 +77,7 @@ function autoGeneratePostScalarsOrEnums({ seq }) {
 function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
     const seqKey = {};
     const getSeq = () => (0, helpers_1.getSequenceCounter)(seqKey);
+    const screen = (0, relations_1.createScreener)("Post", modelFieldDefinitions);
     const buildCreateInput = async (inputData = {}) => {
         const seq = getSeq();
         const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
@@ -77,7 +95,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
         id: inputData.id
     });
     const create = async (inputData = {}) => {
-        const data = await buildCreateInput(inputData);
+        const data = await buildCreateInput(inputData).then(screen);
         return await (0, clientHolder_1.getClient)().post.create({ data });
     };
     const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);

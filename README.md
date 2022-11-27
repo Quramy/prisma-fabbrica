@@ -13,9 +13,11 @@ Prisma generator for model factories.
 - [Getting started](#getting-started)
 - [Usage of factories](#usage-of-factories)
   - [Field default values](#field-default-values)
+  - [Use sequence for scalar fields](#use-sequence-for-scalar-fields)
   - [Required relation](#required-relation)
   - [Connection helper](#connection-helper)
   - [Build input data only](#build-input-data-only)
+  - [has-many / has-one relation](#has-many--has-one-relation)
 - [Generator configuration](#generator-configuration)
 - [Tips](#tips)
   - [Works with jest-prisma](#works-with-jest-prisma)
@@ -263,6 +265,32 @@ await PostFactory.create();
 
 console.log(await prisma.user.count()); // -> 1
 ```
+
+### has-many / has-one relation
+
+Sometimes, you may want a user data whose has post record. You can use `PostFactory.buildCreateInput` too.
+
+```ts
+await UserFactory.create({
+  posts: {
+    create: [await PostFactory.buildCreateInput()],
+  },
+});
+
+console.log(await prisma.post.count()); // -> 1
+```
+
+Note: In the above example, `PostFactory.buildCreateInput()` resolves JSON data such as:
+
+```ts
+{
+  id: "...",
+  title: "...",
+  author: { ... } // Derived from PostFactory defaultData
+}
+```
+
+The `author` field is not allowed in `prisma.user.create` context. So `UserFactory` automatically filters the `author` field out in `.create` method.
 
 ## Generator configuration
 
