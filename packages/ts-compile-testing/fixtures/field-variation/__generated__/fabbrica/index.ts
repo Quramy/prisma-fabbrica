@@ -28,8 +28,12 @@ type UserFactoryDefineInput = {
     roleDefault?: Role;
     roles?: Prisma.UserCreaterolesInput | Prisma.Enumerable<Role>;
 };
+type UserFactoryTraitOptions = {
+    data: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions>;
+};
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
+    traits?: Record<string, UserFactoryTraitOptions>;
 };
 function autoGenerateUserScalarsOrEnums({ seq }: {
     readonly seq: number;
@@ -39,7 +43,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
         role: "USER"
     };
 }
-function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
+function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>({ defaultData: defaultDataResolver }: TOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("User", modelFieldDefinitions);
@@ -79,8 +83,8 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         createForConnect,
     };
 }
-export function defineUserFactory(args: UserFactoryDefineOptions = {}) {
-    return defineUserFactoryInternal(args);
+export function defineUserFactory<TOptions extends UserFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>(args?: TOptions) {
+    return defineUserFactoryInternal<TOptions, TTraitKey>(args ?? ({} as TOptions));
 }
 type ComplexIdModelScalarOrEnumFields = {
     firstName: string;
@@ -90,8 +94,12 @@ type ComplexIdModelFactoryDefineInput = {
     firstName?: string;
     lastName?: string;
 };
+type ComplexIdModelFactoryTraitOptions = {
+    data: Resolver<Partial<ComplexIdModelFactoryDefineInput>, BuildDataOptions>;
+};
 type ComplexIdModelFactoryDefineOptions = {
     defaultData?: Resolver<ComplexIdModelFactoryDefineInput, BuildDataOptions>;
+    traits?: Record<string, ComplexIdModelFactoryTraitOptions>;
 };
 function autoGenerateComplexIdModelScalarsOrEnums({ seq }: {
     readonly seq: number;
@@ -101,7 +109,7 @@ function autoGenerateComplexIdModelScalarsOrEnums({ seq }: {
         lastName: scalarFieldValueGenerator.String({ modelName: "ComplexIdModel", fieldName: "lastName", isId: true, isUnique: false, seq })
     };
 }
-function defineComplexIdModelFactoryInternal({ defaultData: defaultDataResolver }: ComplexIdModelFactoryDefineOptions) {
+function defineComplexIdModelFactoryInternal<TOptions extends ComplexIdModelFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>({ defaultData: defaultDataResolver }: TOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("ComplexIdModel", modelFieldDefinitions);
@@ -142,6 +150,6 @@ function defineComplexIdModelFactoryInternal({ defaultData: defaultDataResolver 
         createForConnect,
     };
 }
-export function defineComplexIdModelFactory(args: ComplexIdModelFactoryDefineOptions = {}) {
-    return defineComplexIdModelFactoryInternal(args);
+export function defineComplexIdModelFactory<TOptions extends ComplexIdModelFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>(args?: TOptions) {
+    return defineComplexIdModelFactoryInternal<TOptions, TTraitKey>(args ?? ({} as TOptions));
 }

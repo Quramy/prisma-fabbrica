@@ -21,8 +21,12 @@ type UserFactoryDefineInput = {
     id?: string;
     name?: string;
 };
+type UserFactoryTraitOptions = {
+    data: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions>;
+};
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
+    traits?: Record<string, UserFactoryTraitOptions>;
 };
 function autoGenerateUserScalarsOrEnums({ seq }: {
     readonly seq: number;
@@ -32,7 +36,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
-function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
+function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>({ defaultData: defaultDataResolver }: TOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("User", modelFieldDefinitions);
@@ -72,6 +76,6 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         createForConnect,
     };
 }
-export function defineUserFactory(args: UserFactoryDefineOptions = {}) {
-    return defineUserFactoryInternal(args);
+export function defineUserFactory<TOptions extends UserFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>(args?: TOptions) {
+    return defineUserFactoryInternal<TOptions, TTraitKey>(args ?? ({} as TOptions));
 }

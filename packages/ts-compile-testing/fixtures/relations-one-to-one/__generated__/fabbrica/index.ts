@@ -38,8 +38,12 @@ type UserFactoryDefineInput = {
     name?: string;
     profile?: UserprofileFactory | Prisma.ProfileCreateNestedOneWithoutUserInput;
 };
+type UserFactoryTraitOptions = {
+    data: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions>;
+};
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
+    traits?: Record<string, UserFactoryTraitOptions>;
 };
 function isUserprofileFactory(x: UserprofileFactory | Prisma.ProfileCreateNestedOneWithoutUserInput | undefined): x is UserprofileFactory {
     return (x as any)?._factoryFor === "Profile";
@@ -52,7 +56,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
-function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
+function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>({ defaultData: defaultDataResolver }: TOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("User", modelFieldDefinitions);
@@ -96,8 +100,8 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         createForConnect,
     };
 }
-export function defineUserFactory(args: UserFactoryDefineOptions = {}) {
-    return defineUserFactoryInternal(args);
+export function defineUserFactory<TOptions extends UserFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>(args?: TOptions) {
+    return defineUserFactoryInternal<TOptions, TTraitKey>(args ?? ({} as TOptions));
 }
 type ProfileScalarOrEnumFields = {
     id: string;
@@ -110,8 +114,12 @@ type ProfileFactoryDefineInput = {
     id?: string;
     user: ProfileuserFactory | Prisma.UserCreateNestedOneWithoutProfileInput;
 };
+type ProfileFactoryTraitOptions = {
+    data: Resolver<Partial<ProfileFactoryDefineInput>, BuildDataOptions>;
+};
 type ProfileFactoryDefineOptions = {
     defaultData: Resolver<ProfileFactoryDefineInput, BuildDataOptions>;
+    traits?: ProfileFactoryTraitOptions;
 };
 function isProfileuserFactory(x: ProfileuserFactory | Prisma.UserCreateNestedOneWithoutProfileInput | undefined): x is ProfileuserFactory {
     return (x as any)?._factoryFor === "User";
@@ -123,7 +131,7 @@ function autoGenerateProfileScalarsOrEnums({ seq }: {
         id: scalarFieldValueGenerator.String({ modelName: "Profile", fieldName: "id", isId: true, isUnique: false, seq })
     };
 }
-function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: ProfileFactoryDefineOptions) {
+function defineProfileFactoryInternal<TOptions extends ProfileFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>({ defaultData: defaultDataResolver }: TOptions) {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("Profile", modelFieldDefinitions);
@@ -167,6 +175,6 @@ function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: Prof
         createForConnect,
     };
 }
-export function defineProfileFactory(args: ProfileFactoryDefineOptions) {
-    return defineProfileFactoryInternal(args);
+export function defineProfileFactory<TOptions extends ProfileFactoryDefineOptions, TTraitKey extends keyof TOptions["traits"]>(args: TOptions) {
+    return defineProfileFactoryInternal<TOptions, TTraitKey>(args);
 }
