@@ -1,11 +1,7 @@
 import { DMMF } from "@prisma/generator-helper";
 import ts from "typescript";
 import { template } from "talt";
-import { camelize, ast } from "../helpers";
-
-function byName<T extends { readonly name: string }>(name: string | { readonly name: string }) {
-  return (x: T) => x.name === (typeof name === "string" ? name : name.name);
-}
+import { camelize, ast, byName } from "../helpers";
 
 export function findPrsimaCreateInputTypeFromModelName(document: DMMF.Document, modelName: string) {
   const search = `${modelName}CreateInput`;

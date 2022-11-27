@@ -13,6 +13,7 @@ Prisma generator for model factories.
 - [Getting started](#getting-started)
 - [Usage of factories](#usage-of-factories)
   - [Field default values](#field-default-values)
+  - [Use sequence for scalar fields](#use-sequence-for-scalar-fields)
   - [Required relation](#required-relation)
   - [Connection helper](#connection-helper)
   - [Build input data only](#build-input-data-only)
