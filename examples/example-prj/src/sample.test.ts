@@ -21,7 +21,7 @@ describe("factories", () => {
     it("creates record with input parameters", async () => {
       await UserFactory.create({ id: "user001", name: "Quramy" });
       const user = await prisma.user.findUnique({ where: { id: "user001" } });
-      expect(user).toEqual({ id: "user001", name: "Quramy" });
+      expect(user).toMatchObject({ id: "user001", name: "Quramy" });
     });
 
     it("creates record with children relation", async () => {
