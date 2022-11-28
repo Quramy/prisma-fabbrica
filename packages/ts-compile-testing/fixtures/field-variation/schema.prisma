@@ -16,6 +16,7 @@ datasource db {
 
 model User {
   id           String @id
+  nullableStr  String?
   role         Role
   roleDefault  Role @default(USER)
   roles        Role[]
