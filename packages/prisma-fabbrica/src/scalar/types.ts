@@ -12,7 +12,7 @@ export interface ScalarFieldValueGenerator {
   Int: (options: ScalarFieldGenerateOptions) => number;
   Float: (options: ScalarFieldGenerateOptions) => number;
   BigInt: (options: ScalarFieldGenerateOptions) => bigint;
-  Decimal: (options: ScalarFieldGenerateOptions) => unknown;
+  Decimal: (options: ScalarFieldGenerateOptions) => any;
   DateTime: (options: ScalarFieldGenerateOptions) => Date;
   Bytes: (options: ScalarFieldGenerateOptions) => Buffer;
   Json: (options: ScalarFieldGenerateOptions) => any;

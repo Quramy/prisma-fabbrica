@@ -1,5 +1,6 @@
 import { User } from "./../client";
 import { ComplexIdModel } from "./../client";
+import { FieldTypePatternModel } from "./../client";
 import { Role } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
@@ -8,7 +9,6 @@ import { ModelWithFields, createScreener } from "@quramy/prisma-fabbrica/lib/rel
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
 import { Resolver, normalizeResolver, getSequenceCounter } from "@quramy/prisma-fabbrica/lib/helpers";
 export { initialize, resetSequence } from "@quramy/prisma-fabbrica";
-
 type BuildDataOptions = {
     readonly seq: number;
 };
@@ -18,6 +18,9 @@ const modelFieldDefinitions: ModelWithFields[] = [{
     }, {
         name: "ComplexIdModel",
         fields: []
+    }, {
+        name: "FieldTypePatternModel",
+        fields: []
     }];
 type UserScalarOrEnumFields = {
     id: string;
@@ -25,7 +28,6 @@ type UserScalarOrEnumFields = {
 };
 type UserFactoryDefineInput = {
     id?: string;
-    nullableStr?: string | null;
     role?: Role;
     roleDefault?: Role;
     roles?: Prisma.UserCreaterolesInput | Prisma.Enumerable<Role>;
@@ -146,4 +148,95 @@ function defineComplexIdModelFactoryInternal({ defaultData: defaultDataResolver 
 }
 export function defineComplexIdModelFactory(args: ComplexIdModelFactoryDefineOptions = {}) {
     return defineComplexIdModelFactoryInternal(args);
+}
+type FieldTypePatternModelScalarOrEnumFields = {
+    id: number;
+    requiredInt: number;
+    requiredStr: string;
+    requiredBool: boolean;
+    requiredFlaot: number;
+    requiredDecimal: (Prisma.Decimal | Prisma.DecimalJsLike | string);
+    requiredJson: Prisma.JsonNullValueInput | Prisma.InputJsonValue;
+    requriedBytes: Buffer;
+    requiredBigInt: (bigint | number);
+};
+type FieldTypePatternModelFactoryDefineInput = {
+    id?: number;
+    requiredInt?: number;
+    nullableInt?: number | null;
+    requiredStr?: string;
+    nullableStr?: string | null;
+    requiredBool?: boolean;
+    nullableBool?: boolean | null;
+    requiredFlaot?: number;
+    nullableFloat?: number | null;
+    requiredDecimal?: (Prisma.Decimal | Prisma.DecimalJsLike | string);
+    nullableDecimal?: (Prisma.Decimal | Prisma.DecimalJsLike | string) | null;
+    requiredJson?: Prisma.JsonNullValueInput | Prisma.InputJsonValue;
+    nullableJson?: Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue;
+    requriedBytes?: Buffer;
+    nullableBytes?: Buffer | null;
+    requiredBigInt?: (bigint | number);
+    nullableBigInt?: (bigint | number) | null;
+};
+type FieldTypePatternModelFactoryDefineOptions = {
+    defaultData?: Resolver<FieldTypePatternModelFactoryDefineInput, BuildDataOptions>;
+};
+function autoGenerateFieldTypePatternModelScalarsOrEnums({ seq }: {
+    readonly seq: number;
+}): FieldTypePatternModelScalarOrEnumFields {
+    return {
+        id: scalarFieldValueGenerator.Int({ modelName: "FieldTypePatternModel", fieldName: "id", isId: true, isUnique: false, seq }),
+        requiredInt: scalarFieldValueGenerator.Int({ modelName: "FieldTypePatternModel", fieldName: "requiredInt", isId: false, isUnique: false, seq }),
+        requiredStr: scalarFieldValueGenerator.String({ modelName: "FieldTypePatternModel", fieldName: "requiredStr", isId: false, isUnique: false, seq }),
+        requiredBool: scalarFieldValueGenerator.Boolean({ modelName: "FieldTypePatternModel", fieldName: "requiredBool", isId: false, isUnique: false, seq }),
+        requiredFlaot: scalarFieldValueGenerator.Float({ modelName: "FieldTypePatternModel", fieldName: "requiredFlaot", isId: false, isUnique: false, seq }),
+        requiredDecimal: scalarFieldValueGenerator.Decimal({ modelName: "FieldTypePatternModel", fieldName: "requiredDecimal", isId: false, isUnique: false, seq }),
+        requiredJson: scalarFieldValueGenerator.Json({ modelName: "FieldTypePatternModel", fieldName: "requiredJson", isId: false, isUnique: false, seq }),
+        requriedBytes: scalarFieldValueGenerator.Bytes({ modelName: "FieldTypePatternModel", fieldName: "requriedBytes", isId: false, isUnique: false, seq }),
+        requiredBigInt: scalarFieldValueGenerator.BigInt({ modelName: "FieldTypePatternModel", fieldName: "requiredBigInt", isId: false, isUnique: false, seq })
+    };
+}
+function defineFieldTypePatternModelFactoryInternal({ defaultData: defaultDataResolver }: FieldTypePatternModelFactoryDefineOptions) {
+    const seqKey = {};
+    const getSeq = () => getSequenceCounter(seqKey);
+    const screen = createScreener("FieldTypePatternModel", modelFieldDefinitions);
+    const build = async (inputData: Partial<Prisma.FieldTypePatternModelCreateInput> = {}) => {
+        const seq = getSeq();
+        const requiredScalarData = autoGenerateFieldTypePatternModelScalarsOrEnums({ seq });
+        const resolveValue = normalizeResolver<FieldTypePatternModelFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+        const defaultData = await resolveValue({ seq });
+        const defaultAssociations = {};
+        const data: Prisma.FieldTypePatternModelCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+        return data;
+    };
+    const buildList = (inputData: number | Partial<Prisma.FieldTypePatternModelCreateInput>[]) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => build(data)));
+    };
+    const pickForConnect = (inputData: FieldTypePatternModel) => ({
+        id: inputData.id
+    });
+    const create = async (inputData: Partial<Prisma.FieldTypePatternModelCreateInput> = {}) => {
+        const data = await build(inputData).then(screen);
+        return await getClient<PrismaClient>().fieldTypePatternModel.create({ data });
+    };
+    const createList = (inputData: number | Partial<Prisma.FieldTypePatternModelCreateInput>[]) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => create(data)));
+    };
+    const createForConnect = (inputData: Partial<Prisma.FieldTypePatternModelCreateInput> = {}) => create(inputData).then(pickForConnect);
+    return {
+        _factoryFor: "FieldTypePatternModel" as const,
+        build,
+        buildList,
+        buildCreateInput: build,
+        pickForConnect,
+        create,
+        createList,
+        createForConnect,
+    };
+}
+export function defineFieldTypePatternModelFactory(args: FieldTypePatternModelFactoryDefineOptions = {}) {
+    return defineFieldTypePatternModelFactoryInternal(args);
 }
