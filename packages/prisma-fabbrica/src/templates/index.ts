@@ -227,6 +227,7 @@ export const autoGenerateModelScalarsOrEnumsFieldArgs = (
   field: DMMF.SchemaArg,
   enums: DMMF.SchemaEnum[],
 ) =>
+  // Note: In Json sclar filed, inputTypes[0].location is not scalar but enumType
   field.inputTypes[field.inputTypes.length - 1].location === "scalar"
     ? template.expression`
         scalarFieldValueGenerator.SCALAR_TYPE({ modelName: MODEL_NAME, fieldName: FIELD_NAME, isId: IS_ID, isUnique: IS_UNIQUE, seq })
