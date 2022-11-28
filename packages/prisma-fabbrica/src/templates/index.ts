@@ -11,8 +11,8 @@ export function findPrsimaCreateInputTypeFromModelName(document: DMMF.Document, 
   return inputType;
 }
 
-function getIdFieldNames(model: DMMF.Model) {
-  return model.primaryKey?.fields ?? [model.fields.find(f => f.isId)!.name];
+export function getIdFieldNames(model: DMMF.Model) {
+  return model.primaryKey?.fields ?? [model.fields.find(f => f.isId || f.isUnique)!.name];
 }
 
 function filterRequiredFields(inputType: DMMF.InputType) {

@@ -1,6 +1,7 @@
 import { User } from "./../client";
 import { ComplexIdModel } from "./../client";
 import { FieldTypePatternModel } from "./../client";
+import { NoPkModel } from "./../client";
 import { Role } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
@@ -20,6 +21,9 @@ const modelFieldDefinitions: ModelWithFields[] = [{
         fields: []
     }, {
         name: "FieldTypePatternModel",
+        fields: []
+    }, {
+        name: "NoPkModel",
         fields: []
     }];
 type UserScalarOrEnumFields = {
@@ -239,4 +243,63 @@ function defineFieldTypePatternModelFactoryInternal({ defaultData: defaultDataRe
 }
 export function defineFieldTypePatternModelFactory(args: FieldTypePatternModelFactoryDefineOptions = {}) {
     return defineFieldTypePatternModelFactoryInternal(args);
+}
+type NoPkModelScalarOrEnumFields = {
+    id: number;
+};
+type NoPkModelFactoryDefineInput = {
+    id?: number;
+};
+type NoPkModelFactoryDefineOptions = {
+    defaultData?: Resolver<NoPkModelFactoryDefineInput, BuildDataOptions>;
+};
+function autoGenerateNoPkModelScalarsOrEnums({ seq }: {
+    readonly seq: number;
+}): NoPkModelScalarOrEnumFields {
+    return {
+        id: scalarFieldValueGenerator.Int({ modelName: "NoPkModel", fieldName: "id", isId: false, isUnique: true, seq })
+    };
+}
+function defineNoPkModelFactoryInternal({ defaultData: defaultDataResolver }: NoPkModelFactoryDefineOptions) {
+    const seqKey = {};
+    const getSeq = () => getSequenceCounter(seqKey);
+    const screen = createScreener("NoPkModel", modelFieldDefinitions);
+    const build = async (inputData: Partial<Prisma.NoPkModelCreateInput> = {}) => {
+        const seq = getSeq();
+        const requiredScalarData = autoGenerateNoPkModelScalarsOrEnums({ seq });
+        const resolveValue = normalizeResolver<NoPkModelFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+        const defaultData = await resolveValue({ seq });
+        const defaultAssociations = {};
+        const data: Prisma.NoPkModelCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+        return data;
+    };
+    const buildList = (inputData: number | Partial<Prisma.NoPkModelCreateInput>[]) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => build(data)));
+    };
+    const pickForConnect = (inputData: NoPkModel) => ({
+        id: inputData.id
+    });
+    const create = async (inputData: Partial<Prisma.NoPkModelCreateInput> = {}) => {
+        const data = await build(inputData).then(screen);
+        return await getClient<PrismaClient>().noPkModel.create({ data });
+    };
+    const createList = (inputData: number | Partial<Prisma.NoPkModelCreateInput>[]) => {
+        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
+        return Promise.all(list.map(data => create(data)));
+    };
+    const createForConnect = (inputData: Partial<Prisma.NoPkModelCreateInput> = {}) => create(inputData).then(pickForConnect);
+    return {
+        _factoryFor: "NoPkModel" as const,
+        build,
+        buildList,
+        buildCreateInput: build,
+        pickForConnect,
+        create,
+        createList,
+        createForConnect,
+    };
+}
+export function defineNoPkModelFactory(args: NoPkModelFactoryDefineOptions = {}) {
+    return defineNoPkModelFactoryInternal(args);
 }
