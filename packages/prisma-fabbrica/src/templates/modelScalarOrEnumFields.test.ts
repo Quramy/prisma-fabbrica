@@ -24,7 +24,7 @@ describe(modelScalarOrEnumFields, () => {
           boolField: boolean;
           strField: string;
           floatField: number;
-          bigIntField: bigint;
+          bigIntField: (bigint | number);
           bytesField: Buffer;
           dateTimeField: Date;
         }

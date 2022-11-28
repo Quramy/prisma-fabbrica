@@ -20,10 +20,7 @@ function filterRequiredFields(inputType: DMMF.InputType) {
 }
 
 function isScalarOrEnumField(field: DMMF.SchemaArg) {
-  return (
-    field.inputTypes.length === 1 &&
-    field.inputTypes.every(cit => cit.location === "enumTypes" || cit.location === "scalar")
-  );
+  return field.inputTypes.every(cit => cit.location === "enumTypes" || cit.location === "scalar");
 }
 
 function isInputObjectTypeField(field: DMMF.SchemaArg) {
@@ -106,17 +103,15 @@ export const scalarFieldType = (
     case "Float":
       return ast.keywordTypeNode(ts.SyntaxKind.NumberKeyword);
     case "BigInt":
-      return ast.keywordTypeNode(ts.SyntaxKind.BigIntKeyword);
+      return template.typeNode`bigint | number`();
     case "Decimal":
-      return template.typeNode`Prisma.Decimal`();
+      return template.typeNode`Prisma.Decimal | Prisma.DecimalJsLike | string`();
     case "DateTime":
       return template.typeNode`Date`();
     case "Bytes":
       return template.typeNode`Buffer`();
     case "Json":
-      // FIXME Is the folloing type right?
-      // return template.typeNode`Prisma.Json`();
-      return ast.keywordTypeNode(ts.SyntaxKind.AnyKeyword);
+      return template.typeNode`Prisma.InputJsonValue`();
     default:
       throw new Error(`Unknown scalar type "${inputType.type}" for ${model.name}.${fieldName} .`);
   }
@@ -127,7 +122,9 @@ export const argInputType = (model: DMMF.Model, fieldName: string, inputType: DM
     if (inputType.location === "scalar") {
       return scalarFieldType(model, fieldName, inputType);
     } else if (inputType.location === "enumTypes") {
-      return ast.typeReferenceNode(ast.identifier(inputType.type as string));
+      return inputType.namespace === "model"
+        ? ast.typeReferenceNode(ast.identifier(inputType.type as string))
+        : template.typeNode`Prisma.${() => ast.identifier(inputType.type as string)}`();
     } else if (inputType.location === "outputObjectTypes" || inputType.location === "inputObjectTypes") {
       return ast.typeReferenceNode(
         template.expression<ts.Identifier>`Prisma.${() => ast.identifier(inputType.type as string)}`(),
@@ -230,11 +227,12 @@ export const autoGenerateModelScalarsOrEnumsFieldArgs = (
   field: DMMF.SchemaArg,
   enums: DMMF.SchemaEnum[],
 ) =>
-  field.inputTypes[0].location === "scalar"
+  // Note: In Json sclar filed, inputTypes[0].location is not scalar but enumType
+  field.inputTypes[field.inputTypes.length - 1].location === "scalar"
     ? template.expression`
         scalarFieldValueGenerator.SCALAR_TYPE({ modelName: MODEL_NAME, fieldName: FIELD_NAME, isId: IS_ID, isUnique: IS_UNIQUE, seq })
       `({
-        SCALAR_TYPE: ast.identifier(field.inputTypes[0].type as string),
+        SCALAR_TYPE: ast.identifier(field.inputTypes[field.inputTypes.length - 1].type as string),
         MODEL_NAME: ast.stringLiteral(model.name),
         FIELD_NAME: ast.stringLiteral(field.name),
         IS_ID:
@@ -384,18 +382,22 @@ export function getSourceFile({
   document: DMMF.Document;
   prismaClientModuleSpecifier?: string;
 }) {
-  const enums = [
+  const modelEnums = [
     ...new Set(
       document.schema.inputObjectTypes.prisma
         .filter(iOT => iOT.name.endsWith("CreateInput"))
         .flatMap(filterEnumFields)
-        .map(field => field.inputTypes[0].type as string),
+        .flatMap(field =>
+          field.inputTypes
+            .filter(inputType => inputType.namespace === "model")
+            .map(inputType => inputType.type as string),
+        ),
     ),
   ];
   const modelNames = document.datamodel.models.map(m => m.name);
   const statements = [
     ...modelNames.map(modelName => importStatement(modelName, prismaClientModuleSpecifier)),
-    ...enums.map(enumName => importStatement(enumName, prismaClientModuleSpecifier)),
+    ...modelEnums.map(enumName => importStatement(enumName, prismaClientModuleSpecifier)),
     ...header(prismaClientModuleSpecifier).statements,
     modelFieldDefinitions(document.datamodel.models),
     ...document.datamodel.models

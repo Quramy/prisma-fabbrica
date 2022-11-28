@@ -16,7 +16,6 @@ datasource db {
 
 model User {
   id           String @id
-  nullableStr  String?
   role         Role
   roleDefault  Role @default(USER)
   roles        Role[]
@@ -31,4 +30,24 @@ model ComplexIdModel {
   firstName String
   lastName  String
   @@id([firstName, lastName])
+}
+
+model FieldTypePatternModel {
+  id              Int @id
+  requiredInt     Int
+  nullableInt     Int?
+  requiredStr     String
+  nullableStr     String?
+  requiredBool    Boolean
+  nullableBool    Boolean?
+  requiredFlaot   Float
+  nullableFloat   Float?
+  requiredDecimal Decimal
+  nullableDecimal Decimal?
+  requiredJson    Json
+  nullableJson    Json?
+  requriedBytes   Bytes
+  nullableBytes   Bytes?
+  requiredBigInt  BigInt
+  nullableBigInt  BigInt?
 }
