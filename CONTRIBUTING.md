@@ -5,5 +5,6 @@
 ```sh
 $ npm ci
 $ npm run bootstrap
+$ npm run migrate:test
 $ npm test
 ```
