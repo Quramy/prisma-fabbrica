@@ -31,7 +31,9 @@ function isInputObjectTypeField(field: DMMF.SchemaArg) {
 }
 
 function filterRequiredScalarOrEnumFields(inputType: DMMF.InputType) {
-  return filterRequiredFields(inputType).filter(isScalarOrEnumField);
+  return filterRequiredFields(inputType)
+    .filter(inputType => !inputType.isNullable)
+    .filter(isScalarOrEnumField);
 }
 
 function filterRequiredInputObjectTypeField(inputType: DMMF.InputType) {
@@ -94,6 +96,8 @@ export const scalarFieldType = (
     throw new Error("Invalid call. This function is allowed for only scalar field.");
   }
   switch (inputType.type) {
+    case "Null":
+      return ast.literalTypeNode(ast.null());
     case "Boolean":
       return ast.keywordTypeNode(ts.SyntaxKind.BooleanKeyword);
     case "String":

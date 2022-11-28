@@ -8,6 +8,7 @@ import { ModelWithFields, createScreener } from "@quramy/prisma-fabbrica/lib/rel
 import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
 import { Resolver, normalizeResolver, getSequenceCounter } from "@quramy/prisma-fabbrica/lib/helpers";
 export { initialize, resetSequence } from "@quramy/prisma-fabbrica";
+
 type BuildDataOptions = {
     readonly seq: number;
 };
@@ -24,6 +25,7 @@ type UserScalarOrEnumFields = {
 };
 type UserFactoryDefineInput = {
     id?: string;
+    nullableStr?: string | null;
     role?: Role;
     roleDefault?: Role;
     roles?: Prisma.UserCreaterolesInput | Prisma.Enumerable<Role>;

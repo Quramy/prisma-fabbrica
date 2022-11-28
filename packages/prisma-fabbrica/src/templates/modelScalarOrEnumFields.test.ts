@@ -31,6 +31,20 @@ describe(modelScalarOrEnumFields, () => {
       `,
     },
     {
+      pattern: "Nullable field",
+      datamodel: `
+        model TestModel {
+          id            Int @id
+          nullableField String?
+        }
+      `,
+      expected: `
+        type TestModelScalarOrEnumFields = {
+          id: number;
+        }
+      `,
+    },
+    {
       pattern: "Complex id",
       datamodel: `
         model TestModel {
