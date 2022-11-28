@@ -19,6 +19,7 @@ Prisma generator for model factories.
   - [Connection helper](#connection-helper)
   - [Build input data only](#build-input-data-only)
   - [has-many / has-one relation](#has-many--has-one-relation)
+  - [More examples](#more-examples)
 - [Generator configuration](#generator-configuration)
 - [Tips](#tips)
   - [Works with jest-prisma](#works-with-jest-prisma)
@@ -87,6 +88,8 @@ seed();
 
 Note: The factories use Prisma client instance passed by `initialize` function.
 
+If you want to use factories in your test code see [Works with jest-prisma](#works-with-jest-prisma) section below.
+
 ## Usage of factories
 
 ### Field default values
@@ -97,8 +100,8 @@ For example, the following `User` model has some required field, `id`, `email`, 
 
 ```graphql
 model User {
-  id          Int @id
-  email       String @unique
+  id          Int      @id
+  email       String   @unique
   firstName   String
   lastName    String
   middleName  String?
@@ -312,6 +315,10 @@ Note: In the above example, `PostFactory.build()` resolves JSON data such as:
 ```
 
 The `author` field is not allowed in `prisma.user.create` context. So `UserFactory` automatically filters the `author` field out in `.create` method.
+
+### More examples
+
+There are ore example codes in https://github.com/Quramy/prisma-fabbrica/tree/main/examples/example-prj/src .
 
 ## Generator configuration
 
