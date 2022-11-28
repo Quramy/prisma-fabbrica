@@ -13,14 +13,39 @@ datasource db {
 }
 
 model User {
-  id    String @id
-  name  String
-  posts Post[]
+  id        String    @id
+  email     String    @unique
+  name      String
+  posts     Post[]
+  comments  Comment[]
+  updatedAt DateTime  @default(now()) @updatedAt
+  createdAt DateTime  @default(now())
 }
 
 model Post {
-  id       String @id
-  title    String
-  author   User   @relation(fields: [authorId], references: [id])
-  authorId String
+  id         String     @id
+  title      String
+  author     User       @relation(fields: [authorId], references: [id])
+  authorId   String
+  comments   Comment[]
+  categories Category[]
+  updatedAt  DateTime   @default(now()) @updatedAt
+  createdAt  DateTime   @default(now())
+}
+
+model Comment {
+  id        String   @id
+  body      String
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  updatedAt DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id    String @id
+  name  String @unique
+  posts Post[]
 }
