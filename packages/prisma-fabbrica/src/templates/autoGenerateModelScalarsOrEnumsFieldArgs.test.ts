@@ -44,6 +44,20 @@ describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
     {
       datamodel: `
         model TestModel {
+          id Int @id
+          uniqueField1 String
+          uniqueField2 String
+          @@unique([uniqueField1, uniqueField2])
+        }
+      `,
+      targetField: "uniqueField1",
+      expected: `
+        scalarFieldValueGenerator.String({ modelName: "TestModel", fieldName: "uniqueField1", isId: false, isUnique: true, seq })
+      `,
+    },
+    {
+      datamodel: `
+        model TestModel {
           id  Int @id
           booleanField Boolean
         }
