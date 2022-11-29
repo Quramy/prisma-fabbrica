@@ -36,8 +36,10 @@ model FieldTypePatternModel {
   id              Int @id
   requiredInt     Int
   nullableInt     Int?
+  enumerableInt   Int[]
   requiredStr     String
   nullableStr     String?
+  enumerableStr   String[]
   requiredBool    Boolean
   nullableBool    Boolean?
   requiredFlaot   Float

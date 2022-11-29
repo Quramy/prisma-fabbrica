@@ -168,8 +168,10 @@ type FieldTypePatternModelFactoryDefineInput = {
     id?: number;
     requiredInt?: number;
     nullableInt?: number | null;
+    enumerableInt?: Prisma.FieldTypePatternModelCreateenumerableIntInput | Prisma.Enumerable<number>;
     requiredStr?: string;
     nullableStr?: string | null;
+    enumerableStr?: Prisma.FieldTypePatternModelCreateenumerableStrInput | Prisma.Enumerable<string>;
     requiredBool?: boolean;
     nullableBool?: boolean | null;
     requiredFlaot?: number;
