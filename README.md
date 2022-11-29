@@ -318,7 +318,7 @@ The `author` field is not allowed in `prisma.user.create` context. So `UserFacto
 
 ### More examples
 
-There are ore example codes in https://github.com/Quramy/prisma-fabbrica/tree/main/examples/example-prj/src .
+There are more example codes in https://github.com/Quramy/prisma-fabbrica/tree/main/examples/example-prj/src .
 
 ## Generator configuration
 
