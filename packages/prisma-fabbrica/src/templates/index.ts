@@ -249,7 +249,10 @@ export const autoGenerateModelScalarsOrEnumsFieldArgs = (
           model.fields.find(byName(field))!.isId || model.primaryKey?.fields.includes(field.name)
             ? ast.true()
             : ast.false(),
-        IS_UNIQUE: model.fields.find(byName(field))!.isUnique ? ast.true() : ast.false(),
+        IS_UNIQUE:
+          model.fields.find(byName(field))!.isUnique || model.uniqueFields.flat().includes(field.name)
+            ? ast.true()
+            : ast.false(),
       })
     : ast.stringLiteral(extractFirstEnumValue(enums, field));
 
