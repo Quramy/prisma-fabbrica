@@ -12,7 +12,17 @@ export function findPrsimaCreateInputTypeFromModelName(document: DMMF.Document, 
 }
 
 export function getIdFieldNames(model: DMMF.Model) {
-  return model.primaryKey?.fields ?? [model.fields.find(f => f.isId || f.isUnique)!.name];
+  if (model.primaryKey) {
+    return model.primaryKey.fields;
+  }
+  const idLike = model.fields.find(f => f.isId || f.isUnique);
+  if (idLike) {
+    return [idLike.name];
+  }
+  if (model.uniqueFields.length) {
+    return model.uniqueFields[0];
+  }
+  throw new Error(`Model ${model.name} does not have @id nor @@id nor @@unique.`);
 }
 
 function filterRequiredFields(inputType: DMMF.InputType) {
