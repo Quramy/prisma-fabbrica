@@ -22,7 +22,7 @@ async function main() {
       JSON.stringify(dmmfDocument, null, 2),
       "utf8",
     );
-    const { stdout } = await exec(`npx prisma generate --schema=${schemaPath}`);
+    const { stdout } = await exec(`NODE_ENV=development npx prisma generate --schema=${schemaPath}`);
     process.stdout.write(stdout);
   }
 }
