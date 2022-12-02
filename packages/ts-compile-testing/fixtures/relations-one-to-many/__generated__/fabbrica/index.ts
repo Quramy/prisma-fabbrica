@@ -3,11 +3,8 @@ import { Post } from "./../client";
 import { Review } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
-import { getClient } from "@quramy/prisma-fabbrica/lib/clientHolder";
-import { ModelWithFields, createScreener } from "@quramy/prisma-fabbrica/lib/relations";
-import scalarFieldValueGenerator from "@quramy/prisma-fabbrica/lib/scalar/gen";
-import { Resolver, normalizeResolver, getSequenceCounter } from "@quramy/prisma-fabbrica/lib/helpers";
-export { initialize, resetSequence } from "@quramy/prisma-fabbrica";
+import { getClient, ModelWithFields, createScreener, scalarFieldValueGenerator, Resolver, normalizeResolver, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
+export { initialize, resetSequence } from "@quramy/prisma-fabbrica/lib/internal";
 type BuildDataOptions = {
     readonly seq: number;
 };
