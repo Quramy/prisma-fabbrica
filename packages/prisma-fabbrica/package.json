@@ -12,6 +12,23 @@
   "bin": {
     "prisma-fabbrica": "./bin.js"
   },
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "require": "./lib/index.js",
+      "default": "./lib/index.js"
+    },
+    "./lib/internal": {
+      "import": "./internal.mjs",
+      "require": "./lib/internal.js",
+      "default": "./lib/internal.js"
+    },
+    "./scripts/jest-prisma": {
+      "import": "./scripts/jest-prisma.mjs",
+      "require": "./scripts/jest-prisma.js",
+      "default": "./scripts/jest-prisma.js"
+    }
+  },
   "scripts": {
     "clean": "rimraf \"*.tsbuildinfo\" \"lib/**/*.{js,ts}\" coverage",
     "test": "NODE_ENV=development jest",

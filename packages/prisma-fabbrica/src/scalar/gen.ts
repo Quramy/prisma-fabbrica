@@ -1,7 +1,7 @@
 import short from "short-uuid";
 import { ScalarFieldValueGenerator } from "./types";
 
-const scalarFieldValueGenerator: ScalarFieldValueGenerator = {
+export const scalarFieldValueGenerator: ScalarFieldValueGenerator = {
   Boolean: () => true,
   String: ({ fieldName, isId, isUnique }) => {
     if (isId || isUnique) {
@@ -26,5 +26,3 @@ const scalarFieldValueGenerator: ScalarFieldValueGenerator = {
     key: "value",
   }),
 };
-
-export default scalarFieldValueGenerator;

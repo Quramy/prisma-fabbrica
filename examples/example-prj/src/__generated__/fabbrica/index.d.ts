@@ -3,8 +3,8 @@ import { Post } from "@prisma/client";
 import { Comment } from "@prisma/client";
 import { Category } from "@prisma/client";
 import { Prisma } from "@prisma/client";
-import { Resolver } from "@quramy/prisma-fabbrica/lib/helpers";
-export { initialize, resetSequence } from "@quramy/prisma-fabbrica";
+import { Resolver } from "@quramy/prisma-fabbrica/lib/internal";
+export { initialize, resetSequence } from "@quramy/prisma-fabbrica/lib/internal";
 type BuildDataOptions = {
     readonly seq: number;
 };
