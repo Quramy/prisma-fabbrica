@@ -95,8 +95,8 @@ export const importStatement = (specifier: string, prismaClientModuleSpecifier: 
 
 export const modelFieldDefinitions = (models: DMMF.Model[]) =>
   template.statement`
-  const modelFieldDefinitions: ModelWithFields[] = ${() => createJSONLiteral(createFieldDefinitions(models))}
-`();
+    const modelFieldDefinitions: ModelWithFields[] = ${() => createJSONLiteral(createFieldDefinitions(models))};
+  `();
 
 export const scalarFieldType = (
   model: DMMF.Model,
@@ -203,24 +203,23 @@ export const modelFactoryDefineInput = (model: DMMF.Model, inputType: DMMF.Input
     MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${model.name}FactoryDefineInput`),
   });
 
-export const modelFactoryDefineOptions = (modelName: string, isOpionalDefaultData: boolean) =>
-  isOpionalDefaultData
+export const modelFactoryDefineOptions = (modelName: string, isOpionalDefaultData: boolean) => {
+  const compiled = isOpionalDefaultData
     ? template.statement<ts.TypeAliasDeclaration>`
         type MODEL_FACTORY_DEFINE_OPTIONS = {
           defaultData?: Resolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions>;
         };
-      `({
-        MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${modelName}FactoryDefineOptions`),
-        MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${modelName}FactoryDefineInput`),
-      })
+      `
     : template.statement<ts.TypeAliasDeclaration>`
         type MODEL_FACTORY_DEFINE_OPTIONS = {
           defaultData: Resolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions>;
         };
-      `({
-        MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${modelName}FactoryDefineOptions`),
-        MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${modelName}FactoryDefineInput`),
-      });
+      `;
+  return compiled({
+    MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${modelName}FactoryDefineOptions`),
+    MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${modelName}FactoryDefineInput`),
+  });
+};
 
 export const isModelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF.Model) => {
   const targetModel = model.fields.find(byName(fieldType))!;
@@ -371,26 +370,24 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
     AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS: ast.identifier(`autoGenerate${model.name}ScalarsOrEnums`),
   });
 
-export const defineModelFactory = (modelName: string, inputType: DMMF.InputType) =>
-  filterRequiredInputObjectTypeField(inputType).length
+export const defineModelFactory = (modelName: string, inputType: DMMF.InputType) => {
+  const compiled = filterRequiredInputObjectTypeField(inputType).length
     ? template.statement<ts.FunctionDeclaration>`
         export function DEFINE_MODEL_FACTORY(args: MODEL_FACTORY_DEFINE_OPTIONS) {
           return DEFINE_MODEL_FACTORY_INERNAL(args);
         }
-      `({
-        DEFINE_MODEL_FACTORY: ast.identifier(`define${modelName}Factory`),
-        DEFINE_MODEL_FACTORY_INERNAL: ast.identifier(`define${modelName}FactoryInternal`),
-        MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${modelName}FactoryDefineOptions`),
-      })
+      `
     : template.statement<ts.FunctionDeclaration>`
         export function DEFINE_MODEL_FACTORY(args: MODEL_FACTORY_DEFINE_OPTIONS = {}) {
           return DEFINE_MODEL_FACTORY_INERNAL(args);
         }
-      `({
-        DEFINE_MODEL_FACTORY: ast.identifier(`define${modelName}Factory`),
-        DEFINE_MODEL_FACTORY_INERNAL: ast.identifier(`define${modelName}FactoryInternal`),
-        MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${modelName}FactoryDefineOptions`),
-      });
+      `;
+  return compiled({
+    DEFINE_MODEL_FACTORY: ast.identifier(`define${modelName}Factory`),
+    DEFINE_MODEL_FACTORY_INERNAL: ast.identifier(`define${modelName}FactoryInternal`),
+    MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${modelName}FactoryDefineOptions`),
+  });
+};
 
 export function getSourceFile({
   document,

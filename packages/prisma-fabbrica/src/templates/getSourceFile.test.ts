@@ -1,5 +1,5 @@
+import ts from "typescript";
 import { getDMMF } from "@prisma/internals";
-import { printNode } from "talt";
 
 import { getSourceFile } from ".";
 
@@ -14,6 +14,11 @@ describe(getSourceFile, () => {
       `,
     });
     const sourceFile = getSourceFile({ document: dmmf });
-    expect(printNode(sourceFile)).toMatchSnapshot();
+    const printer = ts.createPrinter({
+      removeComments: false,
+      newLine: ts.NewLineKind.LineFeed,
+      omitTrailingSemicolon: false,
+    });
+    expect(printer.printFile(sourceFile)).toMatchSnapshot();
   });
 });
