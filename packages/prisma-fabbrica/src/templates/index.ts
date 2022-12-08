@@ -1,8 +1,11 @@
 import { DMMF } from "@prisma/generator-helper";
 import ts from "typescript";
 import { template } from "talt";
-import { camelize, ast, byName, createJSONLiteral } from "../helpers";
+import { camelize, byName } from "../helpers";
 import { createFieldDefinitions } from "../relations";
+
+import { ast } from "./ast-tools/astShorthand";
+import { createJSONLiteral } from "./ast-tools/createJSONLiteral";
 
 export function findPrsimaCreateInputTypeFromModelName(document: DMMF.Document, modelName: string) {
   const search = `${modelName}CreateInput`;
@@ -301,9 +304,9 @@ export const autoGenerateModelScalarsOrEnums = (
     MODEL_SCALAR_OR_ENUM_FIELDS: ast.identifier(`${model.name}ScalarOrEnumFields`),
   });
 
-export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.InputType) =>
+export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.InputType) =>
   template.statement<ts.FunctionDeclaration>`
-    function DEFINE_MODEL_FACTORY_INERNAL({
+    function DEFINE_MODEL_FACTORY_INTERNAL({
       defaultData: defaultDataResolver
     }: MODEL_FACTORY_DEFINE_OPTIONS): MODEL_FACTORY_INTERFACE {
 
@@ -379,7 +382,7 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
     }
   `({
     MODEL_KEY: ast.identifier(camelize(model.name)),
-    DEFINE_MODEL_FACTORY_INERNAL: ast.identifier(`define${model.name}FactoryInternal`),
+    DEFINE_MODEL_FACTORY_INTERNAL: ast.identifier(`define${model.name}FactoryInternal`),
     MODEL_FACTORY_INTERFACE: ast.identifier(`${model.name}FactoryInterface`),
     MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${model.name}FactoryDefineInput`),
     MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
@@ -391,17 +394,17 @@ export const defineModelFactory = (model: DMMF.Model, inputType: DMMF.InputType)
   const compiled = filterRequiredInputObjectTypeField(inputType).length
     ? template.statement<ts.FunctionDeclaration>`
         export function DEFINE_MODEL_FACTORY(args: MODEL_FACTORY_DEFINE_OPTIONS): MODEL_FACTORY_INTERFACE {
-          return DEFINE_MODEL_FACTORY_INERNAL(args);
+          return DEFINE_MODEL_FACTORY_INTERNAL(args);
         }
       `
     : template.statement<ts.FunctionDeclaration>`
         export function DEFINE_MODEL_FACTORY(args: MODEL_FACTORY_DEFINE_OPTIONS = {}): MODEL_FACTORY_INTERFACE {
-          return DEFINE_MODEL_FACTORY_INERNAL(args);
+          return DEFINE_MODEL_FACTORY_INTERNAL(args);
         }
       `;
   return compiled({
     DEFINE_MODEL_FACTORY: ast.identifier(`define${model.name}Factory`),
-    DEFINE_MODEL_FACTORY_INERNAL: ast.identifier(`define${model.name}FactoryInternal`),
+    DEFINE_MODEL_FACTORY_INTERNAL: ast.identifier(`define${model.name}FactoryInternal`),
     MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
     MODEL_FACTORY_INTERFACE: ast.identifier(`${model.name}FactoryInterface`),
   });
@@ -444,7 +447,7 @@ export function getSourceFile({
         ...filterBelongsToField(model, createInputType).map(fieldType => isModelAssociationFactory(fieldType, model)),
         modelFactoryInterface(model),
         autoGenerateModelScalarsOrEnums(model, createInputType, document.schema.enumTypes.model ?? []),
-        defineModelFactoryInernal(model, createInputType),
+        defineModelFactoryInternal(model, createInputType),
         defineModelFactory(model, createInputType),
       ]),
   ];
