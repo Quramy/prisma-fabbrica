@@ -97,8 +97,14 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         createForConnect,
     };
 }
-export function defineUserFactory(args: UserFactoryDefineOptions = {}): UserFactoryInterface {
-    return defineUserFactoryInternal(args);
+/**
+ * Define factory for {@link User} model.
+ *
+ * @params options
+ * @returns factory {@link UserFactoryInterface}
+ */
+export function defineUserFactory(options: UserFactoryDefineOptions = {}): UserFactoryInterface {
+    return defineUserFactoryInternal(options);
 }
 type ProfileScalarOrEnumFields = {
     id: string;
@@ -172,6 +178,12 @@ function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: Prof
         createForConnect,
     };
 }
-export function defineProfileFactory(args: ProfileFactoryDefineOptions): ProfileFactoryInterface {
-    return defineProfileFactoryInternal(args);
+/**
+ * Define factory for {@link Profile} model.
+ *
+ * @params options
+ * @returns factory {@link ProfileFactoryInterface}
+ */
+export function defineProfileFactory(options: ProfileFactoryDefineOptions): ProfileFactoryInterface {
+    return defineProfileFactoryInternal(options);
 }

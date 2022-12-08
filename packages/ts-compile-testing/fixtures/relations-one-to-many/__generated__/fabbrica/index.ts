@@ -107,8 +107,14 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         createForConnect,
     };
 }
-export function defineUserFactory(args: UserFactoryDefineOptions = {}): UserFactoryInterface {
-    return defineUserFactoryInternal(args);
+/**
+ * Define factory for {@link User} model.
+ *
+ * @params options
+ * @returns factory {@link UserFactoryInterface}
+ */
+export function defineUserFactory(options: UserFactoryDefineOptions = {}): UserFactoryInterface {
+    return defineUserFactoryInternal(options);
 }
 type PostScalarOrEnumFields = {
     id: string;
@@ -186,8 +192,14 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         createForConnect,
     };
 }
-export function definePostFactory(args: PostFactoryDefineOptions = {}): PostFactoryInterface {
-    return definePostFactoryInternal(args);
+/**
+ * Define factory for {@link Post} model.
+ *
+ * @params options
+ * @returns factory {@link PostFactoryInterface}
+ */
+export function definePostFactory(options: PostFactoryDefineOptions = {}): PostFactoryInterface {
+    return definePostFactoryInternal(options);
 }
 type ReviewScalarOrEnumFields = {
     id: string;
@@ -275,6 +287,12 @@ function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: Revie
         createForConnect,
     };
 }
-export function defineReviewFactory(args: ReviewFactoryDefineOptions): ReviewFactoryInterface {
-    return defineReviewFactoryInternal(args);
+/**
+ * Define factory for {@link Review} model.
+ *
+ * @params options
+ * @returns factory {@link ReviewFactoryInterface}
+ */
+export function defineReviewFactory(options: ReviewFactoryDefineOptions): ReviewFactoryInterface {
+    return defineReviewFactoryInternal(options);
 }

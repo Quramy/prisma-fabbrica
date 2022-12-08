@@ -86,8 +86,14 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         createForConnect,
     };
 }
-export function definePostFactory(args: PostFactoryDefineOptions = {}): PostFactoryInterface {
-    return definePostFactoryInternal(args);
+/**
+ * Define factory for {@link Post} model.
+ *
+ * @params options
+ * @returns factory {@link PostFactoryInterface}
+ */
+export function definePostFactory(options: PostFactoryDefineOptions = {}): PostFactoryInterface {
+    return definePostFactoryInternal(options);
 }
 type CategoryScalarOrEnumFields = {
     id: string;
@@ -153,6 +159,12 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: Cat
         createForConnect,
     };
 }
-export function defineCategoryFactory(args: CategoryFactoryDefineOptions = {}): CategoryFactoryInterface {
-    return defineCategoryFactoryInternal(args);
+/**
+ * Define factory for {@link Category} model.
+ *
+ * @params options
+ * @returns factory {@link CategoryFactoryInterface}
+ */
+export function defineCategoryFactory(options: CategoryFactoryDefineOptions = {}): CategoryFactoryInterface {
+    return defineCategoryFactoryInternal(options);
 }

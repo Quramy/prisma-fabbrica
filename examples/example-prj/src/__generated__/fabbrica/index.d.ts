@@ -30,7 +30,13 @@ interface UserFactoryInterface {
     createList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<User[]>;
     createForConnect(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Pick<User, "id">>;
 }
-export declare function defineUserFactory(args?: UserFactoryDefineOptions): UserFactoryInterface;
+/**
+ * Define factory for {@link User} model.
+ *
+ * @params options
+ * @returns factory {@link UserFactoryInterface}
+ */
+export declare function defineUserFactory(options?: UserFactoryDefineOptions): UserFactoryInterface;
 type PostauthorFactory = {
     _factoryFor: "User";
     build: () => PromiseLike<Prisma.UserCreateNestedOneWithoutPostsInput["create"]>;
@@ -57,7 +63,13 @@ interface PostFactoryInterface {
     createList(inputData: number | readonly Partial<Prisma.PostCreateInput>[]): PromiseLike<Post[]>;
     createForConnect(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Pick<Post, "id">>;
 }
-export declare function definePostFactory(args: PostFactoryDefineOptions): PostFactoryInterface;
+/**
+ * Define factory for {@link Post} model.
+ *
+ * @params options
+ * @returns factory {@link PostFactoryInterface}
+ */
+export declare function definePostFactory(options: PostFactoryDefineOptions): PostFactoryInterface;
 type CommentpostFactory = {
     _factoryFor: "Post";
     build: () => PromiseLike<Prisma.PostCreateNestedOneWithoutCommentsInput["create"]>;
@@ -87,7 +99,13 @@ interface CommentFactoryInterface {
     createList(inputData: number | readonly Partial<Prisma.CommentCreateInput>[]): PromiseLike<Comment[]>;
     createForConnect(inputData?: Partial<Prisma.CommentCreateInput>): PromiseLike<Pick<Comment, "id">>;
 }
-export declare function defineCommentFactory(args: CommentFactoryDefineOptions): CommentFactoryInterface;
+/**
+ * Define factory for {@link Comment} model.
+ *
+ * @params options
+ * @returns factory {@link CommentFactoryInterface}
+ */
+export declare function defineCommentFactory(options: CommentFactoryDefineOptions): CommentFactoryInterface;
 type CategoryFactoryDefineInput = {
     id?: string;
     name?: string;
@@ -106,4 +124,10 @@ interface CategoryFactoryInterface {
     createList(inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]): PromiseLike<Category[]>;
     createForConnect(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Pick<Category, "id">>;
 }
-export declare function defineCategoryFactory(args?: CategoryFactoryDefineOptions): CategoryFactoryInterface;
+/**
+ * Define factory for {@link Category} model.
+ *
+ * @params options
+ * @returns factory {@link CategoryFactoryInterface}
+ */
+export declare function defineCategoryFactory(options?: CategoryFactoryDefineOptions): CategoryFactoryInterface;

@@ -6,6 +6,7 @@ import { createFieldDefinitions } from "../relations";
 
 import { ast } from "./ast-tools/astShorthand";
 import { createJSONLiteral } from "./ast-tools/createJSONLiteral";
+import { wrapWithTSDoc } from "./ast-tools/comment";
 
 export function findPrsimaCreateInputTypeFromModelName(document: DMMF.Document, modelName: string) {
   const search = `${modelName}CreateInput`;
@@ -393,21 +394,31 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
 export const defineModelFactory = (model: DMMF.Model, inputType: DMMF.InputType) => {
   const compiled = filterRequiredInputObjectTypeField(inputType).length
     ? template.statement<ts.FunctionDeclaration>`
-        export function DEFINE_MODEL_FACTORY(args: MODEL_FACTORY_DEFINE_OPTIONS): MODEL_FACTORY_INTERFACE {
-          return DEFINE_MODEL_FACTORY_INTERNAL(args);
+        export function DEFINE_MODEL_FACTORY(options: MODEL_FACTORY_DEFINE_OPTIONS): MODEL_FACTORY_INTERFACE {
+          return DEFINE_MODEL_FACTORY_INTERNAL(options);
         }
       `
     : template.statement<ts.FunctionDeclaration>`
-        export function DEFINE_MODEL_FACTORY(args: MODEL_FACTORY_DEFINE_OPTIONS = {}): MODEL_FACTORY_INTERFACE {
-          return DEFINE_MODEL_FACTORY_INTERNAL(args);
+        export function DEFINE_MODEL_FACTORY(options: MODEL_FACTORY_DEFINE_OPTIONS = {}): MODEL_FACTORY_INTERFACE {
+          return DEFINE_MODEL_FACTORY_INTERNAL(options);
         }
       `;
-  return compiled({
-    DEFINE_MODEL_FACTORY: ast.identifier(`define${model.name}Factory`),
-    DEFINE_MODEL_FACTORY_INTERNAL: ast.identifier(`define${model.name}FactoryInternal`),
-    MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
-    MODEL_FACTORY_INTERFACE: ast.identifier(`${model.name}FactoryInterface`),
-  });
+
+  const tsDoc = `
+Define factory for {@link ${model.name}} model.
+
+@param options
+@returns factory {@link ${model.name}FactoryInterface}
+  `;
+  return wrapWithTSDoc(
+    tsDoc,
+    compiled({
+      DEFINE_MODEL_FACTORY: ast.identifier(`define${model.name}Factory`),
+      DEFINE_MODEL_FACTORY_INTERNAL: ast.identifier(`define${model.name}FactoryInternal`),
+      MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
+      MODEL_FACTORY_INTERFACE: ast.identifier(`${model.name}FactoryInterface`),
+    }),
+  );
 };
 
 export function getSourceFile({
