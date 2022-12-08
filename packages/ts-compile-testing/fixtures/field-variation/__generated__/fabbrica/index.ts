@@ -36,6 +36,16 @@ type UserFactoryDefineInput = {
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
 };
+interface UserFactoryInterface {
+    readonly _factoryFor: "User";
+    build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
+    buildCreateInput(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
+    buildList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<Prisma.UserCreateInput[]>;
+    pickForConnect(inputData: User): Pick<User, "id">;
+    create(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<User>;
+    createList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<User[]>;
+    createForConnect(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Pick<User, "id">>;
+}
 function autoGenerateUserScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): UserScalarOrEnumFields {
@@ -44,7 +54,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
         role: "USER"
     };
 }
-function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
+function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions): UserFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("User", modelFieldDefinitions);
@@ -78,7 +88,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         createForConnect,
     };
 }
-export function defineUserFactory(args: UserFactoryDefineOptions = {}) {
+export function defineUserFactory(args: UserFactoryDefineOptions = {}): UserFactoryInterface {
     return defineUserFactoryInternal(args);
 }
 type ComplexIdModelScalarOrEnumFields = {
@@ -92,6 +102,16 @@ type ComplexIdModelFactoryDefineInput = {
 type ComplexIdModelFactoryDefineOptions = {
     defaultData?: Resolver<ComplexIdModelFactoryDefineInput, BuildDataOptions>;
 };
+interface ComplexIdModelFactoryInterface {
+    readonly _factoryFor: "ComplexIdModel";
+    build(inputData?: Partial<Prisma.ComplexIdModelCreateInput>): PromiseLike<Prisma.ComplexIdModelCreateInput>;
+    buildCreateInput(inputData?: Partial<Prisma.ComplexIdModelCreateInput>): PromiseLike<Prisma.ComplexIdModelCreateInput>;
+    buildList(inputData: number | readonly Partial<Prisma.ComplexIdModelCreateInput>[]): PromiseLike<Prisma.ComplexIdModelCreateInput[]>;
+    pickForConnect(inputData: ComplexIdModel): Pick<ComplexIdModel, "firstName" | "lastName">;
+    create(inputData?: Partial<Prisma.ComplexIdModelCreateInput>): PromiseLike<ComplexIdModel>;
+    createList(inputData: number | readonly Partial<Prisma.ComplexIdModelCreateInput>[]): PromiseLike<ComplexIdModel[]>;
+    createForConnect(inputData?: Partial<Prisma.ComplexIdModelCreateInput>): PromiseLike<Pick<ComplexIdModel, "firstName" | "lastName">>;
+}
 function autoGenerateComplexIdModelScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): ComplexIdModelScalarOrEnumFields {
@@ -100,7 +120,7 @@ function autoGenerateComplexIdModelScalarsOrEnums({ seq }: {
         lastName: scalarFieldValueGenerator.String({ modelName: "ComplexIdModel", fieldName: "lastName", isId: true, isUnique: false, seq })
     };
 }
-function defineComplexIdModelFactoryInternal({ defaultData: defaultDataResolver }: ComplexIdModelFactoryDefineOptions) {
+function defineComplexIdModelFactoryInternal({ defaultData: defaultDataResolver }: ComplexIdModelFactoryDefineOptions): ComplexIdModelFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("ComplexIdModel", modelFieldDefinitions);
@@ -135,7 +155,7 @@ function defineComplexIdModelFactoryInternal({ defaultData: defaultDataResolver 
         createForConnect,
     };
 }
-export function defineComplexIdModelFactory(args: ComplexIdModelFactoryDefineOptions = {}) {
+export function defineComplexIdModelFactory(args: ComplexIdModelFactoryDefineOptions = {}): ComplexIdModelFactoryInterface {
     return defineComplexIdModelFactoryInternal(args);
 }
 type FieldTypePatternModelScalarOrEnumFields = {
@@ -173,6 +193,16 @@ type FieldTypePatternModelFactoryDefineInput = {
 type FieldTypePatternModelFactoryDefineOptions = {
     defaultData?: Resolver<FieldTypePatternModelFactoryDefineInput, BuildDataOptions>;
 };
+interface FieldTypePatternModelFactoryInterface {
+    readonly _factoryFor: "FieldTypePatternModel";
+    build(inputData?: Partial<Prisma.FieldTypePatternModelCreateInput>): PromiseLike<Prisma.FieldTypePatternModelCreateInput>;
+    buildCreateInput(inputData?: Partial<Prisma.FieldTypePatternModelCreateInput>): PromiseLike<Prisma.FieldTypePatternModelCreateInput>;
+    buildList(inputData: number | readonly Partial<Prisma.FieldTypePatternModelCreateInput>[]): PromiseLike<Prisma.FieldTypePatternModelCreateInput[]>;
+    pickForConnect(inputData: FieldTypePatternModel): Pick<FieldTypePatternModel, "id">;
+    create(inputData?: Partial<Prisma.FieldTypePatternModelCreateInput>): PromiseLike<FieldTypePatternModel>;
+    createList(inputData: number | readonly Partial<Prisma.FieldTypePatternModelCreateInput>[]): PromiseLike<FieldTypePatternModel[]>;
+    createForConnect(inputData?: Partial<Prisma.FieldTypePatternModelCreateInput>): PromiseLike<Pick<FieldTypePatternModel, "id">>;
+}
 function autoGenerateFieldTypePatternModelScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): FieldTypePatternModelScalarOrEnumFields {
@@ -188,7 +218,7 @@ function autoGenerateFieldTypePatternModelScalarsOrEnums({ seq }: {
         requiredBigInt: scalarFieldValueGenerator.BigInt({ modelName: "FieldTypePatternModel", fieldName: "requiredBigInt", isId: false, isUnique: false, seq })
     };
 }
-function defineFieldTypePatternModelFactoryInternal({ defaultData: defaultDataResolver }: FieldTypePatternModelFactoryDefineOptions) {
+function defineFieldTypePatternModelFactoryInternal({ defaultData: defaultDataResolver }: FieldTypePatternModelFactoryDefineOptions): FieldTypePatternModelFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("FieldTypePatternModel", modelFieldDefinitions);
@@ -222,7 +252,7 @@ function defineFieldTypePatternModelFactoryInternal({ defaultData: defaultDataRe
         createForConnect,
     };
 }
-export function defineFieldTypePatternModelFactory(args: FieldTypePatternModelFactoryDefineOptions = {}) {
+export function defineFieldTypePatternModelFactory(args: FieldTypePatternModelFactoryDefineOptions = {}): FieldTypePatternModelFactoryInterface {
     return defineFieldTypePatternModelFactoryInternal(args);
 }
 type NoPkModelScalarOrEnumFields = {
@@ -234,6 +264,16 @@ type NoPkModelFactoryDefineInput = {
 type NoPkModelFactoryDefineOptions = {
     defaultData?: Resolver<NoPkModelFactoryDefineInput, BuildDataOptions>;
 };
+interface NoPkModelFactoryInterface {
+    readonly _factoryFor: "NoPkModel";
+    build(inputData?: Partial<Prisma.NoPkModelCreateInput>): PromiseLike<Prisma.NoPkModelCreateInput>;
+    buildCreateInput(inputData?: Partial<Prisma.NoPkModelCreateInput>): PromiseLike<Prisma.NoPkModelCreateInput>;
+    buildList(inputData: number | readonly Partial<Prisma.NoPkModelCreateInput>[]): PromiseLike<Prisma.NoPkModelCreateInput[]>;
+    pickForConnect(inputData: NoPkModel): Pick<NoPkModel, "id">;
+    create(inputData?: Partial<Prisma.NoPkModelCreateInput>): PromiseLike<NoPkModel>;
+    createList(inputData: number | readonly Partial<Prisma.NoPkModelCreateInput>[]): PromiseLike<NoPkModel[]>;
+    createForConnect(inputData?: Partial<Prisma.NoPkModelCreateInput>): PromiseLike<Pick<NoPkModel, "id">>;
+}
 function autoGenerateNoPkModelScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): NoPkModelScalarOrEnumFields {
@@ -241,7 +281,7 @@ function autoGenerateNoPkModelScalarsOrEnums({ seq }: {
         id: scalarFieldValueGenerator.Int({ modelName: "NoPkModel", fieldName: "id", isId: false, isUnique: true, seq })
     };
 }
-function defineNoPkModelFactoryInternal({ defaultData: defaultDataResolver }: NoPkModelFactoryDefineOptions) {
+function defineNoPkModelFactoryInternal({ defaultData: defaultDataResolver }: NoPkModelFactoryDefineOptions): NoPkModelFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("NoPkModel", modelFieldDefinitions);
@@ -275,6 +315,6 @@ function defineNoPkModelFactoryInternal({ defaultData: defaultDataResolver }: No
         createForConnect,
     };
 }
-export function defineNoPkModelFactory(args: NoPkModelFactoryDefineOptions = {}) {
+export function defineNoPkModelFactory(args: NoPkModelFactoryDefineOptions = {}): NoPkModelFactoryInterface {
     return defineNoPkModelFactoryInternal(args);
 }

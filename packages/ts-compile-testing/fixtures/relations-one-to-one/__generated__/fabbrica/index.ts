@@ -41,6 +41,16 @@ type UserFactoryDefineOptions = {
 function isUserprofileFactory(x: UserprofileFactory | Prisma.ProfileCreateNestedOneWithoutUserInput | undefined): x is UserprofileFactory {
     return (x as any)?._factoryFor === "Profile";
 }
+interface UserFactoryInterface {
+    readonly _factoryFor: "User";
+    build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
+    buildCreateInput(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
+    buildList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<Prisma.UserCreateInput[]>;
+    pickForConnect(inputData: User): Pick<User, "id">;
+    create(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<User>;
+    createList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<User[]>;
+    createForConnect(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Pick<User, "id">>;
+}
 function autoGenerateUserScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): UserScalarOrEnumFields {
@@ -49,7 +59,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
-function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
+function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions): UserFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("User", modelFieldDefinitions);
@@ -87,7 +97,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         createForConnect,
     };
 }
-export function defineUserFactory(args: UserFactoryDefineOptions = {}) {
+export function defineUserFactory(args: UserFactoryDefineOptions = {}): UserFactoryInterface {
     return defineUserFactoryInternal(args);
 }
 type ProfileScalarOrEnumFields = {
@@ -107,6 +117,16 @@ type ProfileFactoryDefineOptions = {
 function isProfileuserFactory(x: ProfileuserFactory | Prisma.UserCreateNestedOneWithoutProfileInput | undefined): x is ProfileuserFactory {
     return (x as any)?._factoryFor === "User";
 }
+interface ProfileFactoryInterface {
+    readonly _factoryFor: "Profile";
+    build(inputData?: Partial<Prisma.ProfileCreateInput>): PromiseLike<Prisma.ProfileCreateInput>;
+    buildCreateInput(inputData?: Partial<Prisma.ProfileCreateInput>): PromiseLike<Prisma.ProfileCreateInput>;
+    buildList(inputData: number | readonly Partial<Prisma.ProfileCreateInput>[]): PromiseLike<Prisma.ProfileCreateInput[]>;
+    pickForConnect(inputData: Profile): Pick<Profile, "id">;
+    create(inputData?: Partial<Prisma.ProfileCreateInput>): PromiseLike<Profile>;
+    createList(inputData: number | readonly Partial<Prisma.ProfileCreateInput>[]): PromiseLike<Profile[]>;
+    createForConnect(inputData?: Partial<Prisma.ProfileCreateInput>): PromiseLike<Pick<Profile, "id">>;
+}
 function autoGenerateProfileScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): ProfileScalarOrEnumFields {
@@ -114,7 +134,7 @@ function autoGenerateProfileScalarsOrEnums({ seq }: {
         id: scalarFieldValueGenerator.String({ modelName: "Profile", fieldName: "id", isId: true, isUnique: false, seq })
     };
 }
-function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: ProfileFactoryDefineOptions) {
+function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: ProfileFactoryDefineOptions): ProfileFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("Profile", modelFieldDefinitions);
@@ -152,6 +172,6 @@ function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: Prof
         createForConnect,
     };
 }
-export function defineProfileFactory(args: ProfileFactoryDefineOptions) {
+export function defineProfileFactory(args: ProfileFactoryDefineOptions): ProfileFactoryInterface {
     return defineProfileFactoryInternal(args);
 }
