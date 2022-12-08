@@ -91,8 +91,14 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
         createForConnect,
     };
 }
-function defineUserFactory(args = {}) {
-    return defineUserFactoryInternal(args);
+/**
+ * Define factory for {@link User} model.
+ *
+ * @params options
+ * @returns factory {@link UserFactoryInterface}
+ */
+function defineUserFactory(options = {}) {
+    return defineUserFactoryInternal(options);
 }
 exports.defineUserFactory = defineUserFactory;
 function isPostauthorFactory(x) {
@@ -142,8 +148,14 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
         createForConnect,
     };
 }
-function definePostFactory(args) {
-    return definePostFactoryInternal(args);
+/**
+ * Define factory for {@link Post} model.
+ *
+ * @params options
+ * @returns factory {@link PostFactoryInterface}
+ */
+function definePostFactory(options) {
+    return definePostFactoryInternal(options);
 }
 exports.definePostFactory = definePostFactory;
 function isCommentpostFactory(x) {
@@ -199,8 +211,14 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver }) {
         createForConnect,
     };
 }
-function defineCommentFactory(args) {
-    return defineCommentFactoryInternal(args);
+/**
+ * Define factory for {@link Comment} model.
+ *
+ * @params options
+ * @returns factory {@link CommentFactoryInterface}
+ */
+function defineCommentFactory(options) {
+    return defineCommentFactoryInternal(options);
 }
 exports.defineCommentFactory = defineCommentFactory;
 function autoGenerateCategoryScalarsOrEnums({ seq }) {
@@ -243,7 +261,13 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }) {
         createForConnect,
     };
 }
-function defineCategoryFactory(args = {}) {
-    return defineCategoryFactoryInternal(args);
+/**
+ * Define factory for {@link Category} model.
+ *
+ * @params options
+ * @returns factory {@link CategoryFactoryInterface}
+ */
+function defineCategoryFactory(options = {}) {
+    return defineCategoryFactoryInternal(options);
 }
 exports.defineCategoryFactory = defineCategoryFactory;

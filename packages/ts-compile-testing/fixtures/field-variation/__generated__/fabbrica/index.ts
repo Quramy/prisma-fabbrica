@@ -88,8 +88,14 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         createForConnect,
     };
 }
-export function defineUserFactory(args: UserFactoryDefineOptions = {}): UserFactoryInterface {
-    return defineUserFactoryInternal(args);
+/**
+ * Define factory for {@link User} model.
+ *
+ * @params options
+ * @returns factory {@link UserFactoryInterface}
+ */
+export function defineUserFactory(options: UserFactoryDefineOptions = {}): UserFactoryInterface {
+    return defineUserFactoryInternal(options);
 }
 type ComplexIdModelScalarOrEnumFields = {
     firstName: string;
@@ -155,8 +161,14 @@ function defineComplexIdModelFactoryInternal({ defaultData: defaultDataResolver 
         createForConnect,
     };
 }
-export function defineComplexIdModelFactory(args: ComplexIdModelFactoryDefineOptions = {}): ComplexIdModelFactoryInterface {
-    return defineComplexIdModelFactoryInternal(args);
+/**
+ * Define factory for {@link ComplexIdModel} model.
+ *
+ * @params options
+ * @returns factory {@link ComplexIdModelFactoryInterface}
+ */
+export function defineComplexIdModelFactory(options: ComplexIdModelFactoryDefineOptions = {}): ComplexIdModelFactoryInterface {
+    return defineComplexIdModelFactoryInternal(options);
 }
 type FieldTypePatternModelScalarOrEnumFields = {
     id: number;
@@ -252,8 +264,14 @@ function defineFieldTypePatternModelFactoryInternal({ defaultData: defaultDataRe
         createForConnect,
     };
 }
-export function defineFieldTypePatternModelFactory(args: FieldTypePatternModelFactoryDefineOptions = {}): FieldTypePatternModelFactoryInterface {
-    return defineFieldTypePatternModelFactoryInternal(args);
+/**
+ * Define factory for {@link FieldTypePatternModel} model.
+ *
+ * @params options
+ * @returns factory {@link FieldTypePatternModelFactoryInterface}
+ */
+export function defineFieldTypePatternModelFactory(options: FieldTypePatternModelFactoryDefineOptions = {}): FieldTypePatternModelFactoryInterface {
+    return defineFieldTypePatternModelFactoryInternal(options);
 }
 type NoPkModelScalarOrEnumFields = {
     id: number;
@@ -315,6 +333,12 @@ function defineNoPkModelFactoryInternal({ defaultData: defaultDataResolver }: No
         createForConnect,
     };
 }
-export function defineNoPkModelFactory(args: NoPkModelFactoryDefineOptions = {}): NoPkModelFactoryInterface {
-    return defineNoPkModelFactoryInternal(args);
+/**
+ * Define factory for {@link NoPkModel} model.
+ *
+ * @params options
+ * @returns factory {@link NoPkModelFactoryInterface}
+ */
+export function defineNoPkModelFactory(options: NoPkModelFactoryDefineOptions = {}): NoPkModelFactoryInterface {
+    return defineNoPkModelFactoryInternal(options);
 }
