@@ -2,7 +2,7 @@ import { Post } from "./../client";
 import { Category } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
-import { getClient, ModelWithFields, createScreener, scalarFieldValueGenerator, Resolver, normalizeResolver, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
+import { getClient, ModelWithFields, createScreener, scalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
 export { initialize, resetSequence } from "@quramy/prisma-fabbrica/lib/internal";
 type BuildDataOptions = {
     readonly seq: number;
@@ -34,6 +34,16 @@ type PostFactoryDefineInput = {
 type PostFactoryDefineOptions = {
     defaultData?: Resolver<PostFactoryDefineInput, BuildDataOptions>;
 };
+interface PostFactoryInterface {
+    readonly _factoryFor: "Post";
+    build(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
+    buildCreateInput(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
+    buildList(inputData: number | readonly Partial<Prisma.PostCreateInput>[]): PromiseLike<Prisma.PostCreateInput[]>;
+    pickForConnect(inputData: Post): Pick<Post, "id">;
+    create(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Post>;
+    createList(inputData: number | readonly Partial<Prisma.PostCreateInput>[]): PromiseLike<Post[]>;
+    createForConnect(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Pick<Post, "id">>;
+}
 function autoGeneratePostScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): PostScalarOrEnumFields {
@@ -42,7 +52,7 @@ function autoGeneratePostScalarsOrEnums({ seq }: {
         title: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false, seq })
     };
 }
-function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFactoryDefineOptions) {
+function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFactoryDefineOptions): PostFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("Post", modelFieldDefinitions);
@@ -55,10 +65,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData: number | Partial<Prisma.PostCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData: number | readonly Partial<Prisma.PostCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
     const pickForConnect = (inputData: Post) => ({
         id: inputData.id
     });
@@ -66,10 +73,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().post.create({ data });
     };
-    const createList = (inputData: number | Partial<Prisma.PostCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData: number | readonly Partial<Prisma.PostCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
     const createForConnect = (inputData: Partial<Prisma.PostCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Post" as const,
@@ -82,7 +86,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         createForConnect,
     };
 }
-export function definePostFactory(args: PostFactoryDefineOptions = {}) {
+export function definePostFactory(args: PostFactoryDefineOptions = {}): PostFactoryInterface {
     return definePostFactoryInternal(args);
 }
 type CategoryScalarOrEnumFields = {
@@ -97,6 +101,16 @@ type CategoryFactoryDefineInput = {
 type CategoryFactoryDefineOptions = {
     defaultData?: Resolver<CategoryFactoryDefineInput, BuildDataOptions>;
 };
+interface CategoryFactoryInterface {
+    readonly _factoryFor: "Category";
+    build(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Prisma.CategoryCreateInput>;
+    buildCreateInput(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Prisma.CategoryCreateInput>;
+    buildList(inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]): PromiseLike<Prisma.CategoryCreateInput[]>;
+    pickForConnect(inputData: Category): Pick<Category, "id">;
+    create(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Category>;
+    createList(inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]): PromiseLike<Category[]>;
+    createForConnect(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Pick<Category, "id">>;
+}
 function autoGenerateCategoryScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): CategoryScalarOrEnumFields {
@@ -105,7 +119,7 @@ function autoGenerateCategoryScalarsOrEnums({ seq }: {
         name: scalarFieldValueGenerator.String({ modelName: "Category", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
-function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: CategoryFactoryDefineOptions) {
+function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: CategoryFactoryDefineOptions): CategoryFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("Category", modelFieldDefinitions);
@@ -118,10 +132,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: Cat
         const data: Prisma.CategoryCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData: number | Partial<Prisma.CategoryCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
     const pickForConnect = (inputData: Category) => ({
         id: inputData.id
     });
@@ -129,10 +140,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: Cat
         const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().category.create({ data });
     };
-    const createList = (inputData: number | Partial<Prisma.CategoryCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
     const createForConnect = (inputData: Partial<Prisma.CategoryCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Category" as const,
@@ -145,6 +153,6 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: Cat
         createForConnect,
     };
 }
-export function defineCategoryFactory(args: CategoryFactoryDefineOptions = {}) {
+export function defineCategoryFactory(args: CategoryFactoryDefineOptions = {}): CategoryFactoryInterface {
     return defineCategoryFactoryInternal(args);
 }

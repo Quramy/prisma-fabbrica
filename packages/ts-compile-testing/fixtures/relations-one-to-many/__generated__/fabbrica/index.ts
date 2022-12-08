@@ -3,7 +3,7 @@ import { Post } from "./../client";
 import { Review } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
-import { getClient, ModelWithFields, createScreener, scalarFieldValueGenerator, Resolver, normalizeResolver, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
+import { getClient, ModelWithFields, createScreener, scalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
 export { initialize, resetSequence } from "@quramy/prisma-fabbrica/lib/internal";
 type BuildDataOptions = {
     readonly seq: number;
@@ -55,6 +55,16 @@ type UserFactoryDefineInput = {
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
 };
+interface UserFactoryInterface {
+    readonly _factoryFor: "User";
+    build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
+    buildCreateInput(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
+    buildList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<Prisma.UserCreateInput[]>;
+    pickForConnect(inputData: User): Pick<User, "id">;
+    create(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<User>;
+    createList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<User[]>;
+    createForConnect(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Pick<User, "id">>;
+}
 function autoGenerateUserScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): UserScalarOrEnumFields {
@@ -63,7 +73,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
-function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions) {
+function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions): UserFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("User", modelFieldDefinitions);
@@ -76,10 +86,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData: number | Partial<Prisma.UserCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
     const pickForConnect = (inputData: User) => ({
         id: inputData.id
     });
@@ -87,10 +94,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().user.create({ data });
     };
-    const createList = (inputData: number | Partial<Prisma.UserCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
     const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "User" as const,
@@ -103,7 +107,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         createForConnect,
     };
 }
-export function defineUserFactory(args: UserFactoryDefineOptions = {}) {
+export function defineUserFactory(args: UserFactoryDefineOptions = {}): UserFactoryInterface {
     return defineUserFactoryInternal(args);
 }
 type PostScalarOrEnumFields = {
@@ -126,6 +130,16 @@ type PostFactoryDefineOptions = {
 function isPostauthorFactory(x: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput | undefined): x is PostauthorFactory {
     return (x as any)?._factoryFor === "User";
 }
+interface PostFactoryInterface {
+    readonly _factoryFor: "Post";
+    build(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
+    buildCreateInput(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
+    buildList(inputData: number | readonly Partial<Prisma.PostCreateInput>[]): PromiseLike<Prisma.PostCreateInput[]>;
+    pickForConnect(inputData: Post): Pick<Post, "id">;
+    create(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Post>;
+    createList(inputData: number | readonly Partial<Prisma.PostCreateInput>[]): PromiseLike<Post[]>;
+    createForConnect(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Pick<Post, "id">>;
+}
 function autoGeneratePostScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): PostScalarOrEnumFields {
@@ -134,7 +148,7 @@ function autoGeneratePostScalarsOrEnums({ seq }: {
         title: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false, seq })
     };
 }
-function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFactoryDefineOptions) {
+function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFactoryDefineOptions): PostFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("Post", modelFieldDefinitions);
@@ -151,10 +165,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData: number | Partial<Prisma.PostCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData: number | readonly Partial<Prisma.PostCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
     const pickForConnect = (inputData: Post) => ({
         id: inputData.id
     });
@@ -162,10 +173,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().post.create({ data });
     };
-    const createList = (inputData: number | Partial<Prisma.PostCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData: number | readonly Partial<Prisma.PostCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
     const createForConnect = (inputData: Partial<Prisma.PostCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Post" as const,
@@ -178,7 +186,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         createForConnect,
     };
 }
-export function definePostFactory(args: PostFactoryDefineOptions = {}) {
+export function definePostFactory(args: PostFactoryDefineOptions = {}): PostFactoryInterface {
     return definePostFactoryInternal(args);
 }
 type ReviewScalarOrEnumFields = {
@@ -208,6 +216,16 @@ function isReviewpostFactory(x: ReviewpostFactory | Prisma.PostCreateNestedOneWi
 function isReviewreviewerFactory(x: ReviewreviewerFactory | Prisma.UserCreateNestedOneWithoutReviewsInput | undefined): x is ReviewreviewerFactory {
     return (x as any)?._factoryFor === "User";
 }
+interface ReviewFactoryInterface {
+    readonly _factoryFor: "Review";
+    build(inputData?: Partial<Prisma.ReviewCreateInput>): PromiseLike<Prisma.ReviewCreateInput>;
+    buildCreateInput(inputData?: Partial<Prisma.ReviewCreateInput>): PromiseLike<Prisma.ReviewCreateInput>;
+    buildList(inputData: number | readonly Partial<Prisma.ReviewCreateInput>[]): PromiseLike<Prisma.ReviewCreateInput[]>;
+    pickForConnect(inputData: Review): Pick<Review, "id">;
+    create(inputData?: Partial<Prisma.ReviewCreateInput>): PromiseLike<Review>;
+    createList(inputData: number | readonly Partial<Prisma.ReviewCreateInput>[]): PromiseLike<Review[]>;
+    createForConnect(inputData?: Partial<Prisma.ReviewCreateInput>): PromiseLike<Pick<Review, "id">>;
+}
 function autoGenerateReviewScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): ReviewScalarOrEnumFields {
@@ -216,7 +234,7 @@ function autoGenerateReviewScalarsOrEnums({ seq }: {
         body: scalarFieldValueGenerator.String({ modelName: "Review", fieldName: "body", isId: false, isUnique: false, seq })
     };
 }
-function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: ReviewFactoryDefineOptions) {
+function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: ReviewFactoryDefineOptions): ReviewFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
     const screen = createScreener("Review", modelFieldDefinitions);
@@ -236,10 +254,7 @@ function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: Revie
         const data: Prisma.ReviewCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData: number | Partial<Prisma.ReviewCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData: number | readonly Partial<Prisma.ReviewCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
     const pickForConnect = (inputData: Review) => ({
         id: inputData.id
     });
@@ -247,10 +262,7 @@ function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: Revie
         const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().review.create({ data });
     };
-    const createList = (inputData: number | Partial<Prisma.ReviewCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData: number | readonly Partial<Prisma.ReviewCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
     const createForConnect = (inputData: Partial<Prisma.ReviewCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Review" as const,
@@ -263,6 +275,6 @@ function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: Revie
         createForConnect,
     };
 }
-export function defineReviewFactory(args: ReviewFactoryDefineOptions) {
+export function defineReviewFactory(args: ReviewFactoryDefineOptions): ReviewFactoryInterface {
     return defineReviewFactoryInternal(args);
 }
