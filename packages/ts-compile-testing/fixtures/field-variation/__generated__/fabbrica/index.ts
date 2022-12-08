@@ -5,7 +5,7 @@ import { NoPkModel } from "./../client";
 import { Role } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
-import { getClient, ModelWithFields, createScreener, scalarFieldValueGenerator, Resolver, normalizeResolver, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
+import { getClient, ModelWithFields, createScreener, scalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
 export { initialize, resetSequence } from "@quramy/prisma-fabbrica/lib/internal";
 type BuildDataOptions = {
     readonly seq: number;
@@ -57,10 +57,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData: number | Partial<Prisma.UserCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
     const pickForConnect = (inputData: User) => ({
         id: inputData.id
     });
@@ -68,10 +65,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().user.create({ data });
     };
-    const createList = (inputData: number | Partial<Prisma.UserCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
     const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "User" as const,
@@ -119,10 +113,7 @@ function defineComplexIdModelFactoryInternal({ defaultData: defaultDataResolver 
         const data: Prisma.ComplexIdModelCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData: number | Partial<Prisma.ComplexIdModelCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData: number | readonly Partial<Prisma.ComplexIdModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
     const pickForConnect = (inputData: ComplexIdModel) => ({
         firstName: inputData.firstName,
         lastName: inputData.lastName
@@ -131,10 +122,7 @@ function defineComplexIdModelFactoryInternal({ defaultData: defaultDataResolver 
         const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().complexIdModel.create({ data });
     };
-    const createList = (inputData: number | Partial<Prisma.ComplexIdModelCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData: number | readonly Partial<Prisma.ComplexIdModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
     const createForConnect = (inputData: Partial<Prisma.ComplexIdModelCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "ComplexIdModel" as const,
@@ -213,10 +201,7 @@ function defineFieldTypePatternModelFactoryInternal({ defaultData: defaultDataRe
         const data: Prisma.FieldTypePatternModelCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData: number | Partial<Prisma.FieldTypePatternModelCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData: number | readonly Partial<Prisma.FieldTypePatternModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
     const pickForConnect = (inputData: FieldTypePatternModel) => ({
         id: inputData.id
     });
@@ -224,10 +209,7 @@ function defineFieldTypePatternModelFactoryInternal({ defaultData: defaultDataRe
         const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().fieldTypePatternModel.create({ data });
     };
-    const createList = (inputData: number | Partial<Prisma.FieldTypePatternModelCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData: number | readonly Partial<Prisma.FieldTypePatternModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
     const createForConnect = (inputData: Partial<Prisma.FieldTypePatternModelCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "FieldTypePatternModel" as const,
@@ -272,10 +254,7 @@ function defineNoPkModelFactoryInternal({ defaultData: defaultDataResolver }: No
         const data: Prisma.NoPkModelCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData: number | Partial<Prisma.NoPkModelCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData: number | readonly Partial<Prisma.NoPkModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
     const pickForConnect = (inputData: NoPkModel) => ({
         id: inputData.id
     });
@@ -283,10 +262,7 @@ function defineNoPkModelFactoryInternal({ defaultData: defaultDataResolver }: No
         const data = await build(inputData).then(screen);
         return await getClient<PrismaClient>().noPkModel.create({ data });
     };
-    const createList = (inputData: number | Partial<Prisma.NoPkModelCreateInput>[]) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData: number | readonly Partial<Prisma.NoPkModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
     const createForConnect = (inputData: Partial<Prisma.NoPkModelCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "NoPkModel" as const,

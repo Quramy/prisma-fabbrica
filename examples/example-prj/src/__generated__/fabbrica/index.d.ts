@@ -23,13 +23,13 @@ type UserFactoryDefineOptions = {
 export declare function defineUserFactory(args?: UserFactoryDefineOptions): {
     _factoryFor: "User";
     build: (inputData?: Partial<Prisma.UserCreateInput>) => Promise<Prisma.UserCreateInput>;
-    buildList: (inputData: number | Partial<Prisma.UserCreateInput>[]) => Promise<Prisma.UserCreateInput[]>;
+    buildList: (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise<Prisma.UserCreateInput[]>;
     buildCreateInput: (inputData?: Partial<Prisma.UserCreateInput>) => Promise<Prisma.UserCreateInput>;
     pickForConnect: (inputData: User) => {
         id: string;
     };
     create: (inputData?: Partial<Prisma.UserCreateInput>) => Promise<User>;
-    createList: (inputData: number | Partial<Prisma.UserCreateInput>[]) => Promise<User[]>;
+    createList: (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise<User[]>;
     createForConnect: (inputData?: Partial<Prisma.UserCreateInput>) => Promise<{
         id: string;
     }>;
@@ -53,13 +53,13 @@ type PostFactoryDefineOptions = {
 export declare function definePostFactory(args: PostFactoryDefineOptions): {
     _factoryFor: "Post";
     build: (inputData?: Partial<Prisma.PostCreateInput>) => Promise<Prisma.PostCreateInput>;
-    buildList: (inputData: number | Partial<Prisma.PostCreateInput>[]) => Promise<Prisma.PostCreateInput[]>;
+    buildList: (inputData: number | readonly Partial<Prisma.PostCreateInput>[]) => Promise<Prisma.PostCreateInput[]>;
     buildCreateInput: (inputData?: Partial<Prisma.PostCreateInput>) => Promise<Prisma.PostCreateInput>;
     pickForConnect: (inputData: Post) => {
         id: string;
     };
     create: (inputData?: Partial<Prisma.PostCreateInput>) => Promise<Post>;
-    createList: (inputData: number | Partial<Prisma.PostCreateInput>[]) => Promise<Post[]>;
+    createList: (inputData: number | readonly Partial<Prisma.PostCreateInput>[]) => Promise<Post[]>;
     createForConnect: (inputData?: Partial<Prisma.PostCreateInput>) => Promise<{
         id: string;
     }>;
@@ -86,13 +86,13 @@ type CommentFactoryDefineOptions = {
 export declare function defineCommentFactory(args: CommentFactoryDefineOptions): {
     _factoryFor: "Comment";
     build: (inputData?: Partial<Prisma.CommentCreateInput>) => Promise<Prisma.CommentCreateInput>;
-    buildList: (inputData: number | Partial<Prisma.CommentCreateInput>[]) => Promise<Prisma.CommentCreateInput[]>;
+    buildList: (inputData: number | readonly Partial<Prisma.CommentCreateInput>[]) => Promise<Prisma.CommentCreateInput[]>;
     buildCreateInput: (inputData?: Partial<Prisma.CommentCreateInput>) => Promise<Prisma.CommentCreateInput>;
     pickForConnect: (inputData: Comment) => {
         id: string;
     };
     create: (inputData?: Partial<Prisma.CommentCreateInput>) => Promise<Comment>;
-    createList: (inputData: number | Partial<Prisma.CommentCreateInput>[]) => Promise<Comment[]>;
+    createList: (inputData: number | readonly Partial<Prisma.CommentCreateInput>[]) => Promise<Comment[]>;
     createForConnect: (inputData?: Partial<Prisma.CommentCreateInput>) => Promise<{
         id: string;
     }>;
@@ -108,13 +108,13 @@ type CategoryFactoryDefineOptions = {
 export declare function defineCategoryFactory(args?: CategoryFactoryDefineOptions): {
     _factoryFor: "Category";
     build: (inputData?: Partial<Prisma.CategoryCreateInput>) => Promise<Prisma.CategoryCreateInput>;
-    buildList: (inputData: number | Partial<Prisma.CategoryCreateInput>[]) => Promise<Prisma.CategoryCreateInput[]>;
+    buildList: (inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]) => Promise<Prisma.CategoryCreateInput[]>;
     buildCreateInput: (inputData?: Partial<Prisma.CategoryCreateInput>) => Promise<Prisma.CategoryCreateInput>;
     pickForConnect: (inputData: Category) => {
         id: string;
     };
     create: (inputData?: Partial<Prisma.CategoryCreateInput>) => Promise<Category>;
-    createList: (inputData: number | Partial<Prisma.CategoryCreateInput>[]) => Promise<Category[]>;
+    createList: (inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]) => Promise<Category[]>;
     createForConnect: (inputData?: Partial<Prisma.CategoryCreateInput>) => Promise<{
         id: string;
     }>;
