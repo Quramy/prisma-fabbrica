@@ -80,6 +80,7 @@ export const header = (prismaClientModuleSpecifier: string) =>
       scalarFieldValueGenerator,
       Resolver,
       normalizeResolver,
+      normalizeList,
       getSequenceCounter,
     } from "@quramy/prisma-fabbrica/lib/internal";
     export { initialize, resetSequence } from "@quramy/prisma-fabbrica/lib/internal";
@@ -318,11 +319,8 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
       };
 
       const buildList = (
-        inputData: number | Partial<Prisma.MODEL_CREATE_INPUT>[]
-      ) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-      }
+        inputData: number | readonly Partial<Prisma.MODEL_CREATE_INPUT>[]
+      ) => Promise.all(normalizeList(inputData).map(data => build(data)));
 
       const pickForConnect = (inputData: ${() => ast.typeReferenceNode(model.name)}) => (
         ${() =>
@@ -342,11 +340,8 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
       };
 
       const createList = (
-        inputData: number | Partial<Prisma.MODEL_CREATE_INPUT>[]
-      ) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-      }
+        inputData: number | readonly Partial<Prisma.MODEL_CREATE_INPUT>[]
+      ) => Promise.all(normalizeList(inputData).map(data => create(data)));
 
       const createForConnect = (inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}) => create(inputData).then(pickForConnect);
 

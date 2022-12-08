@@ -5,7 +5,6 @@ const internal_1 = require("@quramy/prisma-fabbrica/lib/internal");
 var internal_2 = require("@quramy/prisma-fabbrica/lib/internal");
 Object.defineProperty(exports, "initialize", { enumerable: true, get: function () { return internal_2.initialize; } });
 Object.defineProperty(exports, "resetSequence", { enumerable: true, get: function () { return internal_2.resetSequence; } });
-/*hogehoge*/
 const modelFieldDefinitions = [{
         name: "User",
         fields: [{
@@ -71,10 +70,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
     const pickForConnect = (inputData) => ({
         id: inputData.id
     });
@@ -82,10 +78,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = await build(inputData).then(screen);
         return await (0, internal_1.getClient)().user.create({ data });
     };
-    const createList = (inputData) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
     const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "User",
@@ -128,10 +121,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
     const pickForConnect = (inputData) => ({
         id: inputData.id
     });
@@ -139,10 +129,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = await build(inputData).then(screen);
         return await (0, internal_1.getClient)().post.create({ data });
     };
-    const createList = (inputData) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
     const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Post",
@@ -191,10 +178,7 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
     const pickForConnect = (inputData) => ({
         id: inputData.id
     });
@@ -202,10 +186,7 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = await build(inputData).then(screen);
         return await (0, internal_1.getClient)().comment.create({ data });
     };
-    const createList = (inputData) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
     const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Comment",
@@ -241,10 +222,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
     const pickForConnect = (inputData) => ({
         id: inputData.id
     });
@@ -252,10 +230,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = await build(inputData).then(screen);
         return await (0, internal_1.getClient)().category.create({ data });
     };
-    const createList = (inputData) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
     const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Category",
