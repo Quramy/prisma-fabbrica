@@ -94,7 +94,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
 /**
  * Define factory for {@link User} model.
  *
- * @params options
+ * @param options
  * @returns factory {@link UserFactoryInterface}
  */
 function defineUserFactory(options = {}) {
@@ -151,7 +151,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
 /**
  * Define factory for {@link Post} model.
  *
- * @params options
+ * @param options
  * @returns factory {@link PostFactoryInterface}
  */
 function definePostFactory(options) {
@@ -214,7 +214,7 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver }) {
 /**
  * Define factory for {@link Comment} model.
  *
- * @params options
+ * @param options
  * @returns factory {@link CommentFactoryInterface}
  */
 function defineCommentFactory(options) {
@@ -264,7 +264,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }) {
 /**
  * Define factory for {@link Category} model.
  *
- * @params options
+ * @param options
  * @returns factory {@link CategoryFactoryInterface}
  */
 function defineCategoryFactory(options = {}) {

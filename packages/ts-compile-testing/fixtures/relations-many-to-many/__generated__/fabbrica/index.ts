@@ -1,12 +1,14 @@
-import { Post } from "./../client";
-import { Category } from "./../client";
+import type { Post } from "./../client";
+import type { Category } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
 import { getClient, ModelWithFields, createScreener, scalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
 export { initialize, resetSequence } from "@quramy/prisma-fabbrica/lib/internal";
+
 type BuildDataOptions = {
     readonly seq: number;
 };
+
 const modelFieldDefinitions: ModelWithFields[] = [{
         name: "Post",
         fields: [{
@@ -22,18 +24,22 @@ const modelFieldDefinitions: ModelWithFields[] = [{
                 relationName: "CategoryToPost"
             }]
     }];
+
 type PostScalarOrEnumFields = {
     id: string;
     title: string;
 };
+
 type PostFactoryDefineInput = {
     id?: string;
     title?: string;
     categories?: Prisma.CategoryCreateNestedManyWithoutPostsInput;
 };
+
 type PostFactoryDefineOptions = {
     defaultData?: Resolver<PostFactoryDefineInput, BuildDataOptions>;
 };
+
 interface PostFactoryInterface {
     readonly _factoryFor: "Post";
     build(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
@@ -44,6 +50,7 @@ interface PostFactoryInterface {
     createList(inputData: number | readonly Partial<Prisma.PostCreateInput>[]): PromiseLike<Post[]>;
     createForConnect(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Pick<Post, "id">>;
 }
+
 function autoGeneratePostScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): PostScalarOrEnumFields {
@@ -52,6 +59,7 @@ function autoGeneratePostScalarsOrEnums({ seq }: {
         title: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false, seq })
     };
 }
+
 function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFactoryDefineOptions): PostFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
@@ -89,24 +97,29 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
 /**
  * Define factory for {@link Post} model.
  *
- * @params options
+ * @param options
  * @returns factory {@link PostFactoryInterface}
  */
+
 export function definePostFactory(options: PostFactoryDefineOptions = {}): PostFactoryInterface {
     return definePostFactoryInternal(options);
 }
+
 type CategoryScalarOrEnumFields = {
     id: string;
     name: string;
 };
+
 type CategoryFactoryDefineInput = {
     id?: string;
     name?: string;
     posts?: Prisma.PostCreateNestedManyWithoutCategoriesInput;
 };
+
 type CategoryFactoryDefineOptions = {
     defaultData?: Resolver<CategoryFactoryDefineInput, BuildDataOptions>;
 };
+
 interface CategoryFactoryInterface {
     readonly _factoryFor: "Category";
     build(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Prisma.CategoryCreateInput>;
@@ -117,6 +130,7 @@ interface CategoryFactoryInterface {
     createList(inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]): PromiseLike<Category[]>;
     createForConnect(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Pick<Category, "id">>;
 }
+
 function autoGenerateCategoryScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): CategoryScalarOrEnumFields {
@@ -125,6 +139,7 @@ function autoGenerateCategoryScalarsOrEnums({ seq }: {
         name: scalarFieldValueGenerator.String({ modelName: "Category", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
+
 function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: CategoryFactoryDefineOptions): CategoryFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
@@ -162,9 +177,10 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: Cat
 /**
  * Define factory for {@link Category} model.
  *
- * @params options
+ * @param options
  * @returns factory {@link CategoryFactoryInterface}
  */
+
 export function defineCategoryFactory(options: CategoryFactoryDefineOptions = {}): CategoryFactoryInterface {
     return defineCategoryFactoryInternal(options);
 }

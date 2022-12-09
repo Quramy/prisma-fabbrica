@@ -6,7 +6,7 @@ import { createFieldDefinitions } from "../relations";
 
 import { ast } from "./ast-tools/astShorthand";
 import { createJSONLiteral } from "./ast-tools/createJSONLiteral";
-import { wrapWithTSDoc } from "./ast-tools/comment";
+import { wrapWithTSDoc, insertLeadingBreakMarker } from "./ast-tools/comment";
 
 export function findPrsimaCreateInputTypeFromModelName(document: DMMF.Document, modelName: string) {
   const search = `${modelName}CreateInput`;
@@ -88,14 +88,18 @@ export const header = (prismaClientModuleSpecifier: string) =>
       getSequenceCounter,
     } from "@quramy/prisma-fabbrica/lib/internal";
     export { initialize, resetSequence } from "@quramy/prisma-fabbrica/lib/internal";
+  `();
+
+export const buildDataOptions = () =>
+  template.statement<ts.TypeAliasDeclaration>`
     type BuildDataOptions = {
       readonly seq: number;
     };
   `();
 
 export const importStatement = (specifier: string, prismaClientModuleSpecifier: string) =>
-  template.statement`
-    import { ${() => ast.identifier(specifier)} } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
+  template.statement<ts.ImportDeclaration>`
+    import type { ${() => ast.identifier(specifier)} } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
   `();
 
 export const modelFieldDefinitions = (models: DMMF.Model[]) =>
@@ -445,7 +449,8 @@ export function getSourceFile({
     ...modelNames.map(modelName => importStatement(modelName, prismaClientModuleSpecifier)),
     ...modelEnums.map(enumName => importStatement(enumName, prismaClientModuleSpecifier)),
     ...header(prismaClientModuleSpecifier).statements,
-    modelFieldDefinitions(document.datamodel.models),
+    insertLeadingBreakMarker(buildDataOptions()),
+    insertLeadingBreakMarker(modelFieldDefinitions(document.datamodel.models)),
     ...document.datamodel.models
       .map(model => ({ model, createInputType: findPrsimaCreateInputTypeFromModelName(document, model.name) }))
       .flatMap(({ model, createInputType }) => [
@@ -460,7 +465,8 @@ export function getSourceFile({
         autoGenerateModelScalarsOrEnums(model, createInputType, document.schema.enumTypes.model ?? []),
         defineModelFactoryInternal(model, createInputType),
         defineModelFactory(model, createInputType),
-      ]),
+      ])
+      .map(insertLeadingBreakMarker),
   ];
 
   return ast.updateSourceFile(template.sourceFile("")(), statements);
