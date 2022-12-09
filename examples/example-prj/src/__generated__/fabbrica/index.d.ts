@@ -1,7 +1,7 @@
-import { User } from "@prisma/client";
-import { Post } from "@prisma/client";
-import { Comment } from "@prisma/client";
-import { Category } from "@prisma/client";
+import type { User } from "@prisma/client";
+import type { Post } from "@prisma/client";
+import type { Comment } from "@prisma/client";
+import type { Category } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import { Resolver } from "@quramy/prisma-fabbrica/lib/internal";
 export { initialize, resetSequence } from "@quramy/prisma-fabbrica/lib/internal";
@@ -33,7 +33,7 @@ interface UserFactoryInterface {
 /**
  * Define factory for {@link User} model.
  *
- * @params options
+ * @param options
  * @returns factory {@link UserFactoryInterface}
  */
 export declare function defineUserFactory(options?: UserFactoryDefineOptions): UserFactoryInterface;
@@ -66,7 +66,7 @@ interface PostFactoryInterface {
 /**
  * Define factory for {@link Post} model.
  *
- * @params options
+ * @param options
  * @returns factory {@link PostFactoryInterface}
  */
 export declare function definePostFactory(options: PostFactoryDefineOptions): PostFactoryInterface;
@@ -102,7 +102,7 @@ interface CommentFactoryInterface {
 /**
  * Define factory for {@link Comment} model.
  *
- * @params options
+ * @param options
  * @returns factory {@link CommentFactoryInterface}
  */
 export declare function defineCommentFactory(options: CommentFactoryDefineOptions): CommentFactoryInterface;
@@ -127,7 +127,7 @@ interface CategoryFactoryInterface {
 /**
  * Define factory for {@link Category} model.
  *
- * @params options
+ * @param options
  * @returns factory {@link CategoryFactoryInterface}
  */
 export declare function defineCategoryFactory(options?: CategoryFactoryDefineOptions): CategoryFactoryInterface;

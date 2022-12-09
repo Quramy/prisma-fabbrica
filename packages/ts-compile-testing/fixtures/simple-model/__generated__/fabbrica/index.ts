@@ -1,26 +1,32 @@
-import { User } from "./../client";
+import type { User } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
 import { getClient, ModelWithFields, createScreener, scalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
 export { initialize, resetSequence } from "@quramy/prisma-fabbrica/lib/internal";
+
 type BuildDataOptions = {
     readonly seq: number;
 };
+
 const modelFieldDefinitions: ModelWithFields[] = [{
         name: "User",
         fields: []
     }];
+
 type UserScalarOrEnumFields = {
     id: string;
     name: string;
 };
+
 type UserFactoryDefineInput = {
     id?: string;
     name?: string;
 };
+
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
 };
+
 interface UserFactoryInterface {
     readonly _factoryFor: "User";
     build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
@@ -31,6 +37,7 @@ interface UserFactoryInterface {
     createList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<User[]>;
     createForConnect(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Pick<User, "id">>;
 }
+
 function autoGenerateUserScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): UserScalarOrEnumFields {
@@ -39,6 +46,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
+
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions): UserFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
@@ -76,9 +84,10 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
 /**
  * Define factory for {@link User} model.
  *
- * @params options
+ * @param options
  * @returns factory {@link UserFactoryInterface}
  */
+
 export function defineUserFactory(options: UserFactoryDefineOptions = {}): UserFactoryInterface {
     return defineUserFactoryInternal(options);
 }

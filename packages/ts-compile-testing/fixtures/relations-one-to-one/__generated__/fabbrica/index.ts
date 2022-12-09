@@ -1,12 +1,14 @@
-import { User } from "./../client";
-import { Profile } from "./../client";
+import type { User } from "./../client";
+import type { Profile } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
 import { getClient, ModelWithFields, createScreener, scalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
 export { initialize, resetSequence } from "@quramy/prisma-fabbrica/lib/internal";
+
 type BuildDataOptions = {
     readonly seq: number;
 };
+
 const modelFieldDefinitions: ModelWithFields[] = [{
         name: "User",
         fields: [{
@@ -22,25 +24,31 @@ const modelFieldDefinitions: ModelWithFields[] = [{
                 relationName: "ProfileToUser"
             }]
     }];
+
 type UserScalarOrEnumFields = {
     id: string;
     name: string;
 };
+
 type UserprofileFactory = {
     _factoryFor: "Profile";
     build: () => PromiseLike<Prisma.ProfileCreateNestedOneWithoutUserInput["create"]>;
 };
+
 type UserFactoryDefineInput = {
     id?: string;
     name?: string;
     profile?: UserprofileFactory | Prisma.ProfileCreateNestedOneWithoutUserInput;
 };
+
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
 };
+
 function isUserprofileFactory(x: UserprofileFactory | Prisma.ProfileCreateNestedOneWithoutUserInput | undefined): x is UserprofileFactory {
     return (x as any)?._factoryFor === "Profile";
 }
+
 interface UserFactoryInterface {
     readonly _factoryFor: "User";
     build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
@@ -51,6 +59,7 @@ interface UserFactoryInterface {
     createList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<User[]>;
     createForConnect(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Pick<User, "id">>;
 }
+
 function autoGenerateUserScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): UserScalarOrEnumFields {
@@ -59,6 +68,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
+
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions): UserFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
@@ -100,29 +110,36 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
 /**
  * Define factory for {@link User} model.
  *
- * @params options
+ * @param options
  * @returns factory {@link UserFactoryInterface}
  */
+
 export function defineUserFactory(options: UserFactoryDefineOptions = {}): UserFactoryInterface {
     return defineUserFactoryInternal(options);
 }
+
 type ProfileScalarOrEnumFields = {
     id: string;
 };
+
 type ProfileuserFactory = {
     _factoryFor: "User";
     build: () => PromiseLike<Prisma.UserCreateNestedOneWithoutProfileInput["create"]>;
 };
+
 type ProfileFactoryDefineInput = {
     id?: string;
     user: ProfileuserFactory | Prisma.UserCreateNestedOneWithoutProfileInput;
 };
+
 type ProfileFactoryDefineOptions = {
     defaultData: Resolver<ProfileFactoryDefineInput, BuildDataOptions>;
 };
+
 function isProfileuserFactory(x: ProfileuserFactory | Prisma.UserCreateNestedOneWithoutProfileInput | undefined): x is ProfileuserFactory {
     return (x as any)?._factoryFor === "User";
 }
+
 interface ProfileFactoryInterface {
     readonly _factoryFor: "Profile";
     build(inputData?: Partial<Prisma.ProfileCreateInput>): PromiseLike<Prisma.ProfileCreateInput>;
@@ -133,6 +150,7 @@ interface ProfileFactoryInterface {
     createList(inputData: number | readonly Partial<Prisma.ProfileCreateInput>[]): PromiseLike<Profile[]>;
     createForConnect(inputData?: Partial<Prisma.ProfileCreateInput>): PromiseLike<Pick<Profile, "id">>;
 }
+
 function autoGenerateProfileScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): ProfileScalarOrEnumFields {
@@ -140,6 +158,7 @@ function autoGenerateProfileScalarsOrEnums({ seq }: {
         id: scalarFieldValueGenerator.String({ modelName: "Profile", fieldName: "id", isId: true, isUnique: false, seq })
     };
 }
+
 function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: ProfileFactoryDefineOptions): ProfileFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
@@ -181,9 +200,10 @@ function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: Prof
 /**
  * Define factory for {@link Profile} model.
  *
- * @params options
+ * @param options
  * @returns factory {@link ProfileFactoryInterface}
  */
+
 export function defineProfileFactory(options: ProfileFactoryDefineOptions): ProfileFactoryInterface {
     return defineProfileFactoryInternal(options);
 }

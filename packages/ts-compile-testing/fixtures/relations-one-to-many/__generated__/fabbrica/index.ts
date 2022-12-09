@@ -1,13 +1,15 @@
-import { User } from "./../client";
-import { Post } from "./../client";
-import { Review } from "./../client";
+import type { User } from "./../client";
+import type { Post } from "./../client";
+import type { Review } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
 import { getClient, ModelWithFields, createScreener, scalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
 export { initialize, resetSequence } from "@quramy/prisma-fabbrica/lib/internal";
+
 type BuildDataOptions = {
     readonly seq: number;
 };
+
 const modelFieldDefinitions: ModelWithFields[] = [{
         name: "User",
         fields: [{
@@ -42,19 +44,23 @@ const modelFieldDefinitions: ModelWithFields[] = [{
                 relationName: "ReviewToUser"
             }]
     }];
+
 type UserScalarOrEnumFields = {
     id: string;
     name: string;
 };
+
 type UserFactoryDefineInput = {
     id?: string;
     name?: string;
     posts?: Prisma.PostCreateNestedManyWithoutAuthorInput;
     reviews?: Prisma.ReviewCreateNestedManyWithoutReviewerInput;
 };
+
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
 };
+
 interface UserFactoryInterface {
     readonly _factoryFor: "User";
     build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
@@ -65,6 +71,7 @@ interface UserFactoryInterface {
     createList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<User[]>;
     createForConnect(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Pick<User, "id">>;
 }
+
 function autoGenerateUserScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): UserScalarOrEnumFields {
@@ -73,6 +80,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
         name: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
+
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions): UserFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
@@ -110,32 +118,39 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
 /**
  * Define factory for {@link User} model.
  *
- * @params options
+ * @param options
  * @returns factory {@link UserFactoryInterface}
  */
+
 export function defineUserFactory(options: UserFactoryDefineOptions = {}): UserFactoryInterface {
     return defineUserFactoryInternal(options);
 }
+
 type PostScalarOrEnumFields = {
     id: string;
     title: string;
 };
+
 type PostauthorFactory = {
     _factoryFor: "User";
     build: () => PromiseLike<Prisma.UserCreateNestedOneWithoutPostsInput["create"]>;
 };
+
 type PostFactoryDefineInput = {
     id?: string;
     title?: string;
     author?: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput;
     reviews?: Prisma.ReviewCreateNestedManyWithoutPostInput;
 };
+
 type PostFactoryDefineOptions = {
     defaultData?: Resolver<PostFactoryDefineInput, BuildDataOptions>;
 };
+
 function isPostauthorFactory(x: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput | undefined): x is PostauthorFactory {
     return (x as any)?._factoryFor === "User";
 }
+
 interface PostFactoryInterface {
     readonly _factoryFor: "Post";
     build(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
@@ -146,6 +161,7 @@ interface PostFactoryInterface {
     createList(inputData: number | readonly Partial<Prisma.PostCreateInput>[]): PromiseLike<Post[]>;
     createForConnect(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Pick<Post, "id">>;
 }
+
 function autoGeneratePostScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): PostScalarOrEnumFields {
@@ -154,6 +170,7 @@ function autoGeneratePostScalarsOrEnums({ seq }: {
         title: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false, seq })
     };
 }
+
 function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFactoryDefineOptions): PostFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
@@ -195,39 +212,48 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
 /**
  * Define factory for {@link Post} model.
  *
- * @params options
+ * @param options
  * @returns factory {@link PostFactoryInterface}
  */
+
 export function definePostFactory(options: PostFactoryDefineOptions = {}): PostFactoryInterface {
     return definePostFactoryInternal(options);
 }
+
 type ReviewScalarOrEnumFields = {
     id: string;
     body: string;
 };
+
 type ReviewpostFactory = {
     _factoryFor: "Post";
     build: () => PromiseLike<Prisma.PostCreateNestedOneWithoutReviewsInput["create"]>;
 };
+
 type ReviewreviewerFactory = {
     _factoryFor: "User";
     build: () => PromiseLike<Prisma.UserCreateNestedOneWithoutReviewsInput["create"]>;
 };
+
 type ReviewFactoryDefineInput = {
     id?: string;
     body?: string;
     post: ReviewpostFactory | Prisma.PostCreateNestedOneWithoutReviewsInput;
     reviewer: ReviewreviewerFactory | Prisma.UserCreateNestedOneWithoutReviewsInput;
 };
+
 type ReviewFactoryDefineOptions = {
     defaultData: Resolver<ReviewFactoryDefineInput, BuildDataOptions>;
 };
+
 function isReviewpostFactory(x: ReviewpostFactory | Prisma.PostCreateNestedOneWithoutReviewsInput | undefined): x is ReviewpostFactory {
     return (x as any)?._factoryFor === "Post";
 }
+
 function isReviewreviewerFactory(x: ReviewreviewerFactory | Prisma.UserCreateNestedOneWithoutReviewsInput | undefined): x is ReviewreviewerFactory {
     return (x as any)?._factoryFor === "User";
 }
+
 interface ReviewFactoryInterface {
     readonly _factoryFor: "Review";
     build(inputData?: Partial<Prisma.ReviewCreateInput>): PromiseLike<Prisma.ReviewCreateInput>;
@@ -238,6 +264,7 @@ interface ReviewFactoryInterface {
     createList(inputData: number | readonly Partial<Prisma.ReviewCreateInput>[]): PromiseLike<Review[]>;
     createForConnect(inputData?: Partial<Prisma.ReviewCreateInput>): PromiseLike<Pick<Review, "id">>;
 }
+
 function autoGenerateReviewScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): ReviewScalarOrEnumFields {
@@ -246,6 +273,7 @@ function autoGenerateReviewScalarsOrEnums({ seq }: {
         body: scalarFieldValueGenerator.String({ modelName: "Review", fieldName: "body", isId: false, isUnique: false, seq })
     };
 }
+
 function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: ReviewFactoryDefineOptions): ReviewFactoryInterface {
     const seqKey = {};
     const getSeq = () => getSequenceCounter(seqKey);
@@ -290,9 +318,10 @@ function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: Revie
 /**
  * Define factory for {@link Review} model.
  *
- * @params options
+ * @param options
  * @returns factory {@link ReviewFactoryInterface}
  */
+
 export function defineReviewFactory(options: ReviewFactoryDefineOptions): ReviewFactoryInterface {
     return defineReviewFactoryInternal(options);
 }
