@@ -96,13 +96,13 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         createForConnect,
     };
 }
+
 /**
  * Define factory for {@link User} model.
  *
  * @param options
  * @returns factory {@link UserFactoryInterface}
  */
-
 export function defineUserFactory(options: UserFactoryDefineOptions = {}): UserFactoryInterface {
     return defineUserFactoryInternal(options);
 }
@@ -176,13 +176,13 @@ function defineComplexIdModelFactoryInternal({ defaultData: defaultDataResolver 
         createForConnect,
     };
 }
+
 /**
  * Define factory for {@link ComplexIdModel} model.
  *
  * @param options
  * @returns factory {@link ComplexIdModelFactoryInterface}
  */
-
 export function defineComplexIdModelFactory(options: ComplexIdModelFactoryDefineOptions = {}): ComplexIdModelFactoryInterface {
     return defineComplexIdModelFactoryInternal(options);
 }
@@ -286,13 +286,13 @@ function defineFieldTypePatternModelFactoryInternal({ defaultData: defaultDataRe
         createForConnect,
     };
 }
+
 /**
  * Define factory for {@link FieldTypePatternModel} model.
  *
  * @param options
  * @returns factory {@link FieldTypePatternModelFactoryInterface}
  */
-
 export function defineFieldTypePatternModelFactory(options: FieldTypePatternModelFactoryDefineOptions = {}): FieldTypePatternModelFactoryInterface {
     return defineFieldTypePatternModelFactoryInternal(options);
 }
@@ -362,13 +362,13 @@ function defineNoPkModelFactoryInternal({ defaultData: defaultDataResolver }: No
         createForConnect,
     };
 }
+
 /**
  * Define factory for {@link NoPkModel} model.
  *
  * @param options
  * @returns factory {@link NoPkModelFactoryInterface}
  */
-
 export function defineNoPkModelFactory(options: NoPkModelFactoryDefineOptions = {}): NoPkModelFactoryInterface {
     return defineNoPkModelFactoryInternal(options);
 }

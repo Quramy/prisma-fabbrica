@@ -94,13 +94,13 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         createForConnect,
     };
 }
+
 /**
  * Define factory for {@link Post} model.
  *
  * @param options
  * @returns factory {@link PostFactoryInterface}
  */
-
 export function definePostFactory(options: PostFactoryDefineOptions = {}): PostFactoryInterface {
     return definePostFactoryInternal(options);
 }
@@ -174,13 +174,13 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: Cat
         createForConnect,
     };
 }
+
 /**
  * Define factory for {@link Category} model.
  *
  * @param options
  * @returns factory {@link CategoryFactoryInterface}
  */
-
 export function defineCategoryFactory(options: CategoryFactoryDefineOptions = {}): CategoryFactoryInterface {
     return defineCategoryFactoryInternal(options);
 }

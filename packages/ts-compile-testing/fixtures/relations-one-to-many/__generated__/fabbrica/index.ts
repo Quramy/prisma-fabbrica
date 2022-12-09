@@ -115,13 +115,13 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         createForConnect,
     };
 }
+
 /**
  * Define factory for {@link User} model.
  *
  * @param options
  * @returns factory {@link UserFactoryInterface}
  */
-
 export function defineUserFactory(options: UserFactoryDefineOptions = {}): UserFactoryInterface {
     return defineUserFactoryInternal(options);
 }
@@ -209,13 +209,13 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
         createForConnect,
     };
 }
+
 /**
  * Define factory for {@link Post} model.
  *
  * @param options
  * @returns factory {@link PostFactoryInterface}
  */
-
 export function definePostFactory(options: PostFactoryDefineOptions = {}): PostFactoryInterface {
     return definePostFactoryInternal(options);
 }
@@ -315,13 +315,13 @@ function defineReviewFactoryInternal({ defaultData: defaultDataResolver }: Revie
         createForConnect,
     };
 }
+
 /**
  * Define factory for {@link Review} model.
  *
  * @param options
  * @returns factory {@link ReviewFactoryInterface}
  */
-
 export function defineReviewFactory(options: ReviewFactoryDefineOptions): ReviewFactoryInterface {
     return defineReviewFactoryInternal(options);
 }

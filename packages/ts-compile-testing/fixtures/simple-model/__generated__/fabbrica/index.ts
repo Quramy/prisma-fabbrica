@@ -81,13 +81,13 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         createForConnect,
     };
 }
+
 /**
  * Define factory for {@link User} model.
  *
  * @param options
  * @returns factory {@link UserFactoryInterface}
  */
-
 export function defineUserFactory(options: UserFactoryDefineOptions = {}): UserFactoryInterface {
     return defineUserFactoryInternal(options);
 }
