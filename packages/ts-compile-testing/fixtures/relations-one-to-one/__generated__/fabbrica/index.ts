@@ -107,13 +107,13 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
         createForConnect,
     };
 }
+
 /**
  * Define factory for {@link User} model.
  *
  * @param options
  * @returns factory {@link UserFactoryInterface}
  */
-
 export function defineUserFactory(options: UserFactoryDefineOptions = {}): UserFactoryInterface {
     return defineUserFactoryInternal(options);
 }
@@ -197,13 +197,13 @@ function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: Prof
         createForConnect,
     };
 }
+
 /**
  * Define factory for {@link Profile} model.
  *
  * @param options
  * @returns factory {@link ProfileFactoryInterface}
  */
-
 export function defineProfileFactory(options: ProfileFactoryDefineOptions): ProfileFactoryInterface {
     return defineProfileFactoryInternal(options);
 }
