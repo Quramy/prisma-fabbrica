@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "ts-compile-testing",
-  "version": "0.3.1",
+  "version": "1.0.0",
   "scripts": {
     "clean": "rimraf \"fixtures/*/__generated__/client\" \"fixtures/*/dmmf.json\"",
     "pretest": "ts-node scripts/generateFixtures.ts",
