@@ -1,8 +1,12 @@
 import { DMMF } from "@prisma/generator-helper";
 import ts from "typescript";
 import { template } from "talt";
-import { camelize, ast, byName, createJSONLiteral } from "../helpers";
+import { camelize, byName } from "../helpers";
 import { createFieldDefinitions } from "../relations";
+
+import { ast } from "./ast-tools/astShorthand";
+import { createJSONLiteral } from "./ast-tools/createJSONLiteral";
+import { wrapWithTSDoc, insertLeadingBreakMarker } from "./ast-tools/comment";
 
 export function findPrsimaCreateInputTypeFromModelName(document: DMMF.Document, modelName: string) {
   const search = `${modelName}CreateInput`;
@@ -77,20 +81,25 @@ export const header = (prismaClientModuleSpecifier: string) =>
       getClient,
       ModelWithFields,
       createScreener,
-      scalarFieldValueGenerator,
+      getScalarFieldValueGenerator,
       Resolver,
       normalizeResolver,
+      normalizeList,
       getSequenceCounter,
     } from "@quramy/prisma-fabbrica/lib/internal";
-    export { initialize, resetSequence } from "@quramy/prisma-fabbrica/lib/internal";
+    export { initialize, resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
+  `();
+
+export const buildDataOptions = () =>
+  template.statement<ts.TypeAliasDeclaration>`
     type BuildDataOptions = {
       readonly seq: number;
     };
   `();
 
 export const importStatement = (specifier: string, prismaClientModuleSpecifier: string) =>
-  template.statement`
-    import { ${() => ast.identifier(specifier)} } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
+  template.statement<ts.ImportDeclaration>`
+    import type { ${() => ast.identifier(specifier)} } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
   `();
 
 export const modelFieldDefinitions = (models: DMMF.Model[]) =>
@@ -221,6 +230,27 @@ export const modelFactoryDefineOptions = (modelName: string, isOpionalDefaultDat
   });
 };
 
+export const modelFactoryInterface = (model: DMMF.Model) =>
+  template.statement`
+    interface MODEL_FACTORY_INTERFACE {
+      readonly _factoryFor: ${() => ast.literalTypeNode(ast.stringLiteral(model.name))}
+      build(inputData?: Partial<Prisma.MODEL_CREATE_INPUT>): PromiseLike<Prisma.MODEL_CREATE_INPUT>
+      buildCreateInput(inputData?: Partial<Prisma.MODEL_CREATE_INPUT>): PromiseLike<Prisma.MODEL_CREATE_INPUT>
+      buildList(inputData: number | readonly Partial<Prisma.MODEL_CREATE_INPUT>[]): PromiseLike<Prisma.MODEL_CREATE_INPUT[]>
+      pickForConnect(inputData: MODEL_TYPE): Pick<MODEL_TYPE, MODEL_ID_COLS>
+      create(inputData?: Partial<Prisma.MODEL_CREATE_INPUT>): PromiseLike<MODEL_TYPE>
+      createList(inputData: number | readonly Partial<Prisma.MODEL_CREATE_INPUT>[]): PromiseLike<MODEL_TYPE[]>
+      createForConnect(inputData?: Partial<Prisma.MODEL_CREATE_INPUT>): PromiseLike<Pick<MODEL_TYPE, MODEL_ID_COLS>>
+    }
+  `({
+    MODEL_TYPE: ast.identifier(model.name),
+    MODEL_FACTORY_INTERFACE: ast.identifier(`${model.name}FactoryInterface`),
+    MODEL_CREATE_INPUT: ast.identifier(`${model.name}CreateInput`),
+    MODEL_ID_COLS: ast.unionTypeNode(
+      getIdFieldNames(model).map(fieldName => ast.literalTypeNode(ast.stringLiteral(fieldName))),
+    ),
+  });
+
 export const isModelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF.Model) => {
   const targetModel = model.fields.find(byName(fieldType))!;
   return template.statement<ts.FunctionDeclaration>`
@@ -243,7 +273,7 @@ export const autoGenerateModelScalarsOrEnumsFieldArgs = (
   // Note: In Json sclar filed, inputTypes[0].location is not scalar but enumType
   field.inputTypes[field.inputTypes.length - 1].location === "scalar"
     ? template.expression`
-        scalarFieldValueGenerator.SCALAR_TYPE({ modelName: MODEL_NAME, fieldName: FIELD_NAME, isId: IS_ID, isUnique: IS_UNIQUE, seq })
+        getScalarFieldValueGenerator().SCALAR_TYPE({ modelName: MODEL_NAME, fieldName: FIELD_NAME, isId: IS_ID, isUnique: IS_UNIQUE, seq })
       `({
         SCALAR_TYPE: ast.identifier(field.inputTypes[field.inputTypes.length - 1].type as string),
         MODEL_NAME: ast.stringLiteral(model.name),
@@ -279,11 +309,11 @@ export const autoGenerateModelScalarsOrEnums = (
     MODEL_SCALAR_OR_ENUM_FIELDS: ast.identifier(`${model.name}ScalarOrEnumFields`),
   });
 
-export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.InputType) =>
+export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.InputType) =>
   template.statement<ts.FunctionDeclaration>`
-    function DEFINE_MODEL_FACTORY_INERNAL({
+    function DEFINE_MODEL_FACTORY_INTERNAL({
       defaultData: defaultDataResolver
-    }: MODEL_FACTORY_DEFINE_OPTIONS) {
+    }: MODEL_FACTORY_DEFINE_OPTIONS): MODEL_FACTORY_INTERFACE {
 
       const seqKey = {};
       const getSeq = () => getSequenceCounter(seqKey);
@@ -318,11 +348,8 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
       };
 
       const buildList = (
-        inputData: number | Partial<Prisma.MODEL_CREATE_INPUT>[]
-      ) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-      }
+        inputData: number | readonly Partial<Prisma.MODEL_CREATE_INPUT>[]
+      ) => Promise.all(normalizeList(inputData).map(data => build(data)));
 
       const pickForConnect = (inputData: ${() => ast.typeReferenceNode(model.name)}) => (
         ${() =>
@@ -342,11 +369,8 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
       };
 
       const createList = (
-        inputData: number | Partial<Prisma.MODEL_CREATE_INPUT>[]
-      ) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-      }
+        inputData: number | readonly Partial<Prisma.MODEL_CREATE_INPUT>[]
+      ) => Promise.all(normalizeList(inputData).map(data => create(data)));
 
       const createForConnect = (inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}) => create(inputData).then(pickForConnect);
 
@@ -363,30 +387,42 @@ export const defineModelFactoryInernal = (model: DMMF.Model, inputType: DMMF.Inp
     }
   `({
     MODEL_KEY: ast.identifier(camelize(model.name)),
-    DEFINE_MODEL_FACTORY_INERNAL: ast.identifier(`define${model.name}FactoryInternal`),
+    DEFINE_MODEL_FACTORY_INTERNAL: ast.identifier(`define${model.name}FactoryInternal`),
+    MODEL_FACTORY_INTERFACE: ast.identifier(`${model.name}FactoryInterface`),
     MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${model.name}FactoryDefineInput`),
     MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
     MODEL_CREATE_INPUT: ast.identifier(`${model.name}CreateInput`),
     AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS: ast.identifier(`autoGenerate${model.name}ScalarsOrEnums`),
   });
 
-export const defineModelFactory = (modelName: string, inputType: DMMF.InputType) => {
+export const defineModelFactory = (model: DMMF.Model, inputType: DMMF.InputType) => {
   const compiled = filterRequiredInputObjectTypeField(inputType).length
     ? template.statement<ts.FunctionDeclaration>`
-        export function DEFINE_MODEL_FACTORY(args: MODEL_FACTORY_DEFINE_OPTIONS) {
-          return DEFINE_MODEL_FACTORY_INERNAL(args);
+        export function DEFINE_MODEL_FACTORY(options: MODEL_FACTORY_DEFINE_OPTIONS): MODEL_FACTORY_INTERFACE {
+          return DEFINE_MODEL_FACTORY_INTERNAL(options);
         }
       `
     : template.statement<ts.FunctionDeclaration>`
-        export function DEFINE_MODEL_FACTORY(args: MODEL_FACTORY_DEFINE_OPTIONS = {}) {
-          return DEFINE_MODEL_FACTORY_INERNAL(args);
+        export function DEFINE_MODEL_FACTORY(options: MODEL_FACTORY_DEFINE_OPTIONS = {}): MODEL_FACTORY_INTERFACE {
+          return DEFINE_MODEL_FACTORY_INTERNAL(options);
         }
       `;
-  return compiled({
-    DEFINE_MODEL_FACTORY: ast.identifier(`define${modelName}Factory`),
-    DEFINE_MODEL_FACTORY_INERNAL: ast.identifier(`define${modelName}FactoryInternal`),
-    MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${modelName}FactoryDefineOptions`),
-  });
+
+  const tsDoc = `
+Define factory for {@link ${model.name}} model.
+
+@param options
+@returns factory {@link ${model.name}FactoryInterface}
+  `;
+  return wrapWithTSDoc(
+    tsDoc,
+    compiled({
+      DEFINE_MODEL_FACTORY: ast.identifier(`define${model.name}Factory`),
+      DEFINE_MODEL_FACTORY_INTERNAL: ast.identifier(`define${model.name}FactoryInternal`),
+      MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
+      MODEL_FACTORY_INTERFACE: ast.identifier(`${model.name}FactoryInterface`),
+    }),
+  );
 };
 
 export function getSourceFile({
@@ -413,7 +449,8 @@ export function getSourceFile({
     ...modelNames.map(modelName => importStatement(modelName, prismaClientModuleSpecifier)),
     ...modelEnums.map(enumName => importStatement(enumName, prismaClientModuleSpecifier)),
     ...header(prismaClientModuleSpecifier).statements,
-    modelFieldDefinitions(document.datamodel.models),
+    insertLeadingBreakMarker(buildDataOptions()),
+    insertLeadingBreakMarker(modelFieldDefinitions(document.datamodel.models)),
     ...document.datamodel.models
       .map(model => ({ model, createInputType: findPrsimaCreateInputTypeFromModelName(document, model.name) }))
       .flatMap(({ model, createInputType }) => [
@@ -424,10 +461,12 @@ export function getSourceFile({
         modelFactoryDefineInput(model, createInputType),
         modelFactoryDefineOptions(model.name, filterRequiredInputObjectTypeField(createInputType).length === 0),
         ...filterBelongsToField(model, createInputType).map(fieldType => isModelAssociationFactory(fieldType, model)),
+        modelFactoryInterface(model),
         autoGenerateModelScalarsOrEnums(model, createInputType, document.schema.enumTypes.model ?? []),
-        defineModelFactoryInernal(model, createInputType),
-        defineModelFactory(model.name, createInputType),
-      ]),
+        defineModelFactoryInternal(model, createInputType),
+        defineModelFactory(model, createInputType),
+      ])
+      .map(insertLeadingBreakMarker),
   ];
 
   return ast.updateSourceFile(template.sourceFile("")(), statements);

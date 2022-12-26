@@ -8,6 +8,7 @@ import { generatorHandler } from "@prisma/generator-helper";
 import { logger } from "@prisma/internals";
 
 import { getSourceFile } from "./templates";
+import { createPrinter } from "./templates/ast-tools/printer";
 
 function readTsConfig(tsconfigPath: string) {
   const opt: ts.CompilerOptions = {
@@ -60,11 +61,8 @@ generatorHandler({
       ? "@prisma/client"
       : "./" + path.relative(outputDirname, clientGeneratorOutputPath).replace("\\", "/");
 
-    const printer = ts.createPrinter({
-      omitTrailingSemicolon: false,
-      removeComments: false,
-    });
-    const contents = printer.printFile(getSourceFile({ document: options.dmmf, prismaClientModuleSpecifier }));
+    const printer = createPrinter();
+    const contents = printer.print(getSourceFile({ document: options.dmmf, prismaClientModuleSpecifier }));
 
     await fs.rm(outputDirname, { recursive: true, force: true });
     await fs.mkdir(outputDirname, { recursive: true });

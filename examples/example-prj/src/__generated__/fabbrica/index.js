@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineCategoryFactory = exports.defineCommentFactory = exports.definePostFactory = exports.defineUserFactory = exports.resetSequence = exports.initialize = void 0;
+exports.defineCategoryFactory = exports.defineCommentFactory = exports.definePostFactory = exports.defineUserFactory = exports.resetScalarFieldValueGenerator = exports.registerScalarFieldValueGenerator = exports.resetSequence = exports.initialize = void 0;
 const internal_1 = require("@quramy/prisma-fabbrica/lib/internal");
 var internal_2 = require("@quramy/prisma-fabbrica/lib/internal");
 Object.defineProperty(exports, "initialize", { enumerable: true, get: function () { return internal_2.initialize; } });
 Object.defineProperty(exports, "resetSequence", { enumerable: true, get: function () { return internal_2.resetSequence; } });
-/*hogehoge*/
+Object.defineProperty(exports, "registerScalarFieldValueGenerator", { enumerable: true, get: function () { return internal_2.registerScalarFieldValueGenerator; } });
+Object.defineProperty(exports, "resetScalarFieldValueGenerator", { enumerable: true, get: function () { return internal_2.resetScalarFieldValueGenerator; } });
 const modelFieldDefinitions = [{
         name: "User",
         fields: [{
@@ -53,9 +54,9 @@ const modelFieldDefinitions = [{
     }];
 function autoGenerateUserScalarsOrEnums({ seq }) {
     return {
-        id: internal_1.scalarFieldValueGenerator.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false, seq }),
-        email: internal_1.scalarFieldValueGenerator.String({ modelName: "User", fieldName: "email", isId: false, isUnique: true, seq }),
-        name: internal_1.scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
+        id: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "User", fieldName: "id", isId: true, isUnique: false, seq }),
+        email: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "User", fieldName: "email", isId: false, isUnique: true, seq }),
+        name: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
@@ -71,10 +72,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
     const pickForConnect = (inputData) => ({
         id: inputData.id
     });
@@ -82,10 +80,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = await build(inputData).then(screen);
         return await (0, internal_1.getClient)().user.create({ data });
     };
-    const createList = (inputData) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
     const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "User",
@@ -98,8 +93,14 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
         createForConnect,
     };
 }
-function defineUserFactory(args = {}) {
-    return defineUserFactoryInternal(args);
+/**
+ * Define factory for {@link User} model.
+ *
+ * @param options
+ * @returns factory {@link UserFactoryInterface}
+ */
+function defineUserFactory(options = {}) {
+    return defineUserFactoryInternal(options);
 }
 exports.defineUserFactory = defineUserFactory;
 function isPostauthorFactory(x) {
@@ -107,8 +108,8 @@ function isPostauthorFactory(x) {
 }
 function autoGeneratePostScalarsOrEnums({ seq }) {
     return {
-        id: internal_1.scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "id", isId: true, isUnique: false, seq }),
-        title: internal_1.scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false, seq })
+        id: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Post", fieldName: "id", isId: true, isUnique: false, seq }),
+        title: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false, seq })
     };
 }
 function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
@@ -128,10 +129,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
     const pickForConnect = (inputData) => ({
         id: inputData.id
     });
@@ -139,10 +137,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = await build(inputData).then(screen);
         return await (0, internal_1.getClient)().post.create({ data });
     };
-    const createList = (inputData) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
     const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Post",
@@ -155,8 +150,14 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
         createForConnect,
     };
 }
-function definePostFactory(args) {
-    return definePostFactoryInternal(args);
+/**
+ * Define factory for {@link Post} model.
+ *
+ * @param options
+ * @returns factory {@link PostFactoryInterface}
+ */
+function definePostFactory(options) {
+    return definePostFactoryInternal(options);
 }
 exports.definePostFactory = definePostFactory;
 function isCommentpostFactory(x) {
@@ -167,8 +168,8 @@ function isCommentauthorFactory(x) {
 }
 function autoGenerateCommentScalarsOrEnums({ seq }) {
     return {
-        id: internal_1.scalarFieldValueGenerator.String({ modelName: "Comment", fieldName: "id", isId: true, isUnique: false, seq }),
-        body: internal_1.scalarFieldValueGenerator.String({ modelName: "Comment", fieldName: "body", isId: false, isUnique: false, seq })
+        id: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Comment", fieldName: "id", isId: true, isUnique: false, seq }),
+        body: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Comment", fieldName: "body", isId: false, isUnique: false, seq })
     };
 }
 function defineCommentFactoryInternal({ defaultData: defaultDataResolver }) {
@@ -191,10 +192,7 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
     const pickForConnect = (inputData) => ({
         id: inputData.id
     });
@@ -202,10 +200,7 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = await build(inputData).then(screen);
         return await (0, internal_1.getClient)().comment.create({ data });
     };
-    const createList = (inputData) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
     const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Comment",
@@ -218,14 +213,20 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver }) {
         createForConnect,
     };
 }
-function defineCommentFactory(args) {
-    return defineCommentFactoryInternal(args);
+/**
+ * Define factory for {@link Comment} model.
+ *
+ * @param options
+ * @returns factory {@link CommentFactoryInterface}
+ */
+function defineCommentFactory(options) {
+    return defineCommentFactoryInternal(options);
 }
 exports.defineCommentFactory = defineCommentFactory;
 function autoGenerateCategoryScalarsOrEnums({ seq }) {
     return {
-        id: internal_1.scalarFieldValueGenerator.String({ modelName: "Category", fieldName: "id", isId: true, isUnique: false, seq }),
-        name: internal_1.scalarFieldValueGenerator.String({ modelName: "Category", fieldName: "name", isId: false, isUnique: true, seq })
+        id: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Category", fieldName: "id", isId: true, isUnique: false, seq }),
+        name: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Category", fieldName: "name", isId: false, isUnique: true, seq })
     };
 }
 function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }) {
@@ -241,10 +242,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
         return data;
     };
-    const buildList = (inputData) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => build(data)));
-    };
+    const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
     const pickForConnect = (inputData) => ({
         id: inputData.id
     });
@@ -252,10 +250,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }) {
         const data = await build(inputData).then(screen);
         return await (0, internal_1.getClient)().category.create({ data });
     };
-    const createList = (inputData) => {
-        const list = typeof inputData === "number" ? [...new Array(inputData).keys()].map(() => ({})) : inputData;
-        return Promise.all(list.map(data => create(data)));
-    };
+    const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
     const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
         _factoryFor: "Category",
@@ -268,7 +263,13 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }) {
         createForConnect,
     };
 }
-function defineCategoryFactory(args = {}) {
-    return defineCategoryFactoryInternal(args);
+/**
+ * Define factory for {@link Category} model.
+ *
+ * @param options
+ * @returns factory {@link CategoryFactoryInterface}
+ */
+function defineCategoryFactory(options = {}) {
+    return defineCategoryFactoryInternal(options);
 }
 exports.defineCategoryFactory = defineCategoryFactory;

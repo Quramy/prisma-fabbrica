@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { pascalize } from "./stringConverter";
+import { pascalize } from "../../helpers";
 
 type StripCreate<T extends string> = T extends `create${infer S}` ? Uncapitalize<S> : T;
 
