@@ -1,7 +1,6 @@
 {
   "private": true,
   "name": "@quramy/prisma-fabbrica-workspaces",
-  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
