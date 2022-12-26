@@ -327,7 +327,7 @@ prisma-fabbrica provides function to complete scalar fields( https://github.com/
 import { registerScalarFieldValueGenerator } from "./__generated__/fabbrica";
 
 registerScalarFieldValueGenerator({
-  String: ({ modelName, fieldName, seq }) => `${modelName}_{fieldName}_${seq}`,
+  String: ({ modelName, fieldName, seq }) => `${modelName}_${fieldName}_${seq}`,
 });
 ```
 
