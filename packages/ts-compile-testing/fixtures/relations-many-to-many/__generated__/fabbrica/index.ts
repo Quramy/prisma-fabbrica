@@ -2,8 +2,8 @@ import type { Post } from "./../client";
 import type { Category } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
-import { getClient, ModelWithFields, createScreener, scalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
-export { initialize, resetSequence } from "@quramy/prisma-fabbrica/lib/internal";
+import { getClient, ModelWithFields, createScreener, getScalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
+export { initialize, resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
 
 type BuildDataOptions = {
     readonly seq: number;
@@ -55,8 +55,8 @@ function autoGeneratePostScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): PostScalarOrEnumFields {
     return {
-        id: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "id", isId: true, isUnique: false, seq }),
-        title: scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false, seq })
+        id: getScalarFieldValueGenerator().String({ modelName: "Post", fieldName: "id", isId: true, isUnique: false, seq }),
+        title: getScalarFieldValueGenerator().String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false, seq })
     };
 }
 
@@ -135,8 +135,8 @@ function autoGenerateCategoryScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): CategoryScalarOrEnumFields {
     return {
-        id: scalarFieldValueGenerator.String({ modelName: "Category", fieldName: "id", isId: true, isUnique: false, seq }),
-        name: scalarFieldValueGenerator.String({ modelName: "Category", fieldName: "name", isId: false, isUnique: false, seq })
+        id: getScalarFieldValueGenerator().String({ modelName: "Category", fieldName: "id", isId: true, isUnique: false, seq }),
+        name: getScalarFieldValueGenerator().String({ modelName: "Category", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
 

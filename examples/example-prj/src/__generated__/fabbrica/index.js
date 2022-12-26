@@ -1,10 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineCategoryFactory = exports.defineCommentFactory = exports.definePostFactory = exports.defineUserFactory = exports.resetSequence = exports.initialize = void 0;
+exports.defineCategoryFactory = exports.defineCommentFactory = exports.definePostFactory = exports.defineUserFactory = exports.resetScalarFieldValueGenerator = exports.registerScalarFieldValueGenerator = exports.resetSequence = exports.initialize = void 0;
 const internal_1 = require("@quramy/prisma-fabbrica/lib/internal");
 var internal_2 = require("@quramy/prisma-fabbrica/lib/internal");
 Object.defineProperty(exports, "initialize", { enumerable: true, get: function () { return internal_2.initialize; } });
 Object.defineProperty(exports, "resetSequence", { enumerable: true, get: function () { return internal_2.resetSequence; } });
+Object.defineProperty(exports, "registerScalarFieldValueGenerator", { enumerable: true, get: function () { return internal_2.registerScalarFieldValueGenerator; } });
+Object.defineProperty(exports, "resetScalarFieldValueGenerator", { enumerable: true, get: function () { return internal_2.resetScalarFieldValueGenerator; } });
 const modelFieldDefinitions = [{
         name: "User",
         fields: [{
@@ -52,9 +54,9 @@ const modelFieldDefinitions = [{
     }];
 function autoGenerateUserScalarsOrEnums({ seq }) {
     return {
-        id: internal_1.scalarFieldValueGenerator.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false, seq }),
-        email: internal_1.scalarFieldValueGenerator.String({ modelName: "User", fieldName: "email", isId: false, isUnique: true, seq }),
-        name: internal_1.scalarFieldValueGenerator.String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
+        id: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "User", fieldName: "id", isId: true, isUnique: false, seq }),
+        email: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "User", fieldName: "email", isId: false, isUnique: true, seq }),
+        name: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
 function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
@@ -106,8 +108,8 @@ function isPostauthorFactory(x) {
 }
 function autoGeneratePostScalarsOrEnums({ seq }) {
     return {
-        id: internal_1.scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "id", isId: true, isUnique: false, seq }),
-        title: internal_1.scalarFieldValueGenerator.String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false, seq })
+        id: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Post", fieldName: "id", isId: true, isUnique: false, seq }),
+        title: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false, seq })
     };
 }
 function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
@@ -166,8 +168,8 @@ function isCommentauthorFactory(x) {
 }
 function autoGenerateCommentScalarsOrEnums({ seq }) {
     return {
-        id: internal_1.scalarFieldValueGenerator.String({ modelName: "Comment", fieldName: "id", isId: true, isUnique: false, seq }),
-        body: internal_1.scalarFieldValueGenerator.String({ modelName: "Comment", fieldName: "body", isId: false, isUnique: false, seq })
+        id: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Comment", fieldName: "id", isId: true, isUnique: false, seq }),
+        body: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Comment", fieldName: "body", isId: false, isUnique: false, seq })
     };
 }
 function defineCommentFactoryInternal({ defaultData: defaultDataResolver }) {
@@ -223,8 +225,8 @@ function defineCommentFactory(options) {
 exports.defineCommentFactory = defineCommentFactory;
 function autoGenerateCategoryScalarsOrEnums({ seq }) {
     return {
-        id: internal_1.scalarFieldValueGenerator.String({ modelName: "Category", fieldName: "id", isId: true, isUnique: false, seq }),
-        name: internal_1.scalarFieldValueGenerator.String({ modelName: "Category", fieldName: "name", isId: false, isUnique: true, seq })
+        id: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Category", fieldName: "id", isId: true, isUnique: false, seq }),
+        name: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Category", fieldName: "name", isId: false, isUnique: true, seq })
     };
 }
 function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }) {

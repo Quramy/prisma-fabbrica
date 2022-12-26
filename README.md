@@ -19,6 +19,7 @@ Prisma generator for model factories.
   - [Connection helper](#connection-helper)
   - [Build input data only](#build-input-data-only)
   - [has-many / has-one relation](#has-many--has-one-relation)
+  - [Custom scalar field generation](#custom-scalar-field-generation)
   - [More examples](#more-examples)
 - [Generator configuration](#generator-configuration)
 - [Tips](#tips)
@@ -315,6 +316,26 @@ Note: In the above example, `PostFactory.build()` resolves JSON data such as:
 ```
 
 The `author` field is not allowed in `prisma.user.create` context. So `UserFactory` automatically filters the `author` field out in `.create` method.
+
+### Custom scalar field generation
+
+prisma-fabbrica provides function to complete scalar fields( https://github.com/Quramy/prisma-fabbrica/blob/main/packages/prisma-fabbrica/src/scalar/gen.ts ).
+
+`registerScalarFieldValueGenerator` allows to custom this rule. For example:
+
+```ts
+import { registerScalarFieldValueGenerator } from "./__generated__/fabbrica";
+
+registerScalarFieldValueGenerator({
+  String: ({ modelName, fieldName, seq }) => `${modelName}_{fieldName}_${seq}`,
+});
+```
+
+`registerScalarFieldValueGenerator` accepts an object `Record<FiledType, FieldGenerateFunction>`.
+Field type is one of `Boolean`, `String`, `Int`, `Float`, `BigInt`, `Decimal`, `DateTime`, `Bytes`, and `Json`
+`FieldGenerateFunction` is a function to return corresponding filed type.
+
+See also https://github.com/Quramy/prisma-fabbrica/blob/main/packages/prisma-fabbrica/src/scalar/types.ts .
 
 ### More examples
 

@@ -13,7 +13,7 @@ describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
       `,
       targetField: "id",
       expected: `
-        scalarFieldValueGenerator.Int({ modelName: "TestModel", fieldName: "id", isId: true, isUnique: false, seq })
+        getScalarFieldValueGenerator().Int({ modelName: "TestModel", fieldName: "id", isId: true, isUnique: false, seq })
       `,
     },
     {
@@ -26,7 +26,7 @@ describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
       `,
       targetField: "complexIdField",
       expected: `
-        scalarFieldValueGenerator.Int({ modelName: "TestModel", fieldName: "complexIdField", isId: true, isUnique: false, seq })
+        getScalarFieldValueGenerator().Int({ modelName: "TestModel", fieldName: "complexIdField", isId: true, isUnique: false, seq })
       `,
     },
     {
@@ -38,7 +38,7 @@ describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
       `,
       targetField: "uniqueField",
       expected: `
-        scalarFieldValueGenerator.String({ modelName: "TestModel", fieldName: "uniqueField", isId: false, isUnique: true, seq })
+        getScalarFieldValueGenerator().String({ modelName: "TestModel", fieldName: "uniqueField", isId: false, isUnique: true, seq })
       `,
     },
     {
@@ -52,7 +52,7 @@ describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
       `,
       targetField: "uniqueField1",
       expected: `
-        scalarFieldValueGenerator.String({ modelName: "TestModel", fieldName: "uniqueField1", isId: false, isUnique: true, seq })
+        getScalarFieldValueGenerator().String({ modelName: "TestModel", fieldName: "uniqueField1", isId: false, isUnique: true, seq })
       `,
     },
     {
@@ -64,7 +64,7 @@ describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
       `,
       targetField: "booleanField",
       expected: `
-        scalarFieldValueGenerator.Boolean({ modelName: "TestModel", fieldName: "booleanField", isId: false, isUnique: false, seq })
+        getScalarFieldValueGenerator().Boolean({ modelName: "TestModel", fieldName: "booleanField", isId: false, isUnique: false, seq })
       `,
     },
     {
@@ -76,7 +76,7 @@ describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
       `,
       targetField: "stringField",
       expected: `
-        scalarFieldValueGenerator.String({ modelName: "TestModel", fieldName: "stringField", isId: false, isUnique: false, seq })
+        getScalarFieldValueGenerator().String({ modelName: "TestModel", fieldName: "stringField", isId: false, isUnique: false, seq })
       `,
     },
     {
@@ -88,7 +88,7 @@ describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
       `,
       targetField: "intField",
       expected: `
-        scalarFieldValueGenerator.Int({ modelName: "TestModel", fieldName: "intField", isId: false, isUnique: false, seq })
+        getScalarFieldValueGenerator().Int({ modelName: "TestModel", fieldName: "intField", isId: false, isUnique: false, seq })
       `,
     },
     {
@@ -100,7 +100,7 @@ describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
       `,
       targetField: "floatField",
       expected: `
-        scalarFieldValueGenerator.Float({ modelName: "TestModel", fieldName: "floatField", isId: false, isUnique: false, seq })
+        getScalarFieldValueGenerator().Float({ modelName: "TestModel", fieldName: "floatField", isId: false, isUnique: false, seq })
       `,
     },
     {
@@ -112,7 +112,7 @@ describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
       `,
       targetField: "bigIntField",
       expected: `
-        scalarFieldValueGenerator.BigInt({ modelName: "TestModel", fieldName: "bigIntField", isId: false, isUnique: false, seq })
+        getScalarFieldValueGenerator().BigInt({ modelName: "TestModel", fieldName: "bigIntField", isId: false, isUnique: false, seq })
       `,
     },
     {
@@ -124,7 +124,7 @@ describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
       `,
       targetField: "dateTimeField",
       expected: `
-        scalarFieldValueGenerator.DateTime({ modelName: "TestModel", fieldName: "dateTimeField", isId: false, isUnique: false, seq })
+        getScalarFieldValueGenerator().DateTime({ modelName: "TestModel", fieldName: "dateTimeField", isId: false, isUnique: false, seq })
       `,
     },
     {
@@ -136,7 +136,7 @@ describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
       `,
       targetField: "bytesField",
       expected: `
-        scalarFieldValueGenerator.Bytes({ modelName: "TestModel", fieldName: "bytesField", isId: false, isUnique: false, seq })
+        getScalarFieldValueGenerator().Bytes({ modelName: "TestModel", fieldName: "bytesField", isId: false, isUnique: false, seq })
       `,
     },
     {
@@ -148,7 +148,7 @@ describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
       `,
       targetField: "jsonField",
       expected: `
-        scalarFieldValueGenerator.Json({ modelName: "TestModel", fieldName: "jsonField", isId: false, isUnique: false, seq })
+        getScalarFieldValueGenerator().Json({ modelName: "TestModel", fieldName: "jsonField", isId: false, isUnique: false, seq })
       `,
     },
     {

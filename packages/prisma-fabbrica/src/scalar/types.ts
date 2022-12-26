@@ -6,14 +6,20 @@ export type ScalarFieldGenerateOptions = {
   readonly seq: number;
 };
 
+type Stricten<T extends {}> = {
+  [K in keyof T]-?: T[K];
+};
+
 export interface ScalarFieldValueGenerator {
-  Boolean: (options: ScalarFieldGenerateOptions) => boolean;
-  String: (options: ScalarFieldGenerateOptions) => string;
-  Int: (options: ScalarFieldGenerateOptions) => number;
-  Float: (options: ScalarFieldGenerateOptions) => number;
-  BigInt: (options: ScalarFieldGenerateOptions) => bigint;
-  Decimal: (options: ScalarFieldGenerateOptions) => any;
-  DateTime: (options: ScalarFieldGenerateOptions) => Date;
-  Bytes: (options: ScalarFieldGenerateOptions) => Buffer;
-  Json: (options: ScalarFieldGenerateOptions) => any;
+  Boolean?: (options: ScalarFieldGenerateOptions) => boolean;
+  String?: (options: ScalarFieldGenerateOptions) => string;
+  Int?: (options: ScalarFieldGenerateOptions) => number;
+  Float?: (options: ScalarFieldGenerateOptions) => number;
+  BigInt?: (options: ScalarFieldGenerateOptions) => bigint;
+  Decimal?: (options: ScalarFieldGenerateOptions) => any;
+  DateTime?: (options: ScalarFieldGenerateOptions) => Date;
+  Bytes?: (options: ScalarFieldGenerateOptions) => Buffer;
+  Json?: (options: ScalarFieldGenerateOptions) => any;
 }
+
+export type StrictScalarFieldValueGenerator = Stricten<ScalarFieldValueGenerator>;
