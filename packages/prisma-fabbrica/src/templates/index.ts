@@ -81,13 +81,13 @@ export const header = (prismaClientModuleSpecifier: string) =>
       getClient,
       ModelWithFields,
       createScreener,
-      scalarFieldValueGenerator,
+      getScalarFieldValueGenerator,
       Resolver,
       normalizeResolver,
       normalizeList,
       getSequenceCounter,
     } from "@quramy/prisma-fabbrica/lib/internal";
-    export { initialize, resetSequence } from "@quramy/prisma-fabbrica/lib/internal";
+    export { initialize, resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
   `();
 
 export const buildDataOptions = () =>
@@ -273,7 +273,7 @@ export const autoGenerateModelScalarsOrEnumsFieldArgs = (
   // Note: In Json sclar filed, inputTypes[0].location is not scalar but enumType
   field.inputTypes[field.inputTypes.length - 1].location === "scalar"
     ? template.expression`
-        scalarFieldValueGenerator.SCALAR_TYPE({ modelName: MODEL_NAME, fieldName: FIELD_NAME, isId: IS_ID, isUnique: IS_UNIQUE, seq })
+        getScalarFieldValueGenerator().SCALAR_TYPE({ modelName: MODEL_NAME, fieldName: FIELD_NAME, isId: IS_ID, isUnique: IS_UNIQUE, seq })
       `({
         SCALAR_TYPE: ast.identifier(field.inputTypes[field.inputTypes.length - 1].type as string),
         MODEL_NAME: ast.stringLiteral(model.name),

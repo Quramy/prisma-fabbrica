@@ -1,7 +1,7 @@
 import short from "short-uuid";
-import { ScalarFieldValueGenerator } from "./types";
+import { StrictScalarFieldValueGenerator } from "./types";
 
-export const scalarFieldValueGenerator: ScalarFieldValueGenerator = {
+export const scalarFieldValueGenerator: StrictScalarFieldValueGenerator = {
   Boolean: () => true,
   String: ({ fieldName, isId, isUnique }) => {
     if (isId || isUnique) {

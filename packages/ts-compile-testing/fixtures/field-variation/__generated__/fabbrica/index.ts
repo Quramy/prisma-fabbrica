@@ -5,8 +5,8 @@ import type { NoPkModel } from "./../client";
 import type { Role } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
-import { getClient, ModelWithFields, createScreener, scalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
-export { initialize, resetSequence } from "@quramy/prisma-fabbrica/lib/internal";
+import { getClient, ModelWithFields, createScreener, getScalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
+export { initialize, resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
 
 type BuildDataOptions = {
     readonly seq: number;
@@ -57,7 +57,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): UserScalarOrEnumFields {
     return {
-        id: scalarFieldValueGenerator.String({ modelName: "User", fieldName: "id", isId: true, isUnique: false, seq }),
+        id: getScalarFieldValueGenerator().String({ modelName: "User", fieldName: "id", isId: true, isUnique: false, seq }),
         role: "USER"
     };
 }
@@ -136,8 +136,8 @@ function autoGenerateComplexIdModelScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): ComplexIdModelScalarOrEnumFields {
     return {
-        firstName: scalarFieldValueGenerator.String({ modelName: "ComplexIdModel", fieldName: "firstName", isId: true, isUnique: false, seq }),
-        lastName: scalarFieldValueGenerator.String({ modelName: "ComplexIdModel", fieldName: "lastName", isId: true, isUnique: false, seq })
+        firstName: getScalarFieldValueGenerator().String({ modelName: "ComplexIdModel", fieldName: "firstName", isId: true, isUnique: false, seq }),
+        lastName: getScalarFieldValueGenerator().String({ modelName: "ComplexIdModel", fieldName: "lastName", isId: true, isUnique: false, seq })
     };
 }
 
@@ -240,15 +240,15 @@ function autoGenerateFieldTypePatternModelScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): FieldTypePatternModelScalarOrEnumFields {
     return {
-        id: scalarFieldValueGenerator.Int({ modelName: "FieldTypePatternModel", fieldName: "id", isId: true, isUnique: false, seq }),
-        requiredInt: scalarFieldValueGenerator.Int({ modelName: "FieldTypePatternModel", fieldName: "requiredInt", isId: false, isUnique: false, seq }),
-        requiredStr: scalarFieldValueGenerator.String({ modelName: "FieldTypePatternModel", fieldName: "requiredStr", isId: false, isUnique: false, seq }),
-        requiredBool: scalarFieldValueGenerator.Boolean({ modelName: "FieldTypePatternModel", fieldName: "requiredBool", isId: false, isUnique: false, seq }),
-        requiredFlaot: scalarFieldValueGenerator.Float({ modelName: "FieldTypePatternModel", fieldName: "requiredFlaot", isId: false, isUnique: false, seq }),
-        requiredDecimal: scalarFieldValueGenerator.Decimal({ modelName: "FieldTypePatternModel", fieldName: "requiredDecimal", isId: false, isUnique: false, seq }),
-        requiredJson: scalarFieldValueGenerator.Json({ modelName: "FieldTypePatternModel", fieldName: "requiredJson", isId: false, isUnique: false, seq }),
-        requriedBytes: scalarFieldValueGenerator.Bytes({ modelName: "FieldTypePatternModel", fieldName: "requriedBytes", isId: false, isUnique: false, seq }),
-        requiredBigInt: scalarFieldValueGenerator.BigInt({ modelName: "FieldTypePatternModel", fieldName: "requiredBigInt", isId: false, isUnique: false, seq })
+        id: getScalarFieldValueGenerator().Int({ modelName: "FieldTypePatternModel", fieldName: "id", isId: true, isUnique: false, seq }),
+        requiredInt: getScalarFieldValueGenerator().Int({ modelName: "FieldTypePatternModel", fieldName: "requiredInt", isId: false, isUnique: false, seq }),
+        requiredStr: getScalarFieldValueGenerator().String({ modelName: "FieldTypePatternModel", fieldName: "requiredStr", isId: false, isUnique: false, seq }),
+        requiredBool: getScalarFieldValueGenerator().Boolean({ modelName: "FieldTypePatternModel", fieldName: "requiredBool", isId: false, isUnique: false, seq }),
+        requiredFlaot: getScalarFieldValueGenerator().Float({ modelName: "FieldTypePatternModel", fieldName: "requiredFlaot", isId: false, isUnique: false, seq }),
+        requiredDecimal: getScalarFieldValueGenerator().Decimal({ modelName: "FieldTypePatternModel", fieldName: "requiredDecimal", isId: false, isUnique: false, seq }),
+        requiredJson: getScalarFieldValueGenerator().Json({ modelName: "FieldTypePatternModel", fieldName: "requiredJson", isId: false, isUnique: false, seq }),
+        requriedBytes: getScalarFieldValueGenerator().Bytes({ modelName: "FieldTypePatternModel", fieldName: "requriedBytes", isId: false, isUnique: false, seq }),
+        requiredBigInt: getScalarFieldValueGenerator().BigInt({ modelName: "FieldTypePatternModel", fieldName: "requiredBigInt", isId: false, isUnique: false, seq })
     };
 }
 
@@ -324,7 +324,7 @@ function autoGenerateNoPkModelScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): NoPkModelScalarOrEnumFields {
     return {
-        id: scalarFieldValueGenerator.Int({ modelName: "NoPkModel", fieldName: "id", isId: false, isUnique: true, seq })
+        id: getScalarFieldValueGenerator().Int({ modelName: "NoPkModel", fieldName: "id", isId: false, isUnique: true, seq })
     };
 }
 
