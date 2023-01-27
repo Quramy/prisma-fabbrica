@@ -60,7 +60,7 @@ function filterBelongsToField(model: DMMF.Model, inputType: DMMF.InputType) {
 function filterEnumFields(inputType: DMMF.InputType) {
   return inputType.fields.filter(
     field =>
-      field.inputTypes.length > 0 && field.inputTypes.every(childInputType => childInputType.location === "enumTypes"),
+      field.inputTypes.length > 0 && field.inputTypes.some(childInputType => childInputType.location === "enumTypes"),
   );
 }
 
