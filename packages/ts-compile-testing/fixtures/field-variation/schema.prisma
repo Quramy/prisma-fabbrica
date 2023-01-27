@@ -19,11 +19,17 @@ model User {
   role         Role
   roleDefault  Role @default(USER)
   roles        Role[]
+  status       Status?
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+enum Status {
+  Draft
+  Accepted
 }
 
 model ComplexIdModel {

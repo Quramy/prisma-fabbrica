@@ -3,6 +3,7 @@ import type { ComplexIdModel } from "./../client";
 import type { FieldTypePatternModel } from "./../client";
 import type { NoPkModel } from "./../client";
 import type { Role } from "./../client";
+import type { Status } from "./../client";
 import { Prisma } from "./../client";
 import type { PrismaClient } from "./../client";
 import { getClient, ModelWithFields, createScreener, getScalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
@@ -36,6 +37,7 @@ type UserFactoryDefineInput = {
     role?: Role;
     roleDefault?: Role;
     roles?: Prisma.UserCreaterolesInput | Prisma.Enumerable<Role>;
+    status?: Status | null;
 };
 
 type UserFactoryDefineOptions = {
