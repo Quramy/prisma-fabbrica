@@ -20,7 +20,7 @@ type UserFactoryDefineInput = {
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
 };
-interface UserFactoryInterface {
+export interface UserFactoryInterface {
     readonly _factoryFor: "User";
     build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
@@ -53,7 +53,7 @@ type PostFactoryDefineInput = {
 type PostFactoryDefineOptions = {
     defaultData: Resolver<PostFactoryDefineInput, BuildDataOptions>;
 };
-interface PostFactoryInterface {
+export interface PostFactoryInterface {
     readonly _factoryFor: "Post";
     build(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
@@ -89,7 +89,7 @@ type CommentFactoryDefineInput = {
 type CommentFactoryDefineOptions = {
     defaultData: Resolver<CommentFactoryDefineInput, BuildDataOptions>;
 };
-interface CommentFactoryInterface {
+export interface CommentFactoryInterface {
     readonly _factoryFor: "Comment";
     build(inputData?: Partial<Prisma.CommentCreateInput>): PromiseLike<Prisma.CommentCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.CommentCreateInput>): PromiseLike<Prisma.CommentCreateInput>;
@@ -114,7 +114,7 @@ type CategoryFactoryDefineInput = {
 type CategoryFactoryDefineOptions = {
     defaultData?: Resolver<CategoryFactoryDefineInput, BuildDataOptions>;
 };
-interface CategoryFactoryInterface {
+export interface CategoryFactoryInterface {
     readonly _factoryFor: "Category";
     build(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Prisma.CategoryCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Prisma.CategoryCreateInput>;

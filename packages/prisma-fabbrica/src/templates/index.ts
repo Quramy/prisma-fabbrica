@@ -232,7 +232,7 @@ export const modelFactoryDefineOptions = (modelName: string, isOpionalDefaultDat
 
 export const modelFactoryInterface = (model: DMMF.Model) =>
   template.statement`
-    interface MODEL_FACTORY_INTERFACE {
+    export interface MODEL_FACTORY_INTERFACE {
       readonly _factoryFor: ${() => ast.literalTypeNode(ast.stringLiteral(model.name))}
       build(inputData?: Partial<Prisma.MODEL_CREATE_INPUT>): PromiseLike<Prisma.MODEL_CREATE_INPUT>
       buildCreateInput(inputData?: Partial<Prisma.MODEL_CREATE_INPUT>): PromiseLike<Prisma.MODEL_CREATE_INPUT>
