@@ -2,9 +2,9 @@ import { defineUserFactory, definePostFactory } from "./__generated__/fabbrica";
 
 const prisma = jestPrisma.client;
 
-const UserFactory = defineUserFactory();
+export const UserFactory = defineUserFactory();
 
-const PostFactory = definePostFactory({
+export const PostFactory = definePostFactory({
   defaultData: {
     author: UserFactory,
   },
