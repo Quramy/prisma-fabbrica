@@ -332,8 +332,8 @@ registerScalarFieldValueGenerator({
 ```
 
 `registerScalarFieldValueGenerator` accepts an object `Record<FiledType, FieldGenerateFunction>`.
-Field type is one of `Boolean`, `String`, `Int`, `Float`, `BigInt`, `Decimal`, `DateTime`, `Bytes`, and `Json`
-`FieldGenerateFunction` is a function to return corresponding filed type.
+Field type is one of `Boolean`, `String`, `Int`, `Float`, `BigInt`, `Decimal`, `DateTime`, `Bytes`, and `Json`.
+`FieldGenerateFunction` is a function to return corresponding fieled type.
 
 See also https://github.com/Quramy/prisma-fabbrica/blob/main/packages/prisma-fabbrica/src/scalar/types.ts .
 
