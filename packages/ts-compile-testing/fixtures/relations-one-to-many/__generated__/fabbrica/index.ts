@@ -61,7 +61,7 @@ type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
 };
 
-interface UserFactoryInterface {
+export interface UserFactoryInterface {
     readonly _factoryFor: "User";
     build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
@@ -151,7 +151,7 @@ function isPostauthorFactory(x: PostauthorFactory | Prisma.UserCreateNestedOneWi
     return (x as any)?._factoryFor === "User";
 }
 
-interface PostFactoryInterface {
+export interface PostFactoryInterface {
     readonly _factoryFor: "Post";
     build(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
@@ -254,7 +254,7 @@ function isReviewreviewerFactory(x: ReviewreviewerFactory | Prisma.UserCreateNes
     return (x as any)?._factoryFor === "User";
 }
 
-interface ReviewFactoryInterface {
+export interface ReviewFactoryInterface {
     readonly _factoryFor: "Review";
     build(inputData?: Partial<Prisma.ReviewCreateInput>): PromiseLike<Prisma.ReviewCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.ReviewCreateInput>): PromiseLike<Prisma.ReviewCreateInput>;

@@ -49,7 +49,7 @@ function isUserprofileFactory(x: UserprofileFactory | Prisma.ProfileCreateNested
     return (x as any)?._factoryFor === "Profile";
 }
 
-interface UserFactoryInterface {
+export interface UserFactoryInterface {
     readonly _factoryFor: "User";
     build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
@@ -140,7 +140,7 @@ function isProfileuserFactory(x: ProfileuserFactory | Prisma.UserCreateNestedOne
     return (x as any)?._factoryFor === "User";
 }
 
-interface ProfileFactoryInterface {
+export interface ProfileFactoryInterface {
     readonly _factoryFor: "Profile";
     build(inputData?: Partial<Prisma.ProfileCreateInput>): PromiseLike<Prisma.ProfileCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.ProfileCreateInput>): PromiseLike<Prisma.ProfileCreateInput>;

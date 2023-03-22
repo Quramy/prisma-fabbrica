@@ -44,7 +44,7 @@ type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
 };
 
-interface UserFactoryInterface {
+export interface UserFactoryInterface {
     readonly _factoryFor: "User";
     build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
@@ -123,7 +123,7 @@ type ComplexIdModelFactoryDefineOptions = {
     defaultData?: Resolver<ComplexIdModelFactoryDefineInput, BuildDataOptions>;
 };
 
-interface ComplexIdModelFactoryInterface {
+export interface ComplexIdModelFactoryInterface {
     readonly _factoryFor: "ComplexIdModel";
     build(inputData?: Partial<Prisma.ComplexIdModelCreateInput>): PromiseLike<Prisma.ComplexIdModelCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.ComplexIdModelCreateInput>): PromiseLike<Prisma.ComplexIdModelCreateInput>;
@@ -227,7 +227,7 @@ type FieldTypePatternModelFactoryDefineOptions = {
     defaultData?: Resolver<FieldTypePatternModelFactoryDefineInput, BuildDataOptions>;
 };
 
-interface FieldTypePatternModelFactoryInterface {
+export interface FieldTypePatternModelFactoryInterface {
     readonly _factoryFor: "FieldTypePatternModel";
     build(inputData?: Partial<Prisma.FieldTypePatternModelCreateInput>): PromiseLike<Prisma.FieldTypePatternModelCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.FieldTypePatternModelCreateInput>): PromiseLike<Prisma.FieldTypePatternModelCreateInput>;
@@ -311,7 +311,7 @@ type NoPkModelFactoryDefineOptions = {
     defaultData?: Resolver<NoPkModelFactoryDefineInput, BuildDataOptions>;
 };
 
-interface NoPkModelFactoryInterface {
+export interface NoPkModelFactoryInterface {
     readonly _factoryFor: "NoPkModel";
     build(inputData?: Partial<Prisma.NoPkModelCreateInput>): PromiseLike<Prisma.NoPkModelCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.NoPkModelCreateInput>): PromiseLike<Prisma.NoPkModelCreateInput>;

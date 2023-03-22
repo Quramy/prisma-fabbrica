@@ -12,10 +12,10 @@ type UserFactoryDefineInput = {
     id?: string;
     email?: string;
     name?: string;
-    posts?: Prisma.PostCreateNestedManyWithoutAuthorInput;
-    comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput;
     updatedAt?: Date;
     createdAt?: Date;
+    posts?: Prisma.PostCreateNestedManyWithoutAuthorInput;
+    comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput;
 };
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
@@ -44,11 +44,11 @@ type PostauthorFactory = {
 type PostFactoryDefineInput = {
     id?: string;
     title?: string;
+    updatedAt?: Date;
+    createdAt?: Date;
     author: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput;
     comments?: Prisma.CommentCreateNestedManyWithoutPostInput;
     categories?: Prisma.CategoryCreateNestedManyWithoutPostsInput;
-    updatedAt?: Date;
-    createdAt?: Date;
 };
 type PostFactoryDefineOptions = {
     defaultData: Resolver<PostFactoryDefineInput, BuildDataOptions>;
@@ -81,10 +81,10 @@ type CommentauthorFactory = {
 type CommentFactoryDefineInput = {
     id?: string;
     body?: string;
-    post: CommentpostFactory | Prisma.PostCreateNestedOneWithoutCommentsInput;
-    author: CommentauthorFactory | Prisma.UserCreateNestedOneWithoutCommentsInput;
     updatedAt?: Date;
     createdAt?: Date;
+    post: CommentpostFactory | Prisma.PostCreateNestedOneWithoutCommentsInput;
+    author: CommentauthorFactory | Prisma.UserCreateNestedOneWithoutCommentsInput;
 };
 type CommentFactoryDefineOptions = {
     defaultData: Resolver<CommentFactoryDefineInput, BuildDataOptions>;
