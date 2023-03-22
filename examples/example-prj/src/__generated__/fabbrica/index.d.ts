@@ -19,8 +19,14 @@ type UserFactoryDefineInput = {
 };
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
+    traits?: {
+        [traitName: string | symbol]: {
+            data: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions>;
+        };
+    };
 };
-export interface UserFactoryInterface {
+type UserTraitKeys<TOptions extends UserFactoryDefineOptions> = keyof TOptions["traits"];
+export interface UserFactoryInterfaceWithoutTraits {
     readonly _factoryFor: "User";
     build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
@@ -30,13 +36,16 @@ export interface UserFactoryInterface {
     createList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<User[]>;
     createForConnect(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Pick<User, "id">>;
 }
+export interface UserFactoryInterface<TOptions extends UserFactoryDefineOptions = UserFactoryDefineOptions> extends UserFactoryInterfaceWithoutTraits {
+    traits(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits;
+}
 /**
  * Define factory for {@link User} model.
  *
  * @param options
  * @returns factory {@link UserFactoryInterface}
  */
-export declare function defineUserFactory(options?: UserFactoryDefineOptions): UserFactoryInterface;
+export declare function defineUserFactory<TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<TOptions>;
 type PostauthorFactory = {
     _factoryFor: "User";
     build: () => PromiseLike<Prisma.UserCreateNestedOneWithoutPostsInput["create"]>;
@@ -52,8 +61,14 @@ type PostFactoryDefineInput = {
 };
 type PostFactoryDefineOptions = {
     defaultData: Resolver<PostFactoryDefineInput, BuildDataOptions>;
+    traits?: {
+        [traitName: string | symbol]: {
+            data: Resolver<Partial<PostFactoryDefineInput>, BuildDataOptions>;
+        };
+    };
 };
-export interface PostFactoryInterface {
+type PostTraitKeys<TOptions extends PostFactoryDefineOptions> = keyof TOptions["traits"];
+export interface PostFactoryInterfaceWithoutTraits {
     readonly _factoryFor: "Post";
     build(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
@@ -63,13 +78,16 @@ export interface PostFactoryInterface {
     createList(inputData: number | readonly Partial<Prisma.PostCreateInput>[]): PromiseLike<Post[]>;
     createForConnect(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Pick<Post, "id">>;
 }
+export interface PostFactoryInterface<TOptions extends PostFactoryDefineOptions = PostFactoryDefineOptions> extends PostFactoryInterfaceWithoutTraits {
+    traits(name: PostTraitKeys<TOptions>, ...names: readonly PostTraitKeys<TOptions>[]): PostFactoryInterfaceWithoutTraits;
+}
 /**
  * Define factory for {@link Post} model.
  *
  * @param options
  * @returns factory {@link PostFactoryInterface}
  */
-export declare function definePostFactory(options: PostFactoryDefineOptions): PostFactoryInterface;
+export declare function definePostFactory<TOptions extends PostFactoryDefineOptions>(options: TOptions): PostFactoryInterface<TOptions>;
 type CommentpostFactory = {
     _factoryFor: "Post";
     build: () => PromiseLike<Prisma.PostCreateNestedOneWithoutCommentsInput["create"]>;
@@ -88,8 +106,14 @@ type CommentFactoryDefineInput = {
 };
 type CommentFactoryDefineOptions = {
     defaultData: Resolver<CommentFactoryDefineInput, BuildDataOptions>;
+    traits?: {
+        [traitName: string | symbol]: {
+            data: Resolver<Partial<CommentFactoryDefineInput>, BuildDataOptions>;
+        };
+    };
 };
-export interface CommentFactoryInterface {
+type CommentTraitKeys<TOptions extends CommentFactoryDefineOptions> = keyof TOptions["traits"];
+export interface CommentFactoryInterfaceWithoutTraits {
     readonly _factoryFor: "Comment";
     build(inputData?: Partial<Prisma.CommentCreateInput>): PromiseLike<Prisma.CommentCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.CommentCreateInput>): PromiseLike<Prisma.CommentCreateInput>;
@@ -99,13 +123,16 @@ export interface CommentFactoryInterface {
     createList(inputData: number | readonly Partial<Prisma.CommentCreateInput>[]): PromiseLike<Comment[]>;
     createForConnect(inputData?: Partial<Prisma.CommentCreateInput>): PromiseLike<Pick<Comment, "id">>;
 }
+export interface CommentFactoryInterface<TOptions extends CommentFactoryDefineOptions = CommentFactoryDefineOptions> extends CommentFactoryInterfaceWithoutTraits {
+    traits(name: CommentTraitKeys<TOptions>, ...names: readonly CommentTraitKeys<TOptions>[]): CommentFactoryInterfaceWithoutTraits;
+}
 /**
  * Define factory for {@link Comment} model.
  *
  * @param options
  * @returns factory {@link CommentFactoryInterface}
  */
-export declare function defineCommentFactory(options: CommentFactoryDefineOptions): CommentFactoryInterface;
+export declare function defineCommentFactory<TOptions extends CommentFactoryDefineOptions>(options: TOptions): CommentFactoryInterface<TOptions>;
 type CategoryFactoryDefineInput = {
     id?: string;
     name?: string;
@@ -113,8 +140,14 @@ type CategoryFactoryDefineInput = {
 };
 type CategoryFactoryDefineOptions = {
     defaultData?: Resolver<CategoryFactoryDefineInput, BuildDataOptions>;
+    traits?: {
+        [traitName: string | symbol]: {
+            data: Resolver<Partial<CategoryFactoryDefineInput>, BuildDataOptions>;
+        };
+    };
 };
-export interface CategoryFactoryInterface {
+type CategoryTraitKeys<TOptions extends CategoryFactoryDefineOptions> = keyof TOptions["traits"];
+export interface CategoryFactoryInterfaceWithoutTraits {
     readonly _factoryFor: "Category";
     build(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Prisma.CategoryCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Prisma.CategoryCreateInput>;
@@ -124,10 +157,13 @@ export interface CategoryFactoryInterface {
     createList(inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]): PromiseLike<Category[]>;
     createForConnect(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Pick<Category, "id">>;
 }
+export interface CategoryFactoryInterface<TOptions extends CategoryFactoryDefineOptions = CategoryFactoryDefineOptions> extends CategoryFactoryInterfaceWithoutTraits {
+    traits(name: CategoryTraitKeys<TOptions>, ...names: readonly CategoryTraitKeys<TOptions>[]): CategoryFactoryInterfaceWithoutTraits;
+}
 /**
  * Define factory for {@link Category} model.
  *
  * @param options
  * @returns factory {@link CategoryFactoryInterface}
  */
-export declare function defineCategoryFactory(options?: CategoryFactoryDefineOptions): CategoryFactoryInterface;
+export declare function defineCategoryFactory<TOptions extends CategoryFactoryDefineOptions>(options?: TOptions): CategoryFactoryInterface<TOptions>;
