@@ -25,9 +25,16 @@ type UserFactoryDefineInput = {
 
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
+    traits?: {
+        [traitName: string | symbol]: {
+            data: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions>;
+        };
+    };
 };
 
-export interface UserFactoryInterface {
+type UserTraitKeys<TOptions extends UserFactoryDefineOptions> = keyof TOptions["traits"];
+
+export interface UserFactoryInterfaceWithoutTraits {
     readonly _factoryFor: "User";
     build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
@@ -36,6 +43,10 @@ export interface UserFactoryInterface {
     create(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<User>;
     createList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<User[]>;
     createForConnect(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Pick<User, "id">>;
+}
+
+export interface UserFactoryInterface<TOptions extends UserFactoryDefineOptions = UserFactoryDefineOptions> extends UserFactoryInterfaceWithoutTraits {
+    traits(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits;
 }
 
 function autoGenerateUserScalarsOrEnums({ seq }: {
@@ -47,38 +58,56 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
     };
 }
 
-function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions): UserFactoryInterface {
-    const seqKey = {};
-    const getSeq = () => getSequenceCounter(seqKey);
-    const screen = createScreener("User", modelFieldDefinitions);
-    const build = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
-        const seq = getSeq();
-        const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
-        const resolveValue = normalizeResolver<UserFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
-        const defaultData = await resolveValue({ seq });
-        const defaultAssociations = {};
-        const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-        return data;
+function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ defaultData: defaultDataResolver, traits: traitsDefs = {} }: TOptions): UserFactoryInterface<TOptions> {
+    const getFactoryWithTraits = (traitKeys: readonly UserTraitKeys<TOptions>[] = []) => {
+        const seqKey = {};
+        const getSeq = () => getSequenceCounter(seqKey);
+        const screen = createScreener("User", modelFieldDefinitions);
+        const build = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
+            const seq = getSeq();
+            const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
+            const resolveValue = normalizeResolver<UserFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+            const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
+                const acc = await queue;
+                const resolveTraitValue = normalizeResolver<Partial<UserFactoryDefineInput>, BuildDataOptions>(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue({ seq });
+                return {
+                    ...acc,
+                    ...traitData,
+                };
+            }, resolveValue({ seq }));
+            const defaultAssociations = {};
+            const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            return data;
+        };
+        const buildList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
+        const pickForConnect = (inputData: User) => ({
+            id: inputData.id
+        });
+        const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
+            const data = await build(inputData).then(screen);
+            return await getClient<PrismaClient>().user.create({ data });
+        };
+        const createList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
+        const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
+        return {
+            _factoryFor: "User" as const,
+            build,
+            buildList,
+            buildCreateInput: build,
+            pickForConnect,
+            create,
+            createList,
+            createForConnect,
+        };
     };
-    const buildList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
-    const pickForConnect = (inputData: User) => ({
-        id: inputData.id
-    });
-    const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
-        const data = await build(inputData).then(screen);
-        return await getClient<PrismaClient>().user.create({ data });
+    const factory = getFactoryWithTraits();
+    const traits = (name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]) => {
+        return getFactoryWithTraits([name, ...names]);
     };
-    const createList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
-    const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
-        _factoryFor: "User" as const,
-        build,
-        buildList,
-        buildCreateInput: build,
-        pickForConnect,
-        create,
-        createList,
-        createForConnect,
+        ...factory,
+        traits,
     };
 }
 
@@ -88,6 +117,6 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
  * @param options
  * @returns factory {@link UserFactoryInterface}
  */
-export function defineUserFactory(options: UserFactoryDefineOptions = {}): UserFactoryInterface {
-    return defineUserFactoryInternal(options);
+export function defineUserFactory<TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<TOptions> {
+    return defineUserFactoryInternal(options ?? {});
 }

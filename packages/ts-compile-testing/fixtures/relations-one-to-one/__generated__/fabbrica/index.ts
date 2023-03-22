@@ -43,13 +43,20 @@ type UserFactoryDefineInput = {
 
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
+    traits?: {
+        [traitName: string | symbol]: {
+            data: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions>;
+        };
+    };
 };
 
 function isUserprofileFactory(x: UserprofileFactory | Prisma.ProfileCreateNestedOneWithoutUserInput | undefined): x is UserprofileFactory {
     return (x as any)?._factoryFor === "Profile";
 }
 
-export interface UserFactoryInterface {
+type UserTraitKeys<TOptions extends UserFactoryDefineOptions> = keyof TOptions["traits"];
+
+export interface UserFactoryInterfaceWithoutTraits {
     readonly _factoryFor: "User";
     build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
@@ -58,6 +65,10 @@ export interface UserFactoryInterface {
     create(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<User>;
     createList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<User[]>;
     createForConnect(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Pick<User, "id">>;
+}
+
+export interface UserFactoryInterface<TOptions extends UserFactoryDefineOptions = UserFactoryDefineOptions> extends UserFactoryInterfaceWithoutTraits {
+    traits(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits;
 }
 
 function autoGenerateUserScalarsOrEnums({ seq }: {
@@ -69,42 +80,60 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
     };
 }
 
-function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFactoryDefineOptions): UserFactoryInterface {
-    const seqKey = {};
-    const getSeq = () => getSequenceCounter(seqKey);
-    const screen = createScreener("User", modelFieldDefinitions);
-    const build = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
-        const seq = getSeq();
-        const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
-        const resolveValue = normalizeResolver<UserFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
-        const defaultData = await resolveValue({ seq });
-        const defaultAssociations = {
-            profile: isUserprofileFactory(defaultData.profile) ? {
-                create: await defaultData.profile.build()
-            } : defaultData.profile
+function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ defaultData: defaultDataResolver, traits: traitsDefs = {} }: TOptions): UserFactoryInterface<TOptions> {
+    const getFactoryWithTraits = (traitKeys: readonly UserTraitKeys<TOptions>[] = []) => {
+        const seqKey = {};
+        const getSeq = () => getSequenceCounter(seqKey);
+        const screen = createScreener("User", modelFieldDefinitions);
+        const build = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
+            const seq = getSeq();
+            const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
+            const resolveValue = normalizeResolver<UserFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+            const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
+                const acc = await queue;
+                const resolveTraitValue = normalizeResolver<Partial<UserFactoryDefineInput>, BuildDataOptions>(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue({ seq });
+                return {
+                    ...acc,
+                    ...traitData,
+                };
+            }, resolveValue({ seq }));
+            const defaultAssociations = {
+                profile: isUserprofileFactory(defaultData.profile) ? {
+                    create: await defaultData.profile.build()
+                } : defaultData.profile
+            };
+            const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            return data;
         };
-        const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-        return data;
+        const buildList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
+        const pickForConnect = (inputData: User) => ({
+            id: inputData.id
+        });
+        const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
+            const data = await build(inputData).then(screen);
+            return await getClient<PrismaClient>().user.create({ data });
+        };
+        const createList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
+        const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
+        return {
+            _factoryFor: "User" as const,
+            build,
+            buildList,
+            buildCreateInput: build,
+            pickForConnect,
+            create,
+            createList,
+            createForConnect,
+        };
     };
-    const buildList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
-    const pickForConnect = (inputData: User) => ({
-        id: inputData.id
-    });
-    const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
-        const data = await build(inputData).then(screen);
-        return await getClient<PrismaClient>().user.create({ data });
+    const factory = getFactoryWithTraits();
+    const traits = (name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]) => {
+        return getFactoryWithTraits([name, ...names]);
     };
-    const createList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
-    const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
-        _factoryFor: "User" as const,
-        build,
-        buildList,
-        buildCreateInput: build,
-        pickForConnect,
-        create,
-        createList,
-        createForConnect,
+        ...factory,
+        traits,
     };
 }
 
@@ -114,8 +143,8 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }: UserFac
  * @param options
  * @returns factory {@link UserFactoryInterface}
  */
-export function defineUserFactory(options: UserFactoryDefineOptions = {}): UserFactoryInterface {
-    return defineUserFactoryInternal(options);
+export function defineUserFactory<TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<TOptions> {
+    return defineUserFactoryInternal(options ?? {});
 }
 
 type ProfileScalarOrEnumFields = {
@@ -134,13 +163,20 @@ type ProfileFactoryDefineInput = {
 
 type ProfileFactoryDefineOptions = {
     defaultData: Resolver<ProfileFactoryDefineInput, BuildDataOptions>;
+    traits?: {
+        [traitName: string | symbol]: {
+            data: Resolver<Partial<ProfileFactoryDefineInput>, BuildDataOptions>;
+        };
+    };
 };
 
 function isProfileuserFactory(x: ProfileuserFactory | Prisma.UserCreateNestedOneWithoutProfileInput | undefined): x is ProfileuserFactory {
     return (x as any)?._factoryFor === "User";
 }
 
-export interface ProfileFactoryInterface {
+type ProfileTraitKeys<TOptions extends ProfileFactoryDefineOptions> = keyof TOptions["traits"];
+
+export interface ProfileFactoryInterfaceWithoutTraits {
     readonly _factoryFor: "Profile";
     build(inputData?: Partial<Prisma.ProfileCreateInput>): PromiseLike<Prisma.ProfileCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.ProfileCreateInput>): PromiseLike<Prisma.ProfileCreateInput>;
@@ -151,6 +187,10 @@ export interface ProfileFactoryInterface {
     createForConnect(inputData?: Partial<Prisma.ProfileCreateInput>): PromiseLike<Pick<Profile, "id">>;
 }
 
+export interface ProfileFactoryInterface<TOptions extends ProfileFactoryDefineOptions = ProfileFactoryDefineOptions> extends ProfileFactoryInterfaceWithoutTraits {
+    traits(name: ProfileTraitKeys<TOptions>, ...names: readonly ProfileTraitKeys<TOptions>[]): ProfileFactoryInterfaceWithoutTraits;
+}
+
 function autoGenerateProfileScalarsOrEnums({ seq }: {
     readonly seq: number;
 }): ProfileScalarOrEnumFields {
@@ -159,42 +199,60 @@ function autoGenerateProfileScalarsOrEnums({ seq }: {
     };
 }
 
-function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: ProfileFactoryDefineOptions): ProfileFactoryInterface {
-    const seqKey = {};
-    const getSeq = () => getSequenceCounter(seqKey);
-    const screen = createScreener("Profile", modelFieldDefinitions);
-    const build = async (inputData: Partial<Prisma.ProfileCreateInput> = {}) => {
-        const seq = getSeq();
-        const requiredScalarData = autoGenerateProfileScalarsOrEnums({ seq });
-        const resolveValue = normalizeResolver<ProfileFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
-        const defaultData = await resolveValue({ seq });
-        const defaultAssociations = {
-            user: isProfileuserFactory(defaultData.user) ? {
-                create: await defaultData.user.build()
-            } : defaultData.user
+function defineProfileFactoryInternal<TOptions extends ProfileFactoryDefineOptions>({ defaultData: defaultDataResolver, traits: traitsDefs = {} }: TOptions): ProfileFactoryInterface<TOptions> {
+    const getFactoryWithTraits = (traitKeys: readonly ProfileTraitKeys<TOptions>[] = []) => {
+        const seqKey = {};
+        const getSeq = () => getSequenceCounter(seqKey);
+        const screen = createScreener("Profile", modelFieldDefinitions);
+        const build = async (inputData: Partial<Prisma.ProfileCreateInput> = {}) => {
+            const seq = getSeq();
+            const requiredScalarData = autoGenerateProfileScalarsOrEnums({ seq });
+            const resolveValue = normalizeResolver<ProfileFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+            const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
+                const acc = await queue;
+                const resolveTraitValue = normalizeResolver<Partial<ProfileFactoryDefineInput>, BuildDataOptions>(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue({ seq });
+                return {
+                    ...acc,
+                    ...traitData,
+                };
+            }, resolveValue({ seq }));
+            const defaultAssociations = {
+                user: isProfileuserFactory(defaultData.user) ? {
+                    create: await defaultData.user.build()
+                } : defaultData.user
+            };
+            const data: Prisma.ProfileCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            return data;
         };
-        const data: Prisma.ProfileCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-        return data;
+        const buildList = (inputData: number | readonly Partial<Prisma.ProfileCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
+        const pickForConnect = (inputData: Profile) => ({
+            id: inputData.id
+        });
+        const create = async (inputData: Partial<Prisma.ProfileCreateInput> = {}) => {
+            const data = await build(inputData).then(screen);
+            return await getClient<PrismaClient>().profile.create({ data });
+        };
+        const createList = (inputData: number | readonly Partial<Prisma.ProfileCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
+        const createForConnect = (inputData: Partial<Prisma.ProfileCreateInput> = {}) => create(inputData).then(pickForConnect);
+        return {
+            _factoryFor: "Profile" as const,
+            build,
+            buildList,
+            buildCreateInput: build,
+            pickForConnect,
+            create,
+            createList,
+            createForConnect,
+        };
     };
-    const buildList = (inputData: number | readonly Partial<Prisma.ProfileCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
-    const pickForConnect = (inputData: Profile) => ({
-        id: inputData.id
-    });
-    const create = async (inputData: Partial<Prisma.ProfileCreateInput> = {}) => {
-        const data = await build(inputData).then(screen);
-        return await getClient<PrismaClient>().profile.create({ data });
+    const factory = getFactoryWithTraits();
+    const traits = (name: ProfileTraitKeys<TOptions>, ...names: readonly ProfileTraitKeys<TOptions>[]) => {
+        return getFactoryWithTraits([name, ...names]);
     };
-    const createList = (inputData: number | readonly Partial<Prisma.ProfileCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
-    const createForConnect = (inputData: Partial<Prisma.ProfileCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
-        _factoryFor: "Profile" as const,
-        build,
-        buildList,
-        buildCreateInput: build,
-        pickForConnect,
-        create,
-        createList,
-        createForConnect,
+        ...factory,
+        traits,
     };
 }
 
@@ -204,6 +262,6 @@ function defineProfileFactoryInternal({ defaultData: defaultDataResolver }: Prof
  * @param options
  * @returns factory {@link ProfileFactoryInterface}
  */
-export function defineProfileFactory(options: ProfileFactoryDefineOptions): ProfileFactoryInterface {
+export function defineProfileFactory<TOptions extends ProfileFactoryDefineOptions>(options: TOptions): ProfileFactoryInterface<TOptions> {
     return defineProfileFactoryInternal(options);
 }

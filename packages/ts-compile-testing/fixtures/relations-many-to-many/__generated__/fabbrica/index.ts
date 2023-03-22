@@ -38,9 +38,16 @@ type PostFactoryDefineInput = {
 
 type PostFactoryDefineOptions = {
     defaultData?: Resolver<PostFactoryDefineInput, BuildDataOptions>;
+    traits?: {
+        [traitName: string | symbol]: {
+            data: Resolver<Partial<PostFactoryDefineInput>, BuildDataOptions>;
+        };
+    };
 };
 
-export interface PostFactoryInterface {
+type PostTraitKeys<TOptions extends PostFactoryDefineOptions> = keyof TOptions["traits"];
+
+export interface PostFactoryInterfaceWithoutTraits {
     readonly _factoryFor: "Post";
     build(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
@@ -49,6 +56,10 @@ export interface PostFactoryInterface {
     create(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Post>;
     createList(inputData: number | readonly Partial<Prisma.PostCreateInput>[]): PromiseLike<Post[]>;
     createForConnect(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Pick<Post, "id">>;
+}
+
+export interface PostFactoryInterface<TOptions extends PostFactoryDefineOptions = PostFactoryDefineOptions> extends PostFactoryInterfaceWithoutTraits {
+    traits(name: PostTraitKeys<TOptions>, ...names: readonly PostTraitKeys<TOptions>[]): PostFactoryInterfaceWithoutTraits;
 }
 
 function autoGeneratePostScalarsOrEnums({ seq }: {
@@ -60,38 +71,56 @@ function autoGeneratePostScalarsOrEnums({ seq }: {
     };
 }
 
-function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFactoryDefineOptions): PostFactoryInterface {
-    const seqKey = {};
-    const getSeq = () => getSequenceCounter(seqKey);
-    const screen = createScreener("Post", modelFieldDefinitions);
-    const build = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
-        const seq = getSeq();
-        const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
-        const resolveValue = normalizeResolver<PostFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
-        const defaultData = await resolveValue({ seq });
-        const defaultAssociations = {};
-        const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-        return data;
+function definePostFactoryInternal<TOptions extends PostFactoryDefineOptions>({ defaultData: defaultDataResolver, traits: traitsDefs = {} }: TOptions): PostFactoryInterface<TOptions> {
+    const getFactoryWithTraits = (traitKeys: readonly PostTraitKeys<TOptions>[] = []) => {
+        const seqKey = {};
+        const getSeq = () => getSequenceCounter(seqKey);
+        const screen = createScreener("Post", modelFieldDefinitions);
+        const build = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
+            const seq = getSeq();
+            const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
+            const resolveValue = normalizeResolver<PostFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+            const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
+                const acc = await queue;
+                const resolveTraitValue = normalizeResolver<Partial<PostFactoryDefineInput>, BuildDataOptions>(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue({ seq });
+                return {
+                    ...acc,
+                    ...traitData,
+                };
+            }, resolveValue({ seq }));
+            const defaultAssociations = {};
+            const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            return data;
+        };
+        const buildList = (inputData: number | readonly Partial<Prisma.PostCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
+        const pickForConnect = (inputData: Post) => ({
+            id: inputData.id
+        });
+        const create = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
+            const data = await build(inputData).then(screen);
+            return await getClient<PrismaClient>().post.create({ data });
+        };
+        const createList = (inputData: number | readonly Partial<Prisma.PostCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
+        const createForConnect = (inputData: Partial<Prisma.PostCreateInput> = {}) => create(inputData).then(pickForConnect);
+        return {
+            _factoryFor: "Post" as const,
+            build,
+            buildList,
+            buildCreateInput: build,
+            pickForConnect,
+            create,
+            createList,
+            createForConnect,
+        };
     };
-    const buildList = (inputData: number | readonly Partial<Prisma.PostCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
-    const pickForConnect = (inputData: Post) => ({
-        id: inputData.id
-    });
-    const create = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
-        const data = await build(inputData).then(screen);
-        return await getClient<PrismaClient>().post.create({ data });
+    const factory = getFactoryWithTraits();
+    const traits = (name: PostTraitKeys<TOptions>, ...names: readonly PostTraitKeys<TOptions>[]) => {
+        return getFactoryWithTraits([name, ...names]);
     };
-    const createList = (inputData: number | readonly Partial<Prisma.PostCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
-    const createForConnect = (inputData: Partial<Prisma.PostCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
-        _factoryFor: "Post" as const,
-        build,
-        buildList,
-        buildCreateInput: build,
-        pickForConnect,
-        create,
-        createList,
-        createForConnect,
+        ...factory,
+        traits,
     };
 }
 
@@ -101,8 +130,8 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver }: PostFac
  * @param options
  * @returns factory {@link PostFactoryInterface}
  */
-export function definePostFactory(options: PostFactoryDefineOptions = {}): PostFactoryInterface {
-    return definePostFactoryInternal(options);
+export function definePostFactory<TOptions extends PostFactoryDefineOptions>(options?: TOptions): PostFactoryInterface<TOptions> {
+    return definePostFactoryInternal(options ?? {});
 }
 
 type CategoryScalarOrEnumFields = {
@@ -118,9 +147,16 @@ type CategoryFactoryDefineInput = {
 
 type CategoryFactoryDefineOptions = {
     defaultData?: Resolver<CategoryFactoryDefineInput, BuildDataOptions>;
+    traits?: {
+        [traitName: string | symbol]: {
+            data: Resolver<Partial<CategoryFactoryDefineInput>, BuildDataOptions>;
+        };
+    };
 };
 
-export interface CategoryFactoryInterface {
+type CategoryTraitKeys<TOptions extends CategoryFactoryDefineOptions> = keyof TOptions["traits"];
+
+export interface CategoryFactoryInterfaceWithoutTraits {
     readonly _factoryFor: "Category";
     build(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Prisma.CategoryCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Prisma.CategoryCreateInput>;
@@ -129,6 +165,10 @@ export interface CategoryFactoryInterface {
     create(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Category>;
     createList(inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]): PromiseLike<Category[]>;
     createForConnect(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Pick<Category, "id">>;
+}
+
+export interface CategoryFactoryInterface<TOptions extends CategoryFactoryDefineOptions = CategoryFactoryDefineOptions> extends CategoryFactoryInterfaceWithoutTraits {
+    traits(name: CategoryTraitKeys<TOptions>, ...names: readonly CategoryTraitKeys<TOptions>[]): CategoryFactoryInterfaceWithoutTraits;
 }
 
 function autoGenerateCategoryScalarsOrEnums({ seq }: {
@@ -140,38 +180,56 @@ function autoGenerateCategoryScalarsOrEnums({ seq }: {
     };
 }
 
-function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: CategoryFactoryDefineOptions): CategoryFactoryInterface {
-    const seqKey = {};
-    const getSeq = () => getSequenceCounter(seqKey);
-    const screen = createScreener("Category", modelFieldDefinitions);
-    const build = async (inputData: Partial<Prisma.CategoryCreateInput> = {}) => {
-        const seq = getSeq();
-        const requiredScalarData = autoGenerateCategoryScalarsOrEnums({ seq });
-        const resolveValue = normalizeResolver<CategoryFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
-        const defaultData = await resolveValue({ seq });
-        const defaultAssociations = {};
-        const data: Prisma.CategoryCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-        return data;
+function defineCategoryFactoryInternal<TOptions extends CategoryFactoryDefineOptions>({ defaultData: defaultDataResolver, traits: traitsDefs = {} }: TOptions): CategoryFactoryInterface<TOptions> {
+    const getFactoryWithTraits = (traitKeys: readonly CategoryTraitKeys<TOptions>[] = []) => {
+        const seqKey = {};
+        const getSeq = () => getSequenceCounter(seqKey);
+        const screen = createScreener("Category", modelFieldDefinitions);
+        const build = async (inputData: Partial<Prisma.CategoryCreateInput> = {}) => {
+            const seq = getSeq();
+            const requiredScalarData = autoGenerateCategoryScalarsOrEnums({ seq });
+            const resolveValue = normalizeResolver<CategoryFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+            const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
+                const acc = await queue;
+                const resolveTraitValue = normalizeResolver<Partial<CategoryFactoryDefineInput>, BuildDataOptions>(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue({ seq });
+                return {
+                    ...acc,
+                    ...traitData,
+                };
+            }, resolveValue({ seq }));
+            const defaultAssociations = {};
+            const data: Prisma.CategoryCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            return data;
+        };
+        const buildList = (inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
+        const pickForConnect = (inputData: Category) => ({
+            id: inputData.id
+        });
+        const create = async (inputData: Partial<Prisma.CategoryCreateInput> = {}) => {
+            const data = await build(inputData).then(screen);
+            return await getClient<PrismaClient>().category.create({ data });
+        };
+        const createList = (inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
+        const createForConnect = (inputData: Partial<Prisma.CategoryCreateInput> = {}) => create(inputData).then(pickForConnect);
+        return {
+            _factoryFor: "Category" as const,
+            build,
+            buildList,
+            buildCreateInput: build,
+            pickForConnect,
+            create,
+            createList,
+            createForConnect,
+        };
     };
-    const buildList = (inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
-    const pickForConnect = (inputData: Category) => ({
-        id: inputData.id
-    });
-    const create = async (inputData: Partial<Prisma.CategoryCreateInput> = {}) => {
-        const data = await build(inputData).then(screen);
-        return await getClient<PrismaClient>().category.create({ data });
+    const factory = getFactoryWithTraits();
+    const traits = (name: CategoryTraitKeys<TOptions>, ...names: readonly CategoryTraitKeys<TOptions>[]) => {
+        return getFactoryWithTraits([name, ...names]);
     };
-    const createList = (inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
-    const createForConnect = (inputData: Partial<Prisma.CategoryCreateInput> = {}) => create(inputData).then(pickForConnect);
     return {
-        _factoryFor: "Category" as const,
-        build,
-        buildList,
-        buildCreateInput: build,
-        pickForConnect,
-        create,
-        createList,
-        createForConnect,
+        ...factory,
+        traits,
     };
 }
 
@@ -181,6 +239,6 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }: Cat
  * @param options
  * @returns factory {@link CategoryFactoryInterface}
  */
-export function defineCategoryFactory(options: CategoryFactoryDefineOptions = {}): CategoryFactoryInterface {
-    return defineCategoryFactoryInternal(options);
+export function defineCategoryFactory<TOptions extends CategoryFactoryDefineOptions>(options?: TOptions): CategoryFactoryInterface<TOptions> {
+    return defineCategoryFactoryInternal(options ?? {});
 }
