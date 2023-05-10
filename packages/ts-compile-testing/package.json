@@ -10,7 +10,7 @@
     "test:ci": "tsc"
   },
   "devDependencies": {
-    "@prisma/internals": "4.13.0",
+    "@prisma/internals": "4.14.0",
     "ts-node": "10.9.1",
     "typescript": "*"
   }
