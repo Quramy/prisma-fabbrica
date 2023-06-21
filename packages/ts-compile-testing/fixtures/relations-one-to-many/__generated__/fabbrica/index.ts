@@ -80,7 +80,7 @@ export interface UserFactoryInterfaceWithoutTraits {
 }
 
 export interface UserFactoryInterface<TOptions extends UserFactoryDefineOptions = UserFactoryDefineOptions> extends UserFactoryInterfaceWithoutTraits {
-    traits(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits;
+    use(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits;
 }
 
 function autoGenerateUserScalarsOrEnums({ seq }: {
@@ -136,12 +136,12 @@ function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ 
         };
     };
     const factory = getFactoryWithTraits();
-    const traits = (name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]) => {
+    const useTraits = (name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]) => {
         return getFactoryWithTraits([name, ...names]);
     };
     return {
         ...factory,
-        traits,
+        use: useTraits,
     };
 }
 
@@ -199,7 +199,7 @@ export interface PostFactoryInterfaceWithoutTraits {
 }
 
 export interface PostFactoryInterface<TOptions extends PostFactoryDefineOptions = PostFactoryDefineOptions> extends PostFactoryInterfaceWithoutTraits {
-    traits(name: PostTraitKeys<TOptions>, ...names: readonly PostTraitKeys<TOptions>[]): PostFactoryInterfaceWithoutTraits;
+    use(name: PostTraitKeys<TOptions>, ...names: readonly PostTraitKeys<TOptions>[]): PostFactoryInterfaceWithoutTraits;
 }
 
 function autoGeneratePostScalarsOrEnums({ seq }: {
@@ -259,12 +259,12 @@ function definePostFactoryInternal<TOptions extends PostFactoryDefineOptions>({ 
         };
     };
     const factory = getFactoryWithTraits();
-    const traits = (name: PostTraitKeys<TOptions>, ...names: readonly PostTraitKeys<TOptions>[]) => {
+    const useTraits = (name: PostTraitKeys<TOptions>, ...names: readonly PostTraitKeys<TOptions>[]) => {
         return getFactoryWithTraits([name, ...names]);
     };
     return {
         ...factory,
-        traits,
+        use: useTraits,
     };
 }
 
@@ -331,7 +331,7 @@ export interface ReviewFactoryInterfaceWithoutTraits {
 }
 
 export interface ReviewFactoryInterface<TOptions extends ReviewFactoryDefineOptions = ReviewFactoryDefineOptions> extends ReviewFactoryInterfaceWithoutTraits {
-    traits(name: ReviewTraitKeys<TOptions>, ...names: readonly ReviewTraitKeys<TOptions>[]): ReviewFactoryInterfaceWithoutTraits;
+    use(name: ReviewTraitKeys<TOptions>, ...names: readonly ReviewTraitKeys<TOptions>[]): ReviewFactoryInterfaceWithoutTraits;
 }
 
 function autoGenerateReviewScalarsOrEnums({ seq }: {
@@ -394,12 +394,12 @@ function defineReviewFactoryInternal<TOptions extends ReviewFactoryDefineOptions
         };
     };
     const factory = getFactoryWithTraits();
-    const traits = (name: ReviewTraitKeys<TOptions>, ...names: readonly ReviewTraitKeys<TOptions>[]) => {
+    const useTraits = (name: ReviewTraitKeys<TOptions>, ...names: readonly ReviewTraitKeys<TOptions>[]) => {
         return getFactoryWithTraits([name, ...names]);
     };
     return {
         ...factory,
-        traits,
+        use: useTraits,
     };
 }
 
