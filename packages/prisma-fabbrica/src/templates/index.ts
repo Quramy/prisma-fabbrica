@@ -217,11 +217,21 @@ export const modelFactoryDefineOptions = (modelName: string, isOpionalDefaultDat
     ? template.statement<ts.TypeAliasDeclaration>`
         type MODEL_FACTORY_DEFINE_OPTIONS = {
           defaultData?: Resolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions>;
+          traits?: {
+            [traitName: string | symbol]: { 
+              data: Resolver<Partial<MODEL_FACTORY_DEFINE_INPUT>, BuildDataOptions>;
+            }
+          };
         };
       `
     : template.statement<ts.TypeAliasDeclaration>`
         type MODEL_FACTORY_DEFINE_OPTIONS = {
           defaultData: Resolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions>;
+          traits?: {
+            [traitName: string | symbol]: { 
+              data: Resolver<Partial<MODEL_FACTORY_DEFINE_INPUT>, BuildDataOptions>;
+            }
+          };
         };
       `;
   return compiled({
@@ -230,9 +240,17 @@ export const modelFactoryDefineOptions = (modelName: string, isOpionalDefaultDat
   });
 };
 
-export const modelFactoryInterface = (model: DMMF.Model) =>
+export const modelTraitKeys = (model: DMMF.Model) =>
   template.statement`
-    export interface MODEL_FACTORY_INTERFACE {
+    type MODEL_TRAIT_KEYS<TOptions extends MODEL_FACTORY_DEFINE_OPTIONS> = keyof TOptions["traits"];
+  `({
+    MODEL_TRAIT_KEYS: ast.identifier(`${model.name}TraitKeys`),
+    MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
+  });
+
+export const modelFactoryInterfaceWithoutTraits = (model: DMMF.Model) =>
+  template.statement`
+    export interface MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS {
       readonly _factoryFor: ${() => ast.literalTypeNode(ast.stringLiteral(model.name))}
       build(inputData?: Partial<Prisma.MODEL_CREATE_INPUT>): PromiseLike<Prisma.MODEL_CREATE_INPUT>
       buildCreateInput(inputData?: Partial<Prisma.MODEL_CREATE_INPUT>): PromiseLike<Prisma.MODEL_CREATE_INPUT>
@@ -244,11 +262,23 @@ export const modelFactoryInterface = (model: DMMF.Model) =>
     }
   `({
     MODEL_TYPE: ast.identifier(model.name),
-    MODEL_FACTORY_INTERFACE: ast.identifier(`${model.name}FactoryInterface`),
+    MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS: ast.identifier(`${model.name}FactoryInterfaceWithoutTraits`),
     MODEL_CREATE_INPUT: ast.identifier(`${model.name}CreateInput`),
     MODEL_ID_COLS: ast.unionTypeNode(
       getIdFieldNames(model).map(fieldName => ast.literalTypeNode(ast.stringLiteral(fieldName))),
     ),
+  });
+
+export const modelFactoryInterface = (model: DMMF.Model) =>
+  template.statement`
+    export interface MODEL_FACTORY_INTERFACE<TOptions extends MODEL_FACTORY_DEFINE_OPTIONS = MODEL_FACTORY_DEFINE_OPTIONS>  extends MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS {
+      use(name: MODEL_TRAIT_KEYS<TOptions>, ...names: readonly MODEL_TRAIT_KEYS<TOptions>[]): MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS;
+    }
+  `({
+    MODEL_FACTORY_INTERFACE: ast.identifier(`${model.name}FactoryInterface`),
+    MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS: ast.identifier(`${model.name}FactoryInterfaceWithoutTraits`),
+    MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
+    MODEL_TRAIT_KEYS: ast.identifier(`${model.name}TraitKeys`),
   });
 
 export const isModelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF.Model) => {
@@ -311,82 +341,101 @@ export const autoGenerateModelScalarsOrEnums = (
 
 export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.InputType) =>
   template.statement<ts.FunctionDeclaration>`
-    function DEFINE_MODEL_FACTORY_INTERNAL({
-      defaultData: defaultDataResolver
-    }: MODEL_FACTORY_DEFINE_OPTIONS): MODEL_FACTORY_INTERFACE {
+    function DEFINE_MODEL_FACTORY_INTERNAL<TOptions extends MODEL_FACTORY_DEFINE_OPTIONS>({
+      defaultData: defaultDataResolver,
+      traits: traitsDefs = {}
+    }: TOptions): MODEL_FACTORY_INTERFACE<TOptions> {
+      const getFactoryWithTraits = (traitKeys: readonly MODEL_TRAIT_KEYS<TOptions>[] = []) => {
+        const seqKey = {};
+        const getSeq = () => getSequenceCounter(seqKey);
+        const screen = createScreener(${() => ast.stringLiteral(model.name)}, modelFieldDefinitions);
 
-      const seqKey = {};
-      const getSeq = () => getSequenceCounter(seqKey);
-      const screen = createScreener(${() => ast.stringLiteral(model.name)}, modelFieldDefinitions);
-
-      const build = async (
-        inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
-      ) => {
-        const seq = getSeq();
-        const requiredScalarData = AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS({ seq })
-        const resolveValue = normalizeResolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions>(defaultDataResolver ?? {});
-        const defaultData = await resolveValue({ seq });
-        const defaultAssociations = ${() =>
-          ast.objectLiteralExpression(
-            filterBelongsToField(model, inputType).map(field =>
-              ast.propertyAssignment(
-                field.name,
-                template.expression`
-                  IS_MODEL_BELONGS_TO_RELATION_FACTORY(defaultData.FIELD_NAME) ? {
-                    create: await defaultData.FIELD_NAME.build()
-                  } : defaultData.FIELD_NAME
-                `({
-                  IS_MODEL_BELONGS_TO_RELATION_FACTORY: ast.identifier(`is${model.name}${field.name}Factory`),
-                  FIELD_NAME: ast.identifier(field.name),
-                }),
+        const build = async (
+          inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
+        ) => {
+          const seq = getSeq();
+          const requiredScalarData = AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS({ seq });
+          const resolveValue = normalizeResolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions>(defaultDataResolver ?? {});
+          const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
+            const acc = await queue;
+            const resolveTraitValue = normalizeResolver<Partial<MODEL_FACTORY_DEFINE_INPUT>, BuildDataOptions>(traitsDefs[traitKey]?.data ?? {});
+            const traitData = await resolveTraitValue({ seq });
+            return {
+              ...acc,
+              ...traitData,
+            };
+          }, resolveValue({ seq });
+          const defaultAssociations = ${() =>
+            ast.objectLiteralExpression(
+              filterBelongsToField(model, inputType).map(field =>
+                ast.propertyAssignment(
+                  field.name,
+                  template.expression`
+                    IS_MODEL_BELONGS_TO_RELATION_FACTORY(defaultData.FIELD_NAME) ? {
+                      create: await defaultData.FIELD_NAME.build()
+                    } : defaultData.FIELD_NAME
+                  `({
+                    IS_MODEL_BELONGS_TO_RELATION_FACTORY: ast.identifier(`is${model.name}${field.name}Factory`),
+                    FIELD_NAME: ast.identifier(field.name),
+                  }),
+                ),
               ),
-            ),
-            true,
-          )};
-        const data: Prisma.MODEL_CREATE_INPUT = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData};
-        return data;
+              true,
+            )};
+          const data: Prisma.MODEL_CREATE_INPUT = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData};
+          return data;
+        };
+
+        const buildList = (
+          inputData: number | readonly Partial<Prisma.MODEL_CREATE_INPUT>[]
+        ) => Promise.all(normalizeList(inputData).map(data => build(data)));
+
+        const pickForConnect = (inputData: ${() => ast.typeReferenceNode(model.name)}) => (
+          ${() =>
+            ast.objectLiteralExpression(
+              getIdFieldNames(model).map(fieldName =>
+                ast.propertyAssignment(fieldName, template.expression`inputData.${() => ast.identifier(fieldName)}`()),
+              ),
+              true,
+            )}
+        );
+
+        const create = async (
+          inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
+        ) => {
+          const data = await build(inputData).then(screen);
+          return await getClient<PrismaClient>().MODEL_KEY.create({ data });
+        };
+
+        const createList = (
+          inputData: number | readonly Partial<Prisma.MODEL_CREATE_INPUT>[]
+        ) => Promise.all(normalizeList(inputData).map(data => create(data)));
+
+        const createForConnect = (inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}) => create(inputData).then(pickForConnect);
+
+        return {
+          _factoryFor: ${() => ast.stringLiteral(model.name)} as const,
+          build,
+          buildList,
+          buildCreateInput: build,
+          pickForConnect,
+          create,
+          createList,
+          createForConnect,
+        };
       };
-
-      const buildList = (
-        inputData: number | readonly Partial<Prisma.MODEL_CREATE_INPUT>[]
-      ) => Promise.all(normalizeList(inputData).map(data => build(data)));
-
-      const pickForConnect = (inputData: ${() => ast.typeReferenceNode(model.name)}) => (
-        ${() =>
-          ast.objectLiteralExpression(
-            getIdFieldNames(model).map(fieldName =>
-              ast.propertyAssignment(fieldName, template.expression`inputData.${() => ast.identifier(fieldName)}`()),
-            ),
-            true,
-          )}
-      );
-
-      const create = async (
-        inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
-      ) => {
-        const data = await build(inputData).then(screen);
-        return await getClient<PrismaClient>().MODEL_KEY.create({ data });
+      const factory = getFactoryWithTraits();
+      const useTraits = (name: MODEL_TRAIT_KEYS<TOptions>, ...names: readonly MODEL_TRAIT_KEYS<TOptions>[]) => {
+        return getFactoryWithTraits([name, ...names]);
       };
-
-      const createList = (
-        inputData: number | readonly Partial<Prisma.MODEL_CREATE_INPUT>[]
-      ) => Promise.all(normalizeList(inputData).map(data => create(data)));
-
-      const createForConnect = (inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}) => create(inputData).then(pickForConnect);
-
       return {
-        _factoryFor: ${() => ast.stringLiteral(model.name)} as const,
-        build,
-        buildList,
-        buildCreateInput: build,
-        pickForConnect,
-        create,
-        createList,
-        createForConnect,
+        ...factory,
+        use: useTraits,
       };
     }
   `({
     MODEL_KEY: ast.identifier(camelize(model.name)),
+    MODEL_TRAIT_KEYS: ast.identifier(`${model.name}TraitKeys`),
     DEFINE_MODEL_FACTORY_INTERNAL: ast.identifier(`define${model.name}FactoryInternal`),
     MODEL_FACTORY_INTERFACE: ast.identifier(`${model.name}FactoryInterface`),
     MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${model.name}FactoryDefineInput`),
@@ -398,13 +447,13 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
 export const defineModelFactory = (model: DMMF.Model, inputType: DMMF.InputType) => {
   const compiled = filterRequiredInputObjectTypeField(inputType).length
     ? template.statement<ts.FunctionDeclaration>`
-        export function DEFINE_MODEL_FACTORY(options: MODEL_FACTORY_DEFINE_OPTIONS): MODEL_FACTORY_INTERFACE {
+        export function DEFINE_MODEL_FACTORY<TOptions extends MODEL_FACTORY_DEFINE_OPTIONS>(options: TOptions): MODEL_FACTORY_INTERFACE<TOptions> {
           return DEFINE_MODEL_FACTORY_INTERNAL(options);
         }
       `
     : template.statement<ts.FunctionDeclaration>`
-        export function DEFINE_MODEL_FACTORY(options: MODEL_FACTORY_DEFINE_OPTIONS = {}): MODEL_FACTORY_INTERFACE {
-          return DEFINE_MODEL_FACTORY_INTERNAL(options);
+        export function DEFINE_MODEL_FACTORY<TOptions extends MODEL_FACTORY_DEFINE_OPTIONS>(options?: TOptions): MODEL_FACTORY_INTERFACE<TOptions> {
+          return DEFINE_MODEL_FACTORY_INTERNAL(options ?? {});
         }
       `;
 
@@ -461,6 +510,8 @@ export function getSourceFile({
         modelFactoryDefineInput(model, createInputType),
         modelFactoryDefineOptions(model.name, filterRequiredInputObjectTypeField(createInputType).length === 0),
         ...filterBelongsToField(model, createInputType).map(fieldType => isModelAssociationFactory(fieldType, model)),
+        modelTraitKeys(model),
+        modelFactoryInterfaceWithoutTraits(model),
         modelFactoryInterface(model),
         autoGenerateModelScalarsOrEnums(model, createInputType, document.schema.enumTypes.model ?? []),
         defineModelFactoryInternal(model, createInputType),

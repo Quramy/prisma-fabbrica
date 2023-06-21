@@ -59,38 +59,56 @@ function autoGenerateUserScalarsOrEnums({ seq }) {
         name: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
-function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
-    const seqKey = {};
-    const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
-    const screen = (0, internal_1.createScreener)("User", modelFieldDefinitions);
-    const build = async (inputData = {}) => {
-        const seq = getSeq();
-        const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
-        const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
-        const defaultData = await resolveValue({ seq });
-        const defaultAssociations = {};
-        const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-        return data;
+function defineUserFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
+    const getFactoryWithTraits = (traitKeys = []) => {
+        const seqKey = {};
+        const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
+        const screen = (0, internal_1.createScreener)("User", modelFieldDefinitions);
+        const build = async (inputData = {}) => {
+            const seq = getSeq();
+            const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
+            const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
+                const acc = await queue;
+                const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue({ seq });
+                return {
+                    ...acc,
+                    ...traitData,
+                };
+            }, resolveValue({ seq }));
+            const defaultAssociations = {};
+            const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            return data;
+        };
+        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const pickForConnect = (inputData) => ({
+            id: inputData.id
+        });
+        const create = async (inputData = {}) => {
+            const data = await build(inputData).then(screen);
+            return await (0, internal_1.getClient)().user.create({ data });
+        };
+        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
+        return {
+            _factoryFor: "User",
+            build,
+            buildList,
+            buildCreateInput: build,
+            pickForConnect,
+            create,
+            createList,
+            createForConnect,
+        };
     };
-    const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
-    const pickForConnect = (inputData) => ({
-        id: inputData.id
-    });
-    const create = async (inputData = {}) => {
-        const data = await build(inputData).then(screen);
-        return await (0, internal_1.getClient)().user.create({ data });
+    const factory = getFactoryWithTraits();
+    const useTraits = (name, ...names) => {
+        return getFactoryWithTraits([name, ...names]);
     };
-    const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
-    const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
-        _factoryFor: "User",
-        build,
-        buildList,
-        buildCreateInput: build,
-        pickForConnect,
-        create,
-        createList,
-        createForConnect,
+        ...factory,
+        use: useTraits,
     };
 }
 /**
@@ -99,8 +117,8 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver }) {
  * @param options
  * @returns factory {@link UserFactoryInterface}
  */
-function defineUserFactory(options = {}) {
-    return defineUserFactoryInternal(options);
+function defineUserFactory(options) {
+    return defineUserFactoryInternal(options ?? {});
 }
 exports.defineUserFactory = defineUserFactory;
 function isPostauthorFactory(x) {
@@ -112,42 +130,60 @@ function autoGeneratePostScalarsOrEnums({ seq }) {
         title: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false, seq })
     };
 }
-function definePostFactoryInternal({ defaultData: defaultDataResolver }) {
-    const seqKey = {};
-    const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
-    const screen = (0, internal_1.createScreener)("Post", modelFieldDefinitions);
-    const build = async (inputData = {}) => {
-        const seq = getSeq();
-        const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
-        const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
-        const defaultData = await resolveValue({ seq });
-        const defaultAssociations = {
-            author: isPostauthorFactory(defaultData.author) ? {
-                create: await defaultData.author.build()
-            } : defaultData.author
+function definePostFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
+    const getFactoryWithTraits = (traitKeys = []) => {
+        const seqKey = {};
+        const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
+        const screen = (0, internal_1.createScreener)("Post", modelFieldDefinitions);
+        const build = async (inputData = {}) => {
+            const seq = getSeq();
+            const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
+            const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
+                const acc = await queue;
+                const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue({ seq });
+                return {
+                    ...acc,
+                    ...traitData,
+                };
+            }, resolveValue({ seq }));
+            const defaultAssociations = {
+                author: isPostauthorFactory(defaultData.author) ? {
+                    create: await defaultData.author.build()
+                } : defaultData.author
+            };
+            const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            return data;
         };
-        const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-        return data;
+        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const pickForConnect = (inputData) => ({
+            id: inputData.id
+        });
+        const create = async (inputData = {}) => {
+            const data = await build(inputData).then(screen);
+            return await (0, internal_1.getClient)().post.create({ data });
+        };
+        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
+        return {
+            _factoryFor: "Post",
+            build,
+            buildList,
+            buildCreateInput: build,
+            pickForConnect,
+            create,
+            createList,
+            createForConnect,
+        };
     };
-    const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
-    const pickForConnect = (inputData) => ({
-        id: inputData.id
-    });
-    const create = async (inputData = {}) => {
-        const data = await build(inputData).then(screen);
-        return await (0, internal_1.getClient)().post.create({ data });
+    const factory = getFactoryWithTraits();
+    const useTraits = (name, ...names) => {
+        return getFactoryWithTraits([name, ...names]);
     };
-    const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
-    const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
-        _factoryFor: "Post",
-        build,
-        buildList,
-        buildCreateInput: build,
-        pickForConnect,
-        create,
-        createList,
-        createForConnect,
+        ...factory,
+        use: useTraits,
     };
 }
 /**
@@ -172,45 +208,63 @@ function autoGenerateCommentScalarsOrEnums({ seq }) {
         body: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Comment", fieldName: "body", isId: false, isUnique: false, seq })
     };
 }
-function defineCommentFactoryInternal({ defaultData: defaultDataResolver }) {
-    const seqKey = {};
-    const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
-    const screen = (0, internal_1.createScreener)("Comment", modelFieldDefinitions);
-    const build = async (inputData = {}) => {
-        const seq = getSeq();
-        const requiredScalarData = autoGenerateCommentScalarsOrEnums({ seq });
-        const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
-        const defaultData = await resolveValue({ seq });
-        const defaultAssociations = {
-            post: isCommentpostFactory(defaultData.post) ? {
-                create: await defaultData.post.build()
-            } : defaultData.post,
-            author: isCommentauthorFactory(defaultData.author) ? {
-                create: await defaultData.author.build()
-            } : defaultData.author
+function defineCommentFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
+    const getFactoryWithTraits = (traitKeys = []) => {
+        const seqKey = {};
+        const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
+        const screen = (0, internal_1.createScreener)("Comment", modelFieldDefinitions);
+        const build = async (inputData = {}) => {
+            const seq = getSeq();
+            const requiredScalarData = autoGenerateCommentScalarsOrEnums({ seq });
+            const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
+                const acc = await queue;
+                const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue({ seq });
+                return {
+                    ...acc,
+                    ...traitData,
+                };
+            }, resolveValue({ seq }));
+            const defaultAssociations = {
+                post: isCommentpostFactory(defaultData.post) ? {
+                    create: await defaultData.post.build()
+                } : defaultData.post,
+                author: isCommentauthorFactory(defaultData.author) ? {
+                    create: await defaultData.author.build()
+                } : defaultData.author
+            };
+            const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            return data;
         };
-        const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-        return data;
+        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const pickForConnect = (inputData) => ({
+            id: inputData.id
+        });
+        const create = async (inputData = {}) => {
+            const data = await build(inputData).then(screen);
+            return await (0, internal_1.getClient)().comment.create({ data });
+        };
+        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
+        return {
+            _factoryFor: "Comment",
+            build,
+            buildList,
+            buildCreateInput: build,
+            pickForConnect,
+            create,
+            createList,
+            createForConnect,
+        };
     };
-    const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
-    const pickForConnect = (inputData) => ({
-        id: inputData.id
-    });
-    const create = async (inputData = {}) => {
-        const data = await build(inputData).then(screen);
-        return await (0, internal_1.getClient)().comment.create({ data });
+    const factory = getFactoryWithTraits();
+    const useTraits = (name, ...names) => {
+        return getFactoryWithTraits([name, ...names]);
     };
-    const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
-    const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
-        _factoryFor: "Comment",
-        build,
-        buildList,
-        buildCreateInput: build,
-        pickForConnect,
-        create,
-        createList,
-        createForConnect,
+        ...factory,
+        use: useTraits,
     };
 }
 /**
@@ -229,38 +283,56 @@ function autoGenerateCategoryScalarsOrEnums({ seq }) {
         name: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Category", fieldName: "name", isId: false, isUnique: true, seq })
     };
 }
-function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }) {
-    const seqKey = {};
-    const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
-    const screen = (0, internal_1.createScreener)("Category", modelFieldDefinitions);
-    const build = async (inputData = {}) => {
-        const seq = getSeq();
-        const requiredScalarData = autoGenerateCategoryScalarsOrEnums({ seq });
-        const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
-        const defaultData = await resolveValue({ seq });
-        const defaultAssociations = {};
-        const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-        return data;
+function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
+    const getFactoryWithTraits = (traitKeys = []) => {
+        const seqKey = {};
+        const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
+        const screen = (0, internal_1.createScreener)("Category", modelFieldDefinitions);
+        const build = async (inputData = {}) => {
+            const seq = getSeq();
+            const requiredScalarData = autoGenerateCategoryScalarsOrEnums({ seq });
+            const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
+                const acc = await queue;
+                const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue({ seq });
+                return {
+                    ...acc,
+                    ...traitData,
+                };
+            }, resolveValue({ seq }));
+            const defaultAssociations = {};
+            const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            return data;
+        };
+        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const pickForConnect = (inputData) => ({
+            id: inputData.id
+        });
+        const create = async (inputData = {}) => {
+            const data = await build(inputData).then(screen);
+            return await (0, internal_1.getClient)().category.create({ data });
+        };
+        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
+        return {
+            _factoryFor: "Category",
+            build,
+            buildList,
+            buildCreateInput: build,
+            pickForConnect,
+            create,
+            createList,
+            createForConnect,
+        };
     };
-    const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
-    const pickForConnect = (inputData) => ({
-        id: inputData.id
-    });
-    const create = async (inputData = {}) => {
-        const data = await build(inputData).then(screen);
-        return await (0, internal_1.getClient)().category.create({ data });
+    const factory = getFactoryWithTraits();
+    const useTraits = (name, ...names) => {
+        return getFactoryWithTraits([name, ...names]);
     };
-    const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
-    const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
     return {
-        _factoryFor: "Category",
-        build,
-        buildList,
-        buildCreateInput: build,
-        pickForConnect,
-        create,
-        createList,
-        createForConnect,
+        ...factory,
+        use: useTraits,
     };
 }
 /**
@@ -269,7 +341,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver }) {
  * @param options
  * @returns factory {@link CategoryFactoryInterface}
  */
-function defineCategoryFactory(options = {}) {
-    return defineCategoryFactoryInternal(options);
+function defineCategoryFactory(options) {
+    return defineCategoryFactoryInternal(options ?? {});
 }
 exports.defineCategoryFactory = defineCategoryFactory;

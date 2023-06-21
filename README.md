@@ -20,6 +20,8 @@ Prisma generator for model factories.
   - [Build input data only](#build-input-data-only)
   - [has-many / has-one relation](#has-many--has-one-relation)
   - [Custom scalar field generation](#custom-scalar-field-generation)
+  - [Traits](#traits)
+  - [Field value precedence](#field-value-precedence)
   - [More examples](#more-examples)
 - [Generator configuration](#generator-configuration)
 - [Tips](#tips)
@@ -336,6 +338,49 @@ Field type is one of `Boolean`, `String`, `Int`, `Float`, `BigInt`, `Decimal`, `
 `FieldGenerateFunction` is a function to return corresponding fieled type.
 
 See also https://github.com/Quramy/prisma-fabbrica/blob/main/packages/prisma-fabbrica/src/scalar/types.ts .
+
+### Traits
+
+Traits allow you to group fields together and apply them to factory.
+
+```ts
+const UserFactory = defineUserFactory({
+  defaultData: {
+    name: "sample user",
+  },
+  traits: {
+    withdrawal: {
+      data: {
+        name: "****",
+        status: "WITHDRAWAL",
+      },
+    },
+  },
+});
+```
+
+`traits` option accepts an object and the option object's keys are treated as the trait's name. And you can set `data` option to the each trait key. The `data` option accepts value of the same types as the `defaultData` (i.e. plain object, function, async function)
+
+And you can pass the trait's name to `UserFactory.use` function:
+
+```ts
+const deactivatedUser = await UserFactory.use("withdrawal").create();
+```
+
+Multiple traits are also available:
+
+```ts
+await UserFactory.use("someTrait", "anotherTrait").create();
+```
+
+### Field value precedence
+
+Each field is determined in the following priority order(lower numbers have higher priority):
+
+1. Factory's `.create` or `.build` function's argument
+1. The applied trait's `data` entry
+1. Factories `defaultData` entry
+1. Value derived from `registerScalarFieldValueGenerator` if the field is required scalar(or enum)
 
 ### More examples
 
