@@ -59,7 +59,7 @@ export interface PostFactoryInterfaceWithoutTraits {
 }
 
 export interface PostFactoryInterface<TOptions extends PostFactoryDefineOptions = PostFactoryDefineOptions> extends PostFactoryInterfaceWithoutTraits {
-    traits(name: PostTraitKeys<TOptions>, ...names: readonly PostTraitKeys<TOptions>[]): PostFactoryInterfaceWithoutTraits;
+    use(name: PostTraitKeys<TOptions>, ...names: readonly PostTraitKeys<TOptions>[]): PostFactoryInterfaceWithoutTraits;
 }
 
 function autoGeneratePostScalarsOrEnums({ seq }: {
@@ -115,12 +115,12 @@ function definePostFactoryInternal<TOptions extends PostFactoryDefineOptions>({ 
         };
     };
     const factory = getFactoryWithTraits();
-    const traits = (name: PostTraitKeys<TOptions>, ...names: readonly PostTraitKeys<TOptions>[]) => {
+    const useTraits = (name: PostTraitKeys<TOptions>, ...names: readonly PostTraitKeys<TOptions>[]) => {
         return getFactoryWithTraits([name, ...names]);
     };
     return {
         ...factory,
-        traits,
+        use: useTraits,
     };
 }
 
@@ -168,7 +168,7 @@ export interface CategoryFactoryInterfaceWithoutTraits {
 }
 
 export interface CategoryFactoryInterface<TOptions extends CategoryFactoryDefineOptions = CategoryFactoryDefineOptions> extends CategoryFactoryInterfaceWithoutTraits {
-    traits(name: CategoryTraitKeys<TOptions>, ...names: readonly CategoryTraitKeys<TOptions>[]): CategoryFactoryInterfaceWithoutTraits;
+    use(name: CategoryTraitKeys<TOptions>, ...names: readonly CategoryTraitKeys<TOptions>[]): CategoryFactoryInterfaceWithoutTraits;
 }
 
 function autoGenerateCategoryScalarsOrEnums({ seq }: {
@@ -224,12 +224,12 @@ function defineCategoryFactoryInternal<TOptions extends CategoryFactoryDefineOpt
         };
     };
     const factory = getFactoryWithTraits();
-    const traits = (name: CategoryTraitKeys<TOptions>, ...names: readonly CategoryTraitKeys<TOptions>[]) => {
+    const useTraits = (name: CategoryTraitKeys<TOptions>, ...names: readonly CategoryTraitKeys<TOptions>[]) => {
         return getFactoryWithTraits([name, ...names]);
     };
     return {
         ...factory,
-        traits,
+        use: useTraits,
     };
 }
 

@@ -103,12 +103,12 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, traits: t
         };
     };
     const factory = getFactoryWithTraits();
-    const traits = (name, ...names) => {
+    const useTraits = (name, ...names) => {
         return getFactoryWithTraits([name, ...names]);
     };
     return {
         ...factory,
-        traits,
+        use: useTraits,
     };
 }
 /**
@@ -178,12 +178,12 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, traits: t
         };
     };
     const factory = getFactoryWithTraits();
-    const traits = (name, ...names) => {
+    const useTraits = (name, ...names) => {
         return getFactoryWithTraits([name, ...names]);
     };
     return {
         ...factory,
-        traits,
+        use: useTraits,
     };
 }
 /**
@@ -259,12 +259,12 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, traits
         };
     };
     const factory = getFactoryWithTraits();
-    const traits = (name, ...names) => {
+    const useTraits = (name, ...names) => {
         return getFactoryWithTraits([name, ...names]);
     };
     return {
         ...factory,
-        traits,
+        use: useTraits,
     };
 }
 /**
@@ -327,12 +327,12 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, trait
         };
     };
     const factory = getFactoryWithTraits();
-    const traits = (name, ...names) => {
+    const useTraits = (name, ...names) => {
         return getFactoryWithTraits([name, ...names]);
     };
     return {
         ...factory,
-        traits,
+        use: useTraits,
     };
 }
 /**

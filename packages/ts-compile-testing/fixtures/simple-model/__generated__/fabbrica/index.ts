@@ -46,7 +46,7 @@ export interface UserFactoryInterfaceWithoutTraits {
 }
 
 export interface UserFactoryInterface<TOptions extends UserFactoryDefineOptions = UserFactoryDefineOptions> extends UserFactoryInterfaceWithoutTraits {
-    traits(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits;
+    use(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits;
 }
 
 function autoGenerateUserScalarsOrEnums({ seq }: {
@@ -102,12 +102,12 @@ function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ 
         };
     };
     const factory = getFactoryWithTraits();
-    const traits = (name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]) => {
+    const useTraits = (name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]) => {
         return getFactoryWithTraits([name, ...names]);
     };
     return {
         ...factory,
-        traits,
+        use: useTraits,
     };
 }
 

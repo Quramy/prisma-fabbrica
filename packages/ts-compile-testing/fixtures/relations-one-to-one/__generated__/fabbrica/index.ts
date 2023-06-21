@@ -68,7 +68,7 @@ export interface UserFactoryInterfaceWithoutTraits {
 }
 
 export interface UserFactoryInterface<TOptions extends UserFactoryDefineOptions = UserFactoryDefineOptions> extends UserFactoryInterfaceWithoutTraits {
-    traits(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits;
+    use(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits;
 }
 
 function autoGenerateUserScalarsOrEnums({ seq }: {
@@ -128,12 +128,12 @@ function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ 
         };
     };
     const factory = getFactoryWithTraits();
-    const traits = (name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]) => {
+    const useTraits = (name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]) => {
         return getFactoryWithTraits([name, ...names]);
     };
     return {
         ...factory,
-        traits,
+        use: useTraits,
     };
 }
 
@@ -188,7 +188,7 @@ export interface ProfileFactoryInterfaceWithoutTraits {
 }
 
 export interface ProfileFactoryInterface<TOptions extends ProfileFactoryDefineOptions = ProfileFactoryDefineOptions> extends ProfileFactoryInterfaceWithoutTraits {
-    traits(name: ProfileTraitKeys<TOptions>, ...names: readonly ProfileTraitKeys<TOptions>[]): ProfileFactoryInterfaceWithoutTraits;
+    use(name: ProfileTraitKeys<TOptions>, ...names: readonly ProfileTraitKeys<TOptions>[]): ProfileFactoryInterfaceWithoutTraits;
 }
 
 function autoGenerateProfileScalarsOrEnums({ seq }: {
@@ -247,12 +247,12 @@ function defineProfileFactoryInternal<TOptions extends ProfileFactoryDefineOptio
         };
     };
     const factory = getFactoryWithTraits();
-    const traits = (name: ProfileTraitKeys<TOptions>, ...names: readonly ProfileTraitKeys<TOptions>[]) => {
+    const useTraits = (name: ProfileTraitKeys<TOptions>, ...names: readonly ProfileTraitKeys<TOptions>[]) => {
         return getFactoryWithTraits([name, ...names]);
     };
     return {
         ...factory,
-        traits,
+        use: useTraits,
     };
 }
 

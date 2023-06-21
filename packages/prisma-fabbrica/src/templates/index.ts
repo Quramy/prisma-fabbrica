@@ -272,7 +272,7 @@ export const modelFactoryInterfaceWithoutTraits = (model: DMMF.Model) =>
 export const modelFactoryInterface = (model: DMMF.Model) =>
   template.statement`
     export interface MODEL_FACTORY_INTERFACE<TOptions extends MODEL_FACTORY_DEFINE_OPTIONS = MODEL_FACTORY_DEFINE_OPTIONS>  extends MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS {
-      traits(name: MODEL_TRAIT_KEYS<TOptions>, ...names: readonly MODEL_TRAIT_KEYS<TOptions>[]): MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS;
+      use(name: MODEL_TRAIT_KEYS<TOptions>, ...names: readonly MODEL_TRAIT_KEYS<TOptions>[]): MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS;
     }
   `({
     MODEL_FACTORY_INTERFACE: ast.identifier(`${model.name}FactoryInterface`),
@@ -425,12 +425,12 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
         };
       };
       const factory = getFactoryWithTraits();
-      const traits = (name: MODEL_TRAIT_KEYS<TOptions>, ...names: readonly MODEL_TRAIT_KEYS<TOptions>[]) => {
+      const useTraits = (name: MODEL_TRAIT_KEYS<TOptions>, ...names: readonly MODEL_TRAIT_KEYS<TOptions>[]) => {
         return getFactoryWithTraits([name, ...names]);
       };
       return {
         ...factory,
-        traits,
+        use: useTraits,
       };
     }
   `({

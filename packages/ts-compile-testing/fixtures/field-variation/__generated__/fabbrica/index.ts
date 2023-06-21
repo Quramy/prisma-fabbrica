@@ -63,7 +63,7 @@ export interface UserFactoryInterfaceWithoutTraits {
 }
 
 export interface UserFactoryInterface<TOptions extends UserFactoryDefineOptions = UserFactoryDefineOptions> extends UserFactoryInterfaceWithoutTraits {
-    traits(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits;
+    use(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits;
 }
 
 function autoGenerateUserScalarsOrEnums({ seq }: {
@@ -119,12 +119,12 @@ function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ 
         };
     };
     const factory = getFactoryWithTraits();
-    const traits = (name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]) => {
+    const useTraits = (name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]) => {
         return getFactoryWithTraits([name, ...names]);
     };
     return {
         ...factory,
-        traits,
+        use: useTraits,
     };
 }
 
@@ -171,7 +171,7 @@ export interface ComplexIdModelFactoryInterfaceWithoutTraits {
 }
 
 export interface ComplexIdModelFactoryInterface<TOptions extends ComplexIdModelFactoryDefineOptions = ComplexIdModelFactoryDefineOptions> extends ComplexIdModelFactoryInterfaceWithoutTraits {
-    traits(name: ComplexIdModelTraitKeys<TOptions>, ...names: readonly ComplexIdModelTraitKeys<TOptions>[]): ComplexIdModelFactoryInterfaceWithoutTraits;
+    use(name: ComplexIdModelTraitKeys<TOptions>, ...names: readonly ComplexIdModelTraitKeys<TOptions>[]): ComplexIdModelFactoryInterfaceWithoutTraits;
 }
 
 function autoGenerateComplexIdModelScalarsOrEnums({ seq }: {
@@ -228,12 +228,12 @@ function defineComplexIdModelFactoryInternal<TOptions extends ComplexIdModelFact
         };
     };
     const factory = getFactoryWithTraits();
-    const traits = (name: ComplexIdModelTraitKeys<TOptions>, ...names: readonly ComplexIdModelTraitKeys<TOptions>[]) => {
+    const useTraits = (name: ComplexIdModelTraitKeys<TOptions>, ...names: readonly ComplexIdModelTraitKeys<TOptions>[]) => {
         return getFactoryWithTraits([name, ...names]);
     };
     return {
         ...factory,
-        traits,
+        use: useTraits,
     };
 }
 
@@ -304,7 +304,7 @@ export interface FieldTypePatternModelFactoryInterfaceWithoutTraits {
 }
 
 export interface FieldTypePatternModelFactoryInterface<TOptions extends FieldTypePatternModelFactoryDefineOptions = FieldTypePatternModelFactoryDefineOptions> extends FieldTypePatternModelFactoryInterfaceWithoutTraits {
-    traits(name: FieldTypePatternModelTraitKeys<TOptions>, ...names: readonly FieldTypePatternModelTraitKeys<TOptions>[]): FieldTypePatternModelFactoryInterfaceWithoutTraits;
+    use(name: FieldTypePatternModelTraitKeys<TOptions>, ...names: readonly FieldTypePatternModelTraitKeys<TOptions>[]): FieldTypePatternModelFactoryInterfaceWithoutTraits;
 }
 
 function autoGenerateFieldTypePatternModelScalarsOrEnums({ seq }: {
@@ -367,12 +367,12 @@ function defineFieldTypePatternModelFactoryInternal<TOptions extends FieldTypePa
         };
     };
     const factory = getFactoryWithTraits();
-    const traits = (name: FieldTypePatternModelTraitKeys<TOptions>, ...names: readonly FieldTypePatternModelTraitKeys<TOptions>[]) => {
+    const useTraits = (name: FieldTypePatternModelTraitKeys<TOptions>, ...names: readonly FieldTypePatternModelTraitKeys<TOptions>[]) => {
         return getFactoryWithTraits([name, ...names]);
     };
     return {
         ...factory,
-        traits,
+        use: useTraits,
     };
 }
 
@@ -417,7 +417,7 @@ export interface NoPkModelFactoryInterfaceWithoutTraits {
 }
 
 export interface NoPkModelFactoryInterface<TOptions extends NoPkModelFactoryDefineOptions = NoPkModelFactoryDefineOptions> extends NoPkModelFactoryInterfaceWithoutTraits {
-    traits(name: NoPkModelTraitKeys<TOptions>, ...names: readonly NoPkModelTraitKeys<TOptions>[]): NoPkModelFactoryInterfaceWithoutTraits;
+    use(name: NoPkModelTraitKeys<TOptions>, ...names: readonly NoPkModelTraitKeys<TOptions>[]): NoPkModelFactoryInterfaceWithoutTraits;
 }
 
 function autoGenerateNoPkModelScalarsOrEnums({ seq }: {
@@ -472,12 +472,12 @@ function defineNoPkModelFactoryInternal<TOptions extends NoPkModelFactoryDefineO
         };
     };
     const factory = getFactoryWithTraits();
-    const traits = (name: NoPkModelTraitKeys<TOptions>, ...names: readonly NoPkModelTraitKeys<TOptions>[]) => {
+    const useTraits = (name: NoPkModelTraitKeys<TOptions>, ...names: readonly NoPkModelTraitKeys<TOptions>[]) => {
         return getFactoryWithTraits([name, ...names]);
     };
     return {
         ...factory,
-        traits,
+        use: useTraits,
     };
 }
 
