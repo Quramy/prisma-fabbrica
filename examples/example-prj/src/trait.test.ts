@@ -2,13 +2,22 @@ import {
   defineUserFactory,
   definePostFactory,
   defineCommentFactory,
-  CommentFactoryInterface,
+  type CommentFactoryInterface,
+  type PostFactoryInterface,
 } from "./__generated__/fabbrica";
 
 const prisma = jestPrisma.client;
 
-export const UserFactory = defineUserFactory();
+// 'UserFactory' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+export const UserFactory = defineUserFactory({
+  defaultData: async () => ({
+    posts: {
+      connect: await PostFactory.buildList(1),
+    },
+  }),
+});
 
+// 'PostFactory' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
 export const PostFactory = definePostFactory({
   defaultData: {
     author: UserFactory,
@@ -45,6 +54,14 @@ export const CommentFactory = defineCommentFactory({
 
 function getCommentFactory(): CommentFactoryInterface {
   return CommentFactory;
+}
+
+async function hoge() {
+  UserFactory.create({
+    posts: {
+      connect: await PostFactory.buildList(1),
+    },
+  });
 }
 
 describe("factories", () => {

@@ -26,6 +26,7 @@ Prisma generator for model factories.
 - [Generator configuration](#generator-configuration)
 - [Tips](#tips)
   - [Works with jest-prisma](#works-with-jest-prisma)
+  - [Suppress TS circular dependencies error](#suppress-ts-circular-dependencies-error)
 - [License](#license)
 
 <!-- tocstop -->
@@ -423,6 +424,52 @@ export default {
 ```
 
 This script calls prisma-fabbrica's `initialize` function and configures Prisma client used from each factory to integrate to join to transaction managed by jest-prisma.
+
+### Suppress TS circular dependencies error
+
+Sometimes, factories need each other factory as the following, however TypeScript compiler emits errors via circular dependencies.
+
+```ts
+// 'UserFactory' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+export const UserFactory = defineUserFactory({
+  defaultData: async () => ({
+    posts: {
+      connect: await PostFactory.buildList(1),
+    },
+  }),
+});
+
+// 'PostFactory' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+const PostFactory = definePostFactory({
+  defaultData: {
+    author: UserFactory,
+  },
+});
+```
+
+`FactoryInterface` types are available to avoid this error.
+
+```ts
+import { defineUserFactory, definePostFactory, type UserFactoryInterface } from "./__generated__/fabbrica";
+
+const UserFactory = defineUserFactory({
+  defaultData: async () => ({
+    posts: {
+      connect: await PostFactory.buildList(1),
+    },
+  }),
+});
+
+function getUserFactory(): UserFactoryInterface {
+  return UserFactory;
+}
+
+const PostFactory = definePostFactory({
+  defaultData: {
+    author: getUserFactory(),
+  },
+});
+```
 
 ## License
 
