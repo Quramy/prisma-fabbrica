@@ -37,8 +37,8 @@
     "prepublishOnly": "cp ../../README.md ."
   },
   "dependencies": {
-    "@prisma/generator-helper": "^4.2.0",
-    "@prisma/internals": "^4.2.0",
+    "@prisma/generator-helper": "^5.0.0",
+    "@prisma/internals": "^5.0.0",
     "short-uuid": "4.2.2",
     "talt": "2.4.4"
   },
