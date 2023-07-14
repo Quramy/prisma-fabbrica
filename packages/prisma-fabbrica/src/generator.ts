@@ -70,9 +70,10 @@ generatorHandler({
     if (noTranspile) {
       await fs.writeFile(path.join(outputDirname, "index.ts"), contents, "utf8");
     } else {
+      const tsconfigOptValue = options.generator.config.tsconfig;
       const tsconfigPath = path.resolve(
         path.dirname(options.schemaPath),
-        options.generator.config.tsconfig ?? "../tsconfig.json",
+        Array.isArray(tsconfigOptValue) ? tsconfigOptValue[0] : tsconfigOptValue ?? "../tsconfig.json",
       );
       const compileOptions = readTsConfig(tsconfigPath);
       const output = compile(path.join(outputDirname, "index.ts"), contents, {
