@@ -27,6 +27,7 @@ Prisma generator for model factories.
 - [Tips](#tips)
   - [Works with jest-prisma](#works-with-jest-prisma)
   - [Suppress TS circular dependencies error](#suppress-ts-circular-dependencies-error)
+- [Version compatibility](#version-compatibility)
 - [License](#license)
 
 <!-- tocstop -->
@@ -470,6 +471,11 @@ const PostFactory = definePostFactory({
   },
 });
 ```
+
+## Version compatibility
+
+- **If your @prisma/client's version >= 5.0.0, install `@quramt/prisma-fabbrica@2.x.x`.**
+- **If your @prisma/client's version < 5.0.0, install `@quramt/prisma-fabbrica@1.x.x`.**
 
 ## License
 
