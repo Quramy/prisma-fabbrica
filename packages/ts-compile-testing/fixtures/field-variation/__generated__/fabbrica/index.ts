@@ -36,7 +36,7 @@ type UserFactoryDefineInput = {
     id?: string;
     role?: Role;
     roleDefault?: Role;
-    roles?: Prisma.UserCreaterolesInput | Prisma.Enumerable<Role>;
+    roles?: Prisma.UserCreaterolesInput | Array<Role>;
     status?: Status | null;
 };
 
@@ -263,10 +263,10 @@ type FieldTypePatternModelFactoryDefineInput = {
     id?: number;
     requiredInt?: number;
     nullableInt?: number | null;
-    enumerableInt?: Prisma.FieldTypePatternModelCreateenumerableIntInput | Prisma.Enumerable<number>;
+    enumerableInt?: Prisma.FieldTypePatternModelCreateenumerableIntInput | Array<number>;
     requiredStr?: string;
     nullableStr?: string | null;
-    enumerableStr?: Prisma.FieldTypePatternModelCreateenumerableStrInput | Prisma.Enumerable<string>;
+    enumerableStr?: Prisma.FieldTypePatternModelCreateenumerableStrInput | Array<string>;
     requiredBool?: boolean;
     nullableBool?: boolean | null;
     requiredFlaot?: number;
