@@ -9,6 +9,7 @@ describe(getClientModuleSpecifier, () => {
     { outputDirname: "dist", clientGeneratorOutputPath: "../prisma-client", expected: "../../prisma-client" },
     { outputDirname: "./dist", clientGeneratorOutputPath: "../prisma-client", expected: "../../prisma-client" },
     { outputDirname: ".\\dist", clientGeneratorOutputPath: "..\\prisma-client", expected: "../../prisma-client" },
+    { outputDirname: "dist", clientGeneratorOutputPath: "..\\..\\prisma-client", expected: "../../../prisma-client" },
   ])(
     "outputDirname: $outputDirname, clientGeneratorOutputPath: $clientGeneratorOutputPath, expected: $expected",
     ({ outputDirname, clientGeneratorOutputPath, expected }) => {
