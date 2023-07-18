@@ -158,7 +158,7 @@ export const argInputType = (model: DMMF.Model, fieldName: string, inputType: DM
     }
   };
   return inputType.isList
-    ? ast.typeReferenceNode(template.expression<ts.Identifier>`Prisma.Enumerable<${fieldType}>`())
+    ? ast.typeReferenceNode(template.expression<ts.Identifier>`Array<${fieldType}>`())
     : fieldType();
 };
 
