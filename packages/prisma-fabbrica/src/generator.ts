@@ -9,6 +9,7 @@ import { logger } from "@prisma/internals";
 
 import { getSourceFile } from "./templates";
 import { createPrinter } from "./templates/ast-tools/printer";
+import { getClientModuleSpecifier } from "./getClientModuleSpecifier";
 
 function readTsConfig(tsconfigPath: string) {
   const opt: ts.CompilerOptions = {
@@ -55,11 +56,7 @@ generatorHandler({
       return;
     }
 
-    const prismaClientModuleSpecifier = clientGeneratorOutputPath.endsWith(
-      ["node_modules", "@prisma", "client"].join(path.sep),
-    )
-      ? "@prisma/client"
-      : "./" + path.relative(outputDirname, clientGeneratorOutputPath).replace("\\", "/");
+    const prismaClientModuleSpecifier = getClientModuleSpecifier(clientGeneratorOutputPath, outputDirname);
 
     const printer = createPrinter();
     const contents = printer.print(getSourceFile({ document: options.dmmf, prismaClientModuleSpecifier }));
