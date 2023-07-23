@@ -35,7 +35,7 @@ Prisma generator for model factories.
 ## Getting started
 
 ```sh
-npm i @quramy/prisma-fabbrica --dev
+npm i @quramy/prisma-fabbrica -D
 ```
 
 Then, edit your `prisma/schema.prisma` and append the prisma-fabbrica generator configuration:
