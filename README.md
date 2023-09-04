@@ -474,8 +474,8 @@ const PostFactory = definePostFactory({
 
 ## Version compatibility
 
-- **If your @prisma/client's version >= 5.0.0, install `@quramt/prisma-fabbrica@2.x.x`.**
-- **If your @prisma/client's version < 5.0.0, install `@quramt/prisma-fabbrica@1.x.x`.**
+- **If your @prisma/client's version >= 5.0.0, install `@quramy/prisma-fabbrica@2.x.x`.**
+- **If your @prisma/client's version < 5.0.0, install `@quramy/prisma-fabbrica@1.x.x`.**
 
 ## License
 
