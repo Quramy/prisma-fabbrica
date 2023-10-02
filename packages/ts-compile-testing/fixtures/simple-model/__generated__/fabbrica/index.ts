@@ -1,6 +1,6 @@
-import type { User } from "./../client";
-import { Prisma } from "./../client";
-import type { PrismaClient } from "./../client";
+import type { User } from "../client";
+import { Prisma } from "../client";
+import type { PrismaClient } from "../client";
 import { getClient, ModelWithFields, createScreener, getScalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
 export { initialize, resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
 

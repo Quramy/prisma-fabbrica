@@ -110,7 +110,7 @@ export const modelFieldDefinitions = (models: DMMF.Model[]) =>
 export const scalarFieldType = (
   model: DMMF.Model,
   fieldName: string,
-  inputType: DMMF.SchemaArgInputType,
+  inputType: DMMF.TypeRef<"scalar">,
 ): ts.TypeNode => {
   if (inputType.location !== "scalar") {
     throw new Error("Invalid call. This function is allowed for only scalar field.");
@@ -140,10 +140,14 @@ export const scalarFieldType = (
   }
 };
 
-export const argInputType = (model: DMMF.Model, fieldName: string, inputType: DMMF.SchemaArgInputType): ts.TypeNode => {
+export const argInputType = (
+  model: DMMF.Model,
+  fieldName: string,
+  inputType: DMMF.InputTypeRef | DMMF.OutputTypeRef,
+): ts.TypeNode => {
   const fieldType = () => {
     if (inputType.location === "scalar") {
-      return scalarFieldType(model, fieldName, inputType);
+      return scalarFieldType(model, fieldName, inputType as DMMF.TypeRef<"scalar">);
     } else if (inputType.location === "enumTypes") {
       return inputType.namespace === "model"
         ? ast.typeReferenceNode(ast.identifier(inputType.type as string))
