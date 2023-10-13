@@ -65,6 +65,7 @@ describe(modelScalarOrEnumFields, () => {
       datamodel,
     });
     const inputType = findPrsimaCreateInputTypeFromModelName(dmmf, "TestModel");
+    if (!inputType) fail();
     const source = template.statement(expected)();
     expect(printNode(modelScalarOrEnumFields(dmmf.datamodel.models[0], inputType))).toBe(printNode(source).trim());
   });
@@ -84,6 +85,7 @@ describe(modelScalarOrEnumFields, () => {
         id: number;
       }
     `();
+    if (!inputType) fail();
     expect(printNode(modelScalarOrEnumFields(dmmf.datamodel.models[0], inputType))).toBe(printNode(expected).trim());
   });
 });

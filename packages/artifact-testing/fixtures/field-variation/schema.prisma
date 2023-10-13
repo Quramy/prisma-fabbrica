@@ -63,3 +63,8 @@ model FieldTypePatternModel {
 model NoPkModel {
   id Int @unique
 }
+
+model UnsupportedModel {
+  id               Int @id
+  unsupportedField Unsupported("tsvector")
+}

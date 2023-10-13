@@ -25,6 +25,9 @@ const modelFieldDefinitions: ModelWithFields[] = [{
     }, {
         name: "NoPkModel",
         fields: []
+    }, {
+        name: "UnsupportedModel",
+        fields: []
     }];
 
 type UserScalarOrEnumFields = {
