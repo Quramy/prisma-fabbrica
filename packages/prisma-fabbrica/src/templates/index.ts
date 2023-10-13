@@ -11,7 +11,10 @@ import { wrapWithTSDoc, insertLeadingBreakMarker } from "./ast-tools/comment";
 export function findPrsimaCreateInputTypeFromModelName(document: DMMF.Document, modelName: string) {
   const search = `${modelName}CreateInput`;
   const inputType = document.schema.inputObjectTypes.prisma.find(x => x.name === search);
-  if (!inputType) throw new Error(`Not found ${search}`);
+
+  // When model has field annotated with Unsupportted type, Prisma omits to output ModelCreateInput / ModelUpdateInput to DMMF.
+  if (!inputType) return null;
+
   return inputType;
 }
 
@@ -497,7 +500,9 @@ export function getSourceFile({
         ),
     ),
   ];
-  const modelNames = document.datamodel.models.map(m => m.name);
+  const modelNames = document.datamodel.models
+    .map(m => m.name)
+    .filter(modelName => findPrsimaCreateInputTypeFromModelName(document, modelName));
   const statements = [
     ...modelNames.map(modelName => importStatement(modelName, prismaClientModuleSpecifier)),
     ...modelEnums.map(enumName => importStatement(enumName, prismaClientModuleSpecifier)),
@@ -505,7 +510,11 @@ export function getSourceFile({
     insertLeadingBreakMarker(buildDataOptions()),
     insertLeadingBreakMarker(modelFieldDefinitions(document.datamodel.models)),
     ...document.datamodel.models
-      .map(model => ({ model, createInputType: findPrsimaCreateInputTypeFromModelName(document, model.name) }))
+      .reduce((acc, model) => {
+        const createInputType = findPrsimaCreateInputTypeFromModelName(document, model.name);
+        if (!createInputType) return acc;
+        return [...acc, { model, createInputType }];
+      }, [] as readonly { model: DMMF.Model; createInputType: DMMF.InputType }[])
       .flatMap(({ model, createInputType }) => [
         modelScalarOrEnumFields(model, createInputType),
         ...filterBelongsToField(model, createInputType).map(fieldType =>
