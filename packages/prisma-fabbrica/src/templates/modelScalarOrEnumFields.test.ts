@@ -1,7 +1,7 @@
 import { getDMMF } from "@prisma/internals";
 import { template, printNode } from "talt";
 
-import { modelScalarOrEnumFields, findPrsimaCreateInputTypeFromModelName } from ".";
+import { modelScalarOrEnumFields, findPrismaCreateInputTypeFromModelName } from ".";
 
 describe(modelScalarOrEnumFields, () => {
   it.each([
@@ -64,7 +64,7 @@ describe(modelScalarOrEnumFields, () => {
     const dmmf = await getDMMF({
       datamodel,
     });
-    const inputType = findPrsimaCreateInputTypeFromModelName(dmmf, "TestModel");
+    const inputType = findPrismaCreateInputTypeFromModelName(dmmf, "TestModel");
     if (!inputType) fail();
     const source = template.statement(expected)();
     expect(printNode(modelScalarOrEnumFields(dmmf.datamodel.models[0], inputType))).toBe(printNode(source).trim());
@@ -79,7 +79,7 @@ describe(modelScalarOrEnumFields, () => {
         }
       `,
     });
-    const inputType = findPrsimaCreateInputTypeFromModelName(dmmf, "TestModel");
+    const inputType = findPrismaCreateInputTypeFromModelName(dmmf, "TestModel");
     const expected = template.sourceFile`
       type TestModelScalarOrEnumFields = {
         id: number;
