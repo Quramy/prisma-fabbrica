@@ -1,7 +1,7 @@
 import { getDMMF } from "@prisma/internals";
 import { printNode } from "talt";
 
-import { autoGenerateModelScalarsOrEnumsFieldArgs, findPrsimaCreateInputTypeFromModelName } from ".";
+import { autoGenerateModelScalarsOrEnumsFieldArgs, findPrismaCreateInputTypeFromModelName } from ".";
 
 describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
   it.each([
@@ -173,7 +173,7 @@ describe(autoGenerateModelScalarsOrEnumsFieldArgs, () => {
   ])("generates expression node for $targetField", async ({ datamodel, targetField, expected }) => {
     const dmmf = await getDMMF({ datamodel });
     const model = dmmf.datamodel.models[0];
-    const field = findPrsimaCreateInputTypeFromModelName(dmmf, "TestModel")?.fields.find(f => f.name === targetField)!;
+    const field = findPrismaCreateInputTypeFromModelName(dmmf, "TestModel")?.fields.find(f => f.name === targetField)!;
     const enums = dmmf.schema.enumTypes.model ?? [];
     expect(printNode(autoGenerateModelScalarsOrEnumsFieldArgs(model, field, enums))).toBe(expected.trim());
   });
