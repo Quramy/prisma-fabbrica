@@ -23,7 +23,7 @@ describe("Generated functions", () => {
       await expect(factory.build()).resolves.toMatchObject({ status: "Accepted" });
     });
 
-    test("override defalut data with build argument", async () => {
+    test("init with sequence", async () => {
       const factory = defineUserFactory({
         defaultData: ({ seq }) => ({
           id: `model_${seq}`,
@@ -33,7 +33,7 @@ describe("Generated functions", () => {
       await expect(factory.build()).resolves.toMatchObject({ id: "model_0" });
     });
 
-    test("init with sequence", async () => {
+    test("override defalut data with build argument", async () => {
       const factory = defineUserFactory({
         defaultData: ({ seq }) => ({
           id: `model_${seq}`,
