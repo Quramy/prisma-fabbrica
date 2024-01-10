@@ -7,6 +7,7 @@ Object.defineProperty(exports, "initialize", { enumerable: true, get: function (
 Object.defineProperty(exports, "resetSequence", { enumerable: true, get: function () { return internal_2.resetSequence; } });
 Object.defineProperty(exports, "registerScalarFieldValueGenerator", { enumerable: true, get: function () { return internal_2.registerScalarFieldValueGenerator; } });
 Object.defineProperty(exports, "resetScalarFieldValueGenerator", { enumerable: true, get: function () { return internal_2.resetScalarFieldValueGenerator; } });
+const factoryFor = Symbol("factoryFor");
 const modelFieldDefinitions = [{
         name: "User",
         fields: [{
@@ -92,7 +93,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, traits: t
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
         return {
-            _factoryFor: "User",
+            [factoryFor]: "User",
             build,
             buildList,
             buildCreateInput: build,
@@ -122,7 +123,7 @@ function defineUserFactory(options) {
 }
 exports.defineUserFactory = defineUserFactory;
 function isPostauthorFactory(x) {
-    return x?._factoryFor === "User";
+    return x?.[factoryFor] === "User";
 }
 function autoGeneratePostScalarsOrEnums({ seq }) {
     return {
@@ -167,7 +168,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, traits: t
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
         return {
-            _factoryFor: "Post",
+            [factoryFor]: "Post",
             build,
             buildList,
             buildCreateInput: build,
@@ -197,10 +198,10 @@ function definePostFactory(options) {
 }
 exports.definePostFactory = definePostFactory;
 function isCommentpostFactory(x) {
-    return x?._factoryFor === "Post";
+    return x?.[factoryFor] === "Post";
 }
 function isCommentauthorFactory(x) {
-    return x?._factoryFor === "User";
+    return x?.[factoryFor] === "User";
 }
 function autoGenerateCommentScalarsOrEnums({ seq }) {
     return {
@@ -248,7 +249,7 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, traits
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
         return {
-            _factoryFor: "Comment",
+            [factoryFor]: "Comment",
             build,
             buildList,
             buildCreateInput: build,
@@ -316,7 +317,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, trait
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
         return {
-            _factoryFor: "Category",
+            [factoryFor]: "Category",
             build,
             buildList,
             buildCreateInput: build,
