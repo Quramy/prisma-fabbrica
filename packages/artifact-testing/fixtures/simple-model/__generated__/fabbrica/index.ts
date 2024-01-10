@@ -8,6 +8,8 @@ type BuildDataOptions = {
     readonly seq: number;
 };
 
+const factoryFor = Symbol("factoryFor");
+
 const modelFieldDefinitions: ModelWithFields[] = [{
         name: "User",
         fields: []
@@ -35,7 +37,7 @@ type UserFactoryDefineOptions = {
 type UserTraitKeys<TOptions extends UserFactoryDefineOptions> = keyof TOptions["traits"];
 
 export interface UserFactoryInterfaceWithoutTraits {
-    readonly _factoryFor: "User";
+    readonly [factoryFor]: "User";
     build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<Prisma.UserCreateInput[]>;
@@ -91,7 +93,7 @@ function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ 
         const createList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
         return {
-            _factoryFor: "User" as const,
+            [factoryFor]: "User" as const,
             build,
             buildList,
             buildCreateInput: build,

@@ -13,6 +13,8 @@ type BuildDataOptions = {
     readonly seq: number;
 };
 
+const factoryFor = Symbol("factoryFor");
+
 const modelFieldDefinitions: ModelWithFields[] = [{
         name: "User",
         fields: []
@@ -55,7 +57,7 @@ type UserFactoryDefineOptions = {
 type UserTraitKeys<TOptions extends UserFactoryDefineOptions> = keyof TOptions["traits"];
 
 export interface UserFactoryInterfaceWithoutTraits {
-    readonly _factoryFor: "User";
+    readonly [factoryFor]: "User";
     build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<Prisma.UserCreateInput[]>;
@@ -111,7 +113,7 @@ function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ 
         const createList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
         return {
-            _factoryFor: "User" as const,
+            [factoryFor]: "User" as const,
             build,
             buildList,
             buildCreateInput: build,
@@ -163,7 +165,7 @@ type ComplexIdModelFactoryDefineOptions = {
 type ComplexIdModelTraitKeys<TOptions extends ComplexIdModelFactoryDefineOptions> = keyof TOptions["traits"];
 
 export interface ComplexIdModelFactoryInterfaceWithoutTraits {
-    readonly _factoryFor: "ComplexIdModel";
+    readonly [factoryFor]: "ComplexIdModel";
     build(inputData?: Partial<Prisma.ComplexIdModelCreateInput>): PromiseLike<Prisma.ComplexIdModelCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.ComplexIdModelCreateInput>): PromiseLike<Prisma.ComplexIdModelCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.ComplexIdModelCreateInput>[]): PromiseLike<Prisma.ComplexIdModelCreateInput[]>;
@@ -220,7 +222,7 @@ function defineComplexIdModelFactoryInternal<TOptions extends ComplexIdModelFact
         const createList = (inputData: number | readonly Partial<Prisma.ComplexIdModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.ComplexIdModelCreateInput> = {}) => create(inputData).then(pickForConnect);
         return {
-            _factoryFor: "ComplexIdModel" as const,
+            [factoryFor]: "ComplexIdModel" as const,
             build,
             buildList,
             buildCreateInput: build,
@@ -296,7 +298,7 @@ type FieldTypePatternModelFactoryDefineOptions = {
 type FieldTypePatternModelTraitKeys<TOptions extends FieldTypePatternModelFactoryDefineOptions> = keyof TOptions["traits"];
 
 export interface FieldTypePatternModelFactoryInterfaceWithoutTraits {
-    readonly _factoryFor: "FieldTypePatternModel";
+    readonly [factoryFor]: "FieldTypePatternModel";
     build(inputData?: Partial<Prisma.FieldTypePatternModelCreateInput>): PromiseLike<Prisma.FieldTypePatternModelCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.FieldTypePatternModelCreateInput>): PromiseLike<Prisma.FieldTypePatternModelCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.FieldTypePatternModelCreateInput>[]): PromiseLike<Prisma.FieldTypePatternModelCreateInput[]>;
@@ -359,7 +361,7 @@ function defineFieldTypePatternModelFactoryInternal<TOptions extends FieldTypePa
         const createList = (inputData: number | readonly Partial<Prisma.FieldTypePatternModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.FieldTypePatternModelCreateInput> = {}) => create(inputData).then(pickForConnect);
         return {
-            _factoryFor: "FieldTypePatternModel" as const,
+            [factoryFor]: "FieldTypePatternModel" as const,
             build,
             buildList,
             buildCreateInput: build,
@@ -409,7 +411,7 @@ type NoPkModelFactoryDefineOptions = {
 type NoPkModelTraitKeys<TOptions extends NoPkModelFactoryDefineOptions> = keyof TOptions["traits"];
 
 export interface NoPkModelFactoryInterfaceWithoutTraits {
-    readonly _factoryFor: "NoPkModel";
+    readonly [factoryFor]: "NoPkModel";
     build(inputData?: Partial<Prisma.NoPkModelCreateInput>): PromiseLike<Prisma.NoPkModelCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.NoPkModelCreateInput>): PromiseLike<Prisma.NoPkModelCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.NoPkModelCreateInput>[]): PromiseLike<Prisma.NoPkModelCreateInput[]>;
@@ -464,7 +466,7 @@ function defineNoPkModelFactoryInternal<TOptions extends NoPkModelFactoryDefineO
         const createList = (inputData: number | readonly Partial<Prisma.NoPkModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.NoPkModelCreateInput> = {}) => create(inputData).then(pickForConnect);
         return {
-            _factoryFor: "NoPkModel" as const,
+            [factoryFor]: "NoPkModel" as const,
             build,
             buildList,
             buildCreateInput: build,
