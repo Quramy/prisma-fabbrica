@@ -4,6 +4,10 @@ import { defineUserFactory, type UserFactoryInterface, type UserFactoryDefineOpt
 
 export async function seed() {
   const UserFactory = defineUserFactory.withExtraParameters({ loginCount: 0 })({
+    defaultData: ({ seq, loginCount }) => {
+      console.log(seq, loginCount);
+      return {};
+    },
     traits: {
       withLoginRecords: {
         data: ({ loginCount }) => {
@@ -18,7 +22,7 @@ export async function seed() {
     },
   });
 
-  await UserFactory.build();
+  await UserFactory.build(); // UserFactory provides default value defined `withExtraParameters`(i.e. 0) as loginCount
   await UserFactory.build({ loginCount: 100 });
   await UserFactory.use("withLoginRecords").build({ loginCount: 100 });
 }
