@@ -27,6 +27,30 @@ export async function seed() {
   await UserFactory.use("withLoginRecords").build({ loginCount: 100 });
 }
 
+export async function nonDefaultParams() {
+  const UserFactory = defineUserFactory.withExtraParameters<{ readonly loginCount?: number }>({})({
+    defaultData: ({ seq, loginCount }) => {
+      console.log(seq, loginCount);
+      return {};
+    },
+    traits: {
+      withLoginRecords: {
+        data: ({ loginCount }) => {
+          console.log(loginCount);
+          return {};
+        },
+        onAfterCreate: async ({ id, loginCount }) => {
+          console.log(id, loginCount);
+          // await LoginHistoryFactory.createList(loginCount, { id })
+        },
+      },
+    },
+  });
+
+  await UserFactory.build();
+  await UserFactory.build({ loginCount: 100 });
+}
+
 export async function seedWithExplicitTypes() {
   type Context = {
     readonly loginCount: number;
