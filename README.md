@@ -21,6 +21,7 @@ Prisma generator for model factories.
   - [has-many / has-one relation](#has-many--has-one-relation)
   - [Custom scalar field generation](#custom-scalar-field-generation)
   - [Traits](#traits)
+  - [Callbacks](#callbacks)
   - [Field value precedence](#field-value-precedence)
   - [More examples](#more-examples)
 - [Generator configuration](#generator-configuration)
@@ -374,6 +375,64 @@ Multiple traits are also available:
 ```ts
 await UserFactory.use("someTrait", "anotherTrait").create();
 ```
+
+### Callbacks
+
+You can set callback function before or after factory execution.
+
+```ts
+const UserFactory = defineUserFactory({
+  onAfterCreate: async user => {
+    await PostFactory.craete({
+      author: { connect: uesr },
+    });
+  },
+});
+
+await UserFactory.create();
+```
+
+Callback functions are also available within trait definition.
+
+```ts
+const UserFactory = defineUserFactory({
+  traits: {
+    withComment: {
+      onAfterCreate: async user => {
+        await PostFactory.craete({
+          author: { connect: uesr },
+        });
+      },
+    },
+  },
+});
+
+await UserFactory.create();
+await UserFactory.use("withComment").create();
+```
+
+Note: The above code is to explain the callback. If you want to create association, first consider to use `defaultData` and `trait.data` option as in [has-many / has-one relation](#has-many--has-one-relation).
+
+The following three types are available as callback function:
+
+```ts
+const UserFactory = defineUserFactory({
+  onAfterBuild: async createInput => {
+    // do something
+  },
+  onBeforeCreate: async createInput => {
+    // do something
+  },
+  onAfterCreate: async createdData => {
+    // do something
+  },
+});
+```
+
+And here, the parameter types are:
+
+- `createInput` is assignable to model create function parameter (e.g. `Prsima.UserCreateInput`).
+- `createdData` is resolved object by model create function (e.g. `User` model type)
 
 ### Field value precedence
 
