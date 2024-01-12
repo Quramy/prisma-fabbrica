@@ -60,11 +60,23 @@ function autoGenerateUserScalarsOrEnums({ seq }) {
         name: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
-function defineUserFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
+function defineUserFactoryInternal({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }) {
     const getFactoryWithTraits = (traitKeys = []) => {
         const seqKey = {};
         const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
         const screen = (0, internal_1.createScreener)("User", modelFieldDefinitions);
+        const handleAfterBuild = (0, internal_1.createCallbackChain)([
+            onAfterBuild,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+        ]);
+        const handleBeforeCreate = (0, internal_1.createCallbackChain)([
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            onBeforeCreate,
+        ]);
+        const handleAfterCreate = (0, internal_1.createCallbackChain)([
+            onAfterCreate,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+        ]);
         const build = async (inputData = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
@@ -80,6 +92,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, traits: t
             }, resolveValue({ seq }));
             const defaultAssociations = {};
             const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            await handleAfterBuild(data);
             return data;
         };
         const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
@@ -88,7 +101,10 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, traits: t
         });
         const create = async (inputData = {}) => {
             const data = await build(inputData).then(screen);
-            return await (0, internal_1.getClient)().user.create({ data });
+            await handleBeforeCreate(data);
+            const createdData = await (0, internal_1.getClient)().user.create({ data });
+            await handleAfterCreate(createdData);
+            return createdData;
         };
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
@@ -131,11 +147,23 @@ function autoGeneratePostScalarsOrEnums({ seq }) {
         title: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false, seq })
     };
 }
-function definePostFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
+function definePostFactoryInternal({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }) {
     const getFactoryWithTraits = (traitKeys = []) => {
         const seqKey = {};
         const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
         const screen = (0, internal_1.createScreener)("Post", modelFieldDefinitions);
+        const handleAfterBuild = (0, internal_1.createCallbackChain)([
+            onAfterBuild,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+        ]);
+        const handleBeforeCreate = (0, internal_1.createCallbackChain)([
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            onBeforeCreate,
+        ]);
+        const handleAfterCreate = (0, internal_1.createCallbackChain)([
+            onAfterCreate,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+        ]);
         const build = async (inputData = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
@@ -155,6 +183,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, traits: t
                 } : defaultData.author
             };
             const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            await handleAfterBuild(data);
             return data;
         };
         const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
@@ -163,7 +192,10 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, traits: t
         });
         const create = async (inputData = {}) => {
             const data = await build(inputData).then(screen);
-            return await (0, internal_1.getClient)().post.create({ data });
+            await handleBeforeCreate(data);
+            const createdData = await (0, internal_1.getClient)().post.create({ data });
+            await handleAfterCreate(createdData);
+            return createdData;
         };
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
@@ -209,11 +241,23 @@ function autoGenerateCommentScalarsOrEnums({ seq }) {
         body: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Comment", fieldName: "body", isId: false, isUnique: false, seq })
     };
 }
-function defineCommentFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
+function defineCommentFactoryInternal({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }) {
     const getFactoryWithTraits = (traitKeys = []) => {
         const seqKey = {};
         const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
         const screen = (0, internal_1.createScreener)("Comment", modelFieldDefinitions);
+        const handleAfterBuild = (0, internal_1.createCallbackChain)([
+            onAfterBuild,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+        ]);
+        const handleBeforeCreate = (0, internal_1.createCallbackChain)([
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            onBeforeCreate,
+        ]);
+        const handleAfterCreate = (0, internal_1.createCallbackChain)([
+            onAfterCreate,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+        ]);
         const build = async (inputData = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateCommentScalarsOrEnums({ seq });
@@ -236,6 +280,7 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, traits
                 } : defaultData.author
             };
             const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            await handleAfterBuild(data);
             return data;
         };
         const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
@@ -244,7 +289,10 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, traits
         });
         const create = async (inputData = {}) => {
             const data = await build(inputData).then(screen);
-            return await (0, internal_1.getClient)().comment.create({ data });
+            await handleBeforeCreate(data);
+            const createdData = await (0, internal_1.getClient)().comment.create({ data });
+            await handleAfterCreate(createdData);
+            return createdData;
         };
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
@@ -284,11 +332,23 @@ function autoGenerateCategoryScalarsOrEnums({ seq }) {
         name: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Category", fieldName: "name", isId: false, isUnique: true, seq })
     };
 }
-function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
+function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }) {
     const getFactoryWithTraits = (traitKeys = []) => {
         const seqKey = {};
         const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
         const screen = (0, internal_1.createScreener)("Category", modelFieldDefinitions);
+        const handleAfterBuild = (0, internal_1.createCallbackChain)([
+            onAfterBuild,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+        ]);
+        const handleBeforeCreate = (0, internal_1.createCallbackChain)([
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            onBeforeCreate,
+        ]);
+        const handleAfterCreate = (0, internal_1.createCallbackChain)([
+            onAfterCreate,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+        ]);
         const build = async (inputData = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateCategoryScalarsOrEnums({ seq });
@@ -304,6 +364,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, trait
             }, resolveValue({ seq }));
             const defaultAssociations = {};
             const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            await handleAfterBuild(data);
             return data;
         };
         const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
@@ -312,7 +373,10 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, trait
         });
         const create = async (inputData = {}) => {
             const data = await build(inputData).then(screen);
-            return await (0, internal_1.getClient)().category.create({ data });
+            await handleBeforeCreate(data);
+            const createdData = await (0, internal_1.getClient)().category.create({ data });
+            await handleAfterCreate(createdData);
+            return createdData;
         };
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
