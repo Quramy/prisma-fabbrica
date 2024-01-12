@@ -8,6 +8,11 @@ export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValue
 type BuildDataOptions = {
     readonly seq: number;
 };
+type CallbackDefineOptions<TCreated, TCreateInput> = {
+    onAfterBuild?: (createInput: TCreateInput) => void | PromiseLike<void>;
+    onBeforeCreate?: (createInput: TCreateInput) => void | PromiseLike<void>;
+    onAfterCreate?: (created: TCreated) => void | PromiseLike<void>;
+};
 export declare const initialize: (options: import("@quramy/prisma-fabbrica/lib/initialize").InitializeOptions) => void;
 declare const factoryFor: unique symbol;
 type UserFactoryDefineInput = {
@@ -19,14 +24,15 @@ type UserFactoryDefineInput = {
     posts?: Prisma.PostCreateNestedManyWithoutAuthorInput;
     comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput;
 };
+type UserFactoryTrait = {
+    data?: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions>;
+} & CallbackDefineOptions<User, Prisma.UserCreateInput>;
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
     traits?: {
-        [traitName: string | symbol]: {
-            data: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions>;
-        };
+        [traitName: string | symbol]: UserFactoryTrait;
     };
-};
+} & CallbackDefineOptions<User, Prisma.UserCreateInput>;
 type UserTraitKeys<TOptions extends UserFactoryDefineOptions> = keyof TOptions["traits"];
 export interface UserFactoryInterfaceWithoutTraits {
     readonly [factoryFor]: "User";
@@ -61,14 +67,15 @@ type PostFactoryDefineInput = {
     comments?: Prisma.CommentCreateNestedManyWithoutPostInput;
     categories?: Prisma.CategoryCreateNestedManyWithoutPostsInput;
 };
+type PostFactoryTrait = {
+    data?: Resolver<Partial<PostFactoryDefineInput>, BuildDataOptions>;
+} & CallbackDefineOptions<Post, Prisma.PostCreateInput>;
 type PostFactoryDefineOptions = {
     defaultData: Resolver<PostFactoryDefineInput, BuildDataOptions>;
     traits?: {
-        [traitName: string | symbol]: {
-            data: Resolver<Partial<PostFactoryDefineInput>, BuildDataOptions>;
-        };
+        [traitName: string | symbol]: PostFactoryTrait;
     };
-};
+} & CallbackDefineOptions<Post, Prisma.PostCreateInput>;
 type PostTraitKeys<TOptions extends PostFactoryDefineOptions> = keyof TOptions["traits"];
 export interface PostFactoryInterfaceWithoutTraits {
     readonly [factoryFor]: "Post";
@@ -106,14 +113,15 @@ type CommentFactoryDefineInput = {
     post: CommentpostFactory | Prisma.PostCreateNestedOneWithoutCommentsInput;
     author: CommentauthorFactory | Prisma.UserCreateNestedOneWithoutCommentsInput;
 };
+type CommentFactoryTrait = {
+    data?: Resolver<Partial<CommentFactoryDefineInput>, BuildDataOptions>;
+} & CallbackDefineOptions<Comment, Prisma.CommentCreateInput>;
 type CommentFactoryDefineOptions = {
     defaultData: Resolver<CommentFactoryDefineInput, BuildDataOptions>;
     traits?: {
-        [traitName: string | symbol]: {
-            data: Resolver<Partial<CommentFactoryDefineInput>, BuildDataOptions>;
-        };
+        [traitName: string | symbol]: CommentFactoryTrait;
     };
-};
+} & CallbackDefineOptions<Comment, Prisma.CommentCreateInput>;
 type CommentTraitKeys<TOptions extends CommentFactoryDefineOptions> = keyof TOptions["traits"];
 export interface CommentFactoryInterfaceWithoutTraits {
     readonly [factoryFor]: "Comment";
@@ -140,14 +148,15 @@ type CategoryFactoryDefineInput = {
     name?: string;
     posts?: Prisma.PostCreateNestedManyWithoutCategoriesInput;
 };
+type CategoryFactoryTrait = {
+    data?: Resolver<Partial<CategoryFactoryDefineInput>, BuildDataOptions>;
+} & CallbackDefineOptions<Category, Prisma.CategoryCreateInput>;
 type CategoryFactoryDefineOptions = {
     defaultData?: Resolver<CategoryFactoryDefineInput, BuildDataOptions>;
     traits?: {
-        [traitName: string | symbol]: {
-            data: Resolver<Partial<CategoryFactoryDefineInput>, BuildDataOptions>;
-        };
+        [traitName: string | symbol]: CategoryFactoryTrait;
     };
-};
+} & CallbackDefineOptions<Category, Prisma.CategoryCreateInput>;
 type CategoryTraitKeys<TOptions extends CategoryFactoryDefineOptions> = keyof TOptions["traits"];
 export interface CategoryFactoryInterfaceWithoutTraits {
     readonly [factoryFor]: "Category";
