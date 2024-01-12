@@ -95,7 +95,12 @@ export const header = (prismaClientModuleSpecifier: string) =>
     export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
   `();
 
-export const genericTypeDeclarations = () =>
+export const importStatement = (specifier: string, prismaClientModuleSpecifier: string) =>
+  template.statement<ts.ImportDeclaration>`
+    import type { ${() => ast.identifier(specifier)} } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
+  `();
+
+export const genericDeclarations = () =>
   template.sourceFile`
     type BuildDataOptions = {
       readonly seq: number;
@@ -106,15 +111,7 @@ export const genericTypeDeclarations = () =>
       onBeforeCreate?: (createInput: TCreateInput) => void | PromiseLike<void>;
       onAfterCreate?: (created: TCreated) => void | PromiseLike<void>;
     };
-  `();
 
-export const importStatement = (specifier: string, prismaClientModuleSpecifier: string) =>
-  template.statement<ts.ImportDeclaration>`
-    import type { ${() => ast.identifier(specifier)} } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
-  `();
-
-export const initializer = () =>
-  template.sourceFile`
     const initializer = createInitializer();
     const { getClient } = initializer;
     export const { initialize } = initializer;
@@ -559,8 +556,7 @@ export function getSourceFile({
     ...modelNames.map(modelName => importStatement(modelName, prismaClientModuleSpecifier)),
     ...modelEnums.map(enumName => importStatement(enumName, prismaClientModuleSpecifier)),
     ...header(prismaClientModuleSpecifier).statements,
-    ...insertLeadingBreakMarker(genericTypeDeclarations().statements),
-    ...insertLeadingBreakMarker(initializer().statements),
+    ...insertLeadingBreakMarker(genericDeclarations().statements),
     insertLeadingBreakMarker(modelFieldDefinitions(document.datamodel.models)),
     ...document.datamodel.models
       .reduce(
