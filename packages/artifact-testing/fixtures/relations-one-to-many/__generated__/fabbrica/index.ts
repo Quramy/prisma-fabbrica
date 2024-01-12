@@ -3,11 +3,15 @@ import type { Post } from "../client";
 import type { Review } from "../client";
 import { Prisma } from "../client";
 import type { PrismaClient } from "../client";
-import { getClient, ModelWithFields, createScreener, getScalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
+import { getClient, ModelWithFields, createScreener, getScalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, createCallbackChain, } from "@quramy/prisma-fabbrica/lib/internal";
 export { initialize, resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
-
 type BuildDataOptions = {
     readonly seq: number;
+};
+type CallbackDefineOptions<TCreated, TCreateInput> = {
+    onAfterBuild?: (createInput: TCreateInput) => void | PromiseLike<void>;
+    onBeforeCreate?: (createInput: TCreateInput) => void | PromiseLike<void>;
+    onAfterCreate?: (created: TCreated) => void | PromiseLike<void>;
 };
 
 const factoryFor = Symbol("factoryFor");
@@ -59,14 +63,16 @@ type UserFactoryDefineInput = {
     reviews?: Prisma.ReviewCreateNestedManyWithoutReviewerInput;
 };
 
+type UserFactoryTrait = {
+    data?: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions>;
+} & CallbackDefineOptions<User, Prisma.UserCreateInput>;
+
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
     traits?: {
-        [traitName: string | symbol]: {
-            data: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions>;
-        };
+        [traitName: string | symbol]: UserFactoryTrait;
     };
-};
+} & CallbackDefineOptions<User, Prisma.UserCreateInput>;
 
 type UserTraitKeys<TOptions extends UserFactoryDefineOptions> = keyof TOptions["traits"];
 
@@ -94,11 +100,23 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
     };
 }
 
-function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ defaultData: defaultDataResolver, traits: traitsDefs = {} }: TOptions): UserFactoryInterface<TOptions> {
+function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions): UserFactoryInterface<TOptions> {
     const getFactoryWithTraits = (traitKeys: readonly UserTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
         const screen = createScreener("User", modelFieldDefinitions);
+        const handleAfterBuild = createCallbackChain([
+            onAfterBuild,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+        ]);
+        const handleBeforeCreate = createCallbackChain([
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            onBeforeCreate,
+        ]);
+        const handleAfterCreate = createCallbackChain([
+            onAfterCreate,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+        ]);
         const build = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
@@ -114,6 +132,7 @@ function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ 
             }, resolveValue({ seq }));
             const defaultAssociations = {};
             const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            await handleAfterBuild(data);
             return data;
         };
         const buildList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
@@ -122,7 +141,10 @@ function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ 
         });
         const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
             const data = await build(inputData).then(screen);
-            return await getClient<PrismaClient>().user.create({ data });
+            await handleBeforeCreate(data);
+            const createdData = await getClient<PrismaClient>().user.create({ data });
+            await handleAfterCreate(createdData);
+            return createdData;
         };
         const createList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
@@ -174,14 +196,16 @@ type PostFactoryDefineInput = {
     reviews?: Prisma.ReviewCreateNestedManyWithoutPostInput;
 };
 
+type PostFactoryTrait = {
+    data?: Resolver<Partial<PostFactoryDefineInput>, BuildDataOptions>;
+} & CallbackDefineOptions<Post, Prisma.PostCreateInput>;
+
 type PostFactoryDefineOptions = {
     defaultData?: Resolver<PostFactoryDefineInput, BuildDataOptions>;
     traits?: {
-        [traitName: string | symbol]: {
-            data: Resolver<Partial<PostFactoryDefineInput>, BuildDataOptions>;
-        };
+        [traitName: string | symbol]: PostFactoryTrait;
     };
-};
+} & CallbackDefineOptions<Post, Prisma.PostCreateInput>;
 
 function isPostauthorFactory(x: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput | undefined): x is PostauthorFactory {
     return (x as any)?.[factoryFor] === "User";
@@ -213,11 +237,23 @@ function autoGeneratePostScalarsOrEnums({ seq }: {
     };
 }
 
-function definePostFactoryInternal<TOptions extends PostFactoryDefineOptions>({ defaultData: defaultDataResolver, traits: traitsDefs = {} }: TOptions): PostFactoryInterface<TOptions> {
+function definePostFactoryInternal<TOptions extends PostFactoryDefineOptions>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions): PostFactoryInterface<TOptions> {
     const getFactoryWithTraits = (traitKeys: readonly PostTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
         const screen = createScreener("Post", modelFieldDefinitions);
+        const handleAfterBuild = createCallbackChain([
+            onAfterBuild,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+        ]);
+        const handleBeforeCreate = createCallbackChain([
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            onBeforeCreate,
+        ]);
+        const handleAfterCreate = createCallbackChain([
+            onAfterCreate,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+        ]);
         const build = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
@@ -237,6 +273,7 @@ function definePostFactoryInternal<TOptions extends PostFactoryDefineOptions>({ 
                 } : defaultData.author
             };
             const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            await handleAfterBuild(data);
             return data;
         };
         const buildList = (inputData: number | readonly Partial<Prisma.PostCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
@@ -245,7 +282,10 @@ function definePostFactoryInternal<TOptions extends PostFactoryDefineOptions>({ 
         });
         const create = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
             const data = await build(inputData).then(screen);
-            return await getClient<PrismaClient>().post.create({ data });
+            await handleBeforeCreate(data);
+            const createdData = await getClient<PrismaClient>().post.create({ data });
+            await handleAfterCreate(createdData);
+            return createdData;
         };
         const createList = (inputData: number | readonly Partial<Prisma.PostCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.PostCreateInput> = {}) => create(inputData).then(pickForConnect);
@@ -302,14 +342,16 @@ type ReviewFactoryDefineInput = {
     reviewer: ReviewreviewerFactory | Prisma.UserCreateNestedOneWithoutReviewsInput;
 };
 
+type ReviewFactoryTrait = {
+    data?: Resolver<Partial<ReviewFactoryDefineInput>, BuildDataOptions>;
+} & CallbackDefineOptions<Review, Prisma.ReviewCreateInput>;
+
 type ReviewFactoryDefineOptions = {
     defaultData: Resolver<ReviewFactoryDefineInput, BuildDataOptions>;
     traits?: {
-        [traitName: string | symbol]: {
-            data: Resolver<Partial<ReviewFactoryDefineInput>, BuildDataOptions>;
-        };
+        [traitName: string | symbol]: ReviewFactoryTrait;
     };
-};
+} & CallbackDefineOptions<Review, Prisma.ReviewCreateInput>;
 
 function isReviewpostFactory(x: ReviewpostFactory | Prisma.PostCreateNestedOneWithoutReviewsInput | undefined): x is ReviewpostFactory {
     return (x as any)?.[factoryFor] === "Post";
@@ -345,11 +387,23 @@ function autoGenerateReviewScalarsOrEnums({ seq }: {
     };
 }
 
-function defineReviewFactoryInternal<TOptions extends ReviewFactoryDefineOptions>({ defaultData: defaultDataResolver, traits: traitsDefs = {} }: TOptions): ReviewFactoryInterface<TOptions> {
+function defineReviewFactoryInternal<TOptions extends ReviewFactoryDefineOptions>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions): ReviewFactoryInterface<TOptions> {
     const getFactoryWithTraits = (traitKeys: readonly ReviewTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
         const screen = createScreener("Review", modelFieldDefinitions);
+        const handleAfterBuild = createCallbackChain([
+            onAfterBuild,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+        ]);
+        const handleBeforeCreate = createCallbackChain([
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            onBeforeCreate,
+        ]);
+        const handleAfterCreate = createCallbackChain([
+            onAfterCreate,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+        ]);
         const build = async (inputData: Partial<Prisma.ReviewCreateInput> = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateReviewScalarsOrEnums({ seq });
@@ -372,6 +426,7 @@ function defineReviewFactoryInternal<TOptions extends ReviewFactoryDefineOptions
                 } : defaultData.reviewer
             };
             const data: Prisma.ReviewCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            await handleAfterBuild(data);
             return data;
         };
         const buildList = (inputData: number | readonly Partial<Prisma.ReviewCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
@@ -380,7 +435,10 @@ function defineReviewFactoryInternal<TOptions extends ReviewFactoryDefineOptions
         });
         const create = async (inputData: Partial<Prisma.ReviewCreateInput> = {}) => {
             const data = await build(inputData).then(screen);
-            return await getClient<PrismaClient>().review.create({ data });
+            await handleBeforeCreate(data);
+            const createdData = await getClient<PrismaClient>().review.create({ data });
+            await handleAfterCreate(createdData);
+            return createdData;
         };
         const createList = (inputData: number | readonly Partial<Prisma.ReviewCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.ReviewCreateInput> = {}) => create(inputData).then(pickForConnect);

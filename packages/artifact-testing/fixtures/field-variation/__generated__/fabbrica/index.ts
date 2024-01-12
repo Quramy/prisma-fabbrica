@@ -6,11 +6,15 @@ import type { Role } from "../client";
 import type { Status } from "../client";
 import { Prisma } from "../client";
 import type { PrismaClient } from "../client";
-import { getClient, ModelWithFields, createScreener, getScalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
+import { getClient, ModelWithFields, createScreener, getScalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, createCallbackChain, } from "@quramy/prisma-fabbrica/lib/internal";
 export { initialize, resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
-
 type BuildDataOptions = {
     readonly seq: number;
+};
+type CallbackDefineOptions<TCreated, TCreateInput> = {
+    onAfterBuild?: (createInput: TCreateInput) => void | PromiseLike<void>;
+    onBeforeCreate?: (createInput: TCreateInput) => void | PromiseLike<void>;
+    onAfterCreate?: (created: TCreated) => void | PromiseLike<void>;
 };
 
 const factoryFor = Symbol("factoryFor");
@@ -45,14 +49,16 @@ type UserFactoryDefineInput = {
     status?: Status | null;
 };
 
+type UserFactoryTrait = {
+    data?: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions>;
+} & CallbackDefineOptions<User, Prisma.UserCreateInput>;
+
 type UserFactoryDefineOptions = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
     traits?: {
-        [traitName: string | symbol]: {
-            data: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions>;
-        };
+        [traitName: string | symbol]: UserFactoryTrait;
     };
-};
+} & CallbackDefineOptions<User, Prisma.UserCreateInput>;
 
 type UserTraitKeys<TOptions extends UserFactoryDefineOptions> = keyof TOptions["traits"];
 
@@ -80,11 +86,23 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
     };
 }
 
-function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ defaultData: defaultDataResolver, traits: traitsDefs = {} }: TOptions): UserFactoryInterface<TOptions> {
+function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions): UserFactoryInterface<TOptions> {
     const getFactoryWithTraits = (traitKeys: readonly UserTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
         const screen = createScreener("User", modelFieldDefinitions);
+        const handleAfterBuild = createCallbackChain([
+            onAfterBuild,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+        ]);
+        const handleBeforeCreate = createCallbackChain([
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            onBeforeCreate,
+        ]);
+        const handleAfterCreate = createCallbackChain([
+            onAfterCreate,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+        ]);
         const build = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
@@ -100,6 +118,7 @@ function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ 
             }, resolveValue({ seq }));
             const defaultAssociations = {};
             const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            await handleAfterBuild(data);
             return data;
         };
         const buildList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
@@ -108,7 +127,10 @@ function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ 
         });
         const create = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
             const data = await build(inputData).then(screen);
-            return await getClient<PrismaClient>().user.create({ data });
+            await handleBeforeCreate(data);
+            const createdData = await getClient<PrismaClient>().user.create({ data });
+            await handleAfterCreate(createdData);
+            return createdData;
         };
         const createList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
@@ -153,14 +175,16 @@ type ComplexIdModelFactoryDefineInput = {
     lastName?: string;
 };
 
+type ComplexIdModelFactoryTrait = {
+    data?: Resolver<Partial<ComplexIdModelFactoryDefineInput>, BuildDataOptions>;
+} & CallbackDefineOptions<ComplexIdModel, Prisma.ComplexIdModelCreateInput>;
+
 type ComplexIdModelFactoryDefineOptions = {
     defaultData?: Resolver<ComplexIdModelFactoryDefineInput, BuildDataOptions>;
     traits?: {
-        [traitName: string | symbol]: {
-            data: Resolver<Partial<ComplexIdModelFactoryDefineInput>, BuildDataOptions>;
-        };
+        [traitName: string | symbol]: ComplexIdModelFactoryTrait;
     };
-};
+} & CallbackDefineOptions<ComplexIdModel, Prisma.ComplexIdModelCreateInput>;
 
 type ComplexIdModelTraitKeys<TOptions extends ComplexIdModelFactoryDefineOptions> = keyof TOptions["traits"];
 
@@ -188,11 +212,23 @@ function autoGenerateComplexIdModelScalarsOrEnums({ seq }: {
     };
 }
 
-function defineComplexIdModelFactoryInternal<TOptions extends ComplexIdModelFactoryDefineOptions>({ defaultData: defaultDataResolver, traits: traitsDefs = {} }: TOptions): ComplexIdModelFactoryInterface<TOptions> {
+function defineComplexIdModelFactoryInternal<TOptions extends ComplexIdModelFactoryDefineOptions>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions): ComplexIdModelFactoryInterface<TOptions> {
     const getFactoryWithTraits = (traitKeys: readonly ComplexIdModelTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
         const screen = createScreener("ComplexIdModel", modelFieldDefinitions);
+        const handleAfterBuild = createCallbackChain([
+            onAfterBuild,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+        ]);
+        const handleBeforeCreate = createCallbackChain([
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            onBeforeCreate,
+        ]);
+        const handleAfterCreate = createCallbackChain([
+            onAfterCreate,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+        ]);
         const build = async (inputData: Partial<Prisma.ComplexIdModelCreateInput> = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateComplexIdModelScalarsOrEnums({ seq });
@@ -208,6 +244,7 @@ function defineComplexIdModelFactoryInternal<TOptions extends ComplexIdModelFact
             }, resolveValue({ seq }));
             const defaultAssociations = {};
             const data: Prisma.ComplexIdModelCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            await handleAfterBuild(data);
             return data;
         };
         const buildList = (inputData: number | readonly Partial<Prisma.ComplexIdModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
@@ -217,7 +254,10 @@ function defineComplexIdModelFactoryInternal<TOptions extends ComplexIdModelFact
         });
         const create = async (inputData: Partial<Prisma.ComplexIdModelCreateInput> = {}) => {
             const data = await build(inputData).then(screen);
-            return await getClient<PrismaClient>().complexIdModel.create({ data });
+            await handleBeforeCreate(data);
+            const createdData = await getClient<PrismaClient>().complexIdModel.create({ data });
+            await handleAfterCreate(createdData);
+            return createdData;
         };
         const createList = (inputData: number | readonly Partial<Prisma.ComplexIdModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.ComplexIdModelCreateInput> = {}) => create(inputData).then(pickForConnect);
@@ -286,14 +326,16 @@ type FieldTypePatternModelFactoryDefineInput = {
     nullableBigInt?: (bigint | number) | null;
 };
 
+type FieldTypePatternModelFactoryTrait = {
+    data?: Resolver<Partial<FieldTypePatternModelFactoryDefineInput>, BuildDataOptions>;
+} & CallbackDefineOptions<FieldTypePatternModel, Prisma.FieldTypePatternModelCreateInput>;
+
 type FieldTypePatternModelFactoryDefineOptions = {
     defaultData?: Resolver<FieldTypePatternModelFactoryDefineInput, BuildDataOptions>;
     traits?: {
-        [traitName: string | symbol]: {
-            data: Resolver<Partial<FieldTypePatternModelFactoryDefineInput>, BuildDataOptions>;
-        };
+        [traitName: string | symbol]: FieldTypePatternModelFactoryTrait;
     };
-};
+} & CallbackDefineOptions<FieldTypePatternModel, Prisma.FieldTypePatternModelCreateInput>;
 
 type FieldTypePatternModelTraitKeys<TOptions extends FieldTypePatternModelFactoryDefineOptions> = keyof TOptions["traits"];
 
@@ -328,11 +370,23 @@ function autoGenerateFieldTypePatternModelScalarsOrEnums({ seq }: {
     };
 }
 
-function defineFieldTypePatternModelFactoryInternal<TOptions extends FieldTypePatternModelFactoryDefineOptions>({ defaultData: defaultDataResolver, traits: traitsDefs = {} }: TOptions): FieldTypePatternModelFactoryInterface<TOptions> {
+function defineFieldTypePatternModelFactoryInternal<TOptions extends FieldTypePatternModelFactoryDefineOptions>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions): FieldTypePatternModelFactoryInterface<TOptions> {
     const getFactoryWithTraits = (traitKeys: readonly FieldTypePatternModelTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
         const screen = createScreener("FieldTypePatternModel", modelFieldDefinitions);
+        const handleAfterBuild = createCallbackChain([
+            onAfterBuild,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+        ]);
+        const handleBeforeCreate = createCallbackChain([
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            onBeforeCreate,
+        ]);
+        const handleAfterCreate = createCallbackChain([
+            onAfterCreate,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+        ]);
         const build = async (inputData: Partial<Prisma.FieldTypePatternModelCreateInput> = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateFieldTypePatternModelScalarsOrEnums({ seq });
@@ -348,6 +402,7 @@ function defineFieldTypePatternModelFactoryInternal<TOptions extends FieldTypePa
             }, resolveValue({ seq }));
             const defaultAssociations = {};
             const data: Prisma.FieldTypePatternModelCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            await handleAfterBuild(data);
             return data;
         };
         const buildList = (inputData: number | readonly Partial<Prisma.FieldTypePatternModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
@@ -356,7 +411,10 @@ function defineFieldTypePatternModelFactoryInternal<TOptions extends FieldTypePa
         });
         const create = async (inputData: Partial<Prisma.FieldTypePatternModelCreateInput> = {}) => {
             const data = await build(inputData).then(screen);
-            return await getClient<PrismaClient>().fieldTypePatternModel.create({ data });
+            await handleBeforeCreate(data);
+            const createdData = await getClient<PrismaClient>().fieldTypePatternModel.create({ data });
+            await handleAfterCreate(createdData);
+            return createdData;
         };
         const createList = (inputData: number | readonly Partial<Prisma.FieldTypePatternModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.FieldTypePatternModelCreateInput> = {}) => create(inputData).then(pickForConnect);
@@ -399,14 +457,16 @@ type NoPkModelFactoryDefineInput = {
     id?: number;
 };
 
+type NoPkModelFactoryTrait = {
+    data?: Resolver<Partial<NoPkModelFactoryDefineInput>, BuildDataOptions>;
+} & CallbackDefineOptions<NoPkModel, Prisma.NoPkModelCreateInput>;
+
 type NoPkModelFactoryDefineOptions = {
     defaultData?: Resolver<NoPkModelFactoryDefineInput, BuildDataOptions>;
     traits?: {
-        [traitName: string | symbol]: {
-            data: Resolver<Partial<NoPkModelFactoryDefineInput>, BuildDataOptions>;
-        };
+        [traitName: string | symbol]: NoPkModelFactoryTrait;
     };
-};
+} & CallbackDefineOptions<NoPkModel, Prisma.NoPkModelCreateInput>;
 
 type NoPkModelTraitKeys<TOptions extends NoPkModelFactoryDefineOptions> = keyof TOptions["traits"];
 
@@ -433,11 +493,23 @@ function autoGenerateNoPkModelScalarsOrEnums({ seq }: {
     };
 }
 
-function defineNoPkModelFactoryInternal<TOptions extends NoPkModelFactoryDefineOptions>({ defaultData: defaultDataResolver, traits: traitsDefs = {} }: TOptions): NoPkModelFactoryInterface<TOptions> {
+function defineNoPkModelFactoryInternal<TOptions extends NoPkModelFactoryDefineOptions>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions): NoPkModelFactoryInterface<TOptions> {
     const getFactoryWithTraits = (traitKeys: readonly NoPkModelTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
         const screen = createScreener("NoPkModel", modelFieldDefinitions);
+        const handleAfterBuild = createCallbackChain([
+            onAfterBuild,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+        ]);
+        const handleBeforeCreate = createCallbackChain([
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            onBeforeCreate,
+        ]);
+        const handleAfterCreate = createCallbackChain([
+            onAfterCreate,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+        ]);
         const build = async (inputData: Partial<Prisma.NoPkModelCreateInput> = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateNoPkModelScalarsOrEnums({ seq });
@@ -453,6 +525,7 @@ function defineNoPkModelFactoryInternal<TOptions extends NoPkModelFactoryDefineO
             }, resolveValue({ seq }));
             const defaultAssociations = {};
             const data: Prisma.NoPkModelCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            await handleAfterBuild(data);
             return data;
         };
         const buildList = (inputData: number | readonly Partial<Prisma.NoPkModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
@@ -461,7 +534,10 @@ function defineNoPkModelFactoryInternal<TOptions extends NoPkModelFactoryDefineO
         });
         const create = async (inputData: Partial<Prisma.NoPkModelCreateInput> = {}) => {
             const data = await build(inputData).then(screen);
-            return await getClient<PrismaClient>().noPkModel.create({ data });
+            await handleBeforeCreate(data);
+            const createdData = await getClient<PrismaClient>().noPkModel.create({ data });
+            await handleAfterCreate(createdData);
+            return createdData;
         };
         const createList = (inputData: number | readonly Partial<Prisma.NoPkModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.NoPkModelCreateInput> = {}) => create(inputData).then(pickForConnect);
