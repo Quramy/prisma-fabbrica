@@ -86,6 +86,7 @@ export const header = (prismaClientModuleSpecifier: string) =>
       normalizeResolver,
       normalizeList,
       getSequenceCounter,
+      createCallbackChain,
     } from "@quramy/prisma-fabbrica/lib/internal";
     import type {
       ModelWithFields,
@@ -94,10 +95,16 @@ export const header = (prismaClientModuleSpecifier: string) =>
     export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
   `();
 
-export const buildDataOptions = () =>
-  template.statement<ts.TypeAliasDeclaration>`
+export const genericTypeDeclarations = () =>
+  template.sourceFile`
     type BuildDataOptions = {
       readonly seq: number;
+    };
+
+    type CallbackDefineOptions<TCreated, TCreateInput> = {
+      onAfterBuild?: (createInput: TCreateInput) => void | PromiseLike<void>;
+      onBeforeCreate?: (createInput: TCreateInput) => void | PromiseLike<void>;
+      onAfterCreate?: (created: TCreated) => void | PromiseLike<void>;
     };
   `();
 
@@ -227,31 +234,42 @@ export const modelFactoryDefineInput = (model: DMMF.Model, inputType: DMMF.Input
     MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${model.name}FactoryDefineInput`),
   });
 
-export const modelFactoryDefineOptions = (modelName: string, isOpionalDefaultData: boolean) => {
+export const modelFactoryTrait = (model: DMMF.Model) =>
+  template.statement<ts.TypeAliasDeclaration>`
+    type MODEL_FACTORY_TRAIT = {
+      data?: Resolver<Partial<MODEL_FACTORY_DEFINE_INPUT>, BuildDataOptions>;
+    } & CallbackDefineOptions<MODEL_TYPE, Prisma.MODEL_CREATE_INPUT>;
+  `({
+    MODEL_TYPE: ast.identifier(model.name),
+    MODEL_CREATE_INPUT: ast.identifier(`${model.name}CreateInput`),
+    MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${model.name}FactoryDefineInput`),
+    MODEL_FACTORY_TRAIT: ast.identifier(`${model.name}FactoryTrait`),
+  });
+
+export const modelFactoryDefineOptions = (model: DMMF.Model, isOpionalDefaultData: boolean) => {
   const compiled = isOpionalDefaultData
     ? template.statement<ts.TypeAliasDeclaration>`
         type MODEL_FACTORY_DEFINE_OPTIONS = {
           defaultData?: Resolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions>;
           traits?: {
-            [traitName: string | symbol]: { 
-              data: Resolver<Partial<MODEL_FACTORY_DEFINE_INPUT>, BuildDataOptions>;
-            }
+            [traitName: string | symbol]: MODEL_FACTORY_TRAIT;
           };
-        };
+        } & CallbackDefineOptions<MODEL_TYPE, Prisma.MODEL_CREATE_INPUT>;
       `
     : template.statement<ts.TypeAliasDeclaration>`
         type MODEL_FACTORY_DEFINE_OPTIONS = {
           defaultData: Resolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions>;
           traits?: {
-            [traitName: string | symbol]: { 
-              data: Resolver<Partial<MODEL_FACTORY_DEFINE_INPUT>, BuildDataOptions>;
-            }
+            [traitName: string | symbol]: MODEL_FACTORY_TRAIT;
           };
-        };
+        } & CallbackDefineOptions<MODEL_TYPE, Prisma.MODEL_CREATE_INPUT>;
       `;
   return compiled({
-    MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${modelName}FactoryDefineOptions`),
-    MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${modelName}FactoryDefineInput`),
+    MODEL_TYPE: ast.identifier(model.name),
+    MODEL_CREATE_INPUT: ast.identifier(`${model.name}CreateInput`),
+    MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${model.name}FactoryDefineInput`),
+    MODEL_FACTORY_TRAIT: ast.identifier(`${model.name}FactoryTrait`),
+    MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
   });
 };
 
@@ -358,12 +376,31 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
   template.statement<ts.FunctionDeclaration>`
     function DEFINE_MODEL_FACTORY_INTERNAL<TOptions extends MODEL_FACTORY_DEFINE_OPTIONS>({
       defaultData: defaultDataResolver,
+      onAfterBuild,
+      onBeforeCreate,
+      onAfterCreate,
       traits: traitsDefs = {}
     }: TOptions): MODEL_FACTORY_INTERFACE<TOptions> {
       const getFactoryWithTraits = (traitKeys: readonly MODEL_TRAIT_KEYS<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
         const screen = createScreener(${() => ast.stringLiteral(model.name)}, modelFieldDefinitions);
+
+        const handleAfterBuild = createCallbackChain([
+          onAfterBuild,
+          ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+        ]);
+        const handleBeforeCreate = createCallbackChain([
+          ...traitKeys
+            .slice()
+            .reverse()
+            .map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+          onBeforeCreate,
+        ]);
+        const handleAfterCreate = createCallbackChain([
+          onAfterCreate,
+          ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+        ]);
 
         const build = async (
           inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
@@ -398,6 +435,7 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
               true,
             )};
           const data: Prisma.MODEL_CREATE_INPUT = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData};
+          await handleAfterBuild(data);
           return data;
         };
 
@@ -419,7 +457,10 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
           inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
         ) => {
           const data = await build(inputData).then(screen);
-          return await getClient<PrismaClient>().MODEL_KEY.create({ data });
+          await handleBeforeCreate(data);
+          const createdData = await getClient<PrismaClient>().MODEL_KEY.create({ data });
+          await handleAfterCreate(createdData);
+          return createdData;
         };
 
         const createList = (
@@ -518,7 +559,7 @@ export function getSourceFile({
     ...modelNames.map(modelName => importStatement(modelName, prismaClientModuleSpecifier)),
     ...modelEnums.map(enumName => importStatement(enumName, prismaClientModuleSpecifier)),
     ...header(prismaClientModuleSpecifier).statements,
-    insertLeadingBreakMarker(buildDataOptions()),
+    ...insertLeadingBreakMarker(genericTypeDeclarations().statements),
     ...insertLeadingBreakMarker(initializer().statements),
     insertLeadingBreakMarker(modelFieldDefinitions(document.datamodel.models)),
     ...document.datamodel.models
@@ -536,7 +577,8 @@ export function getSourceFile({
           modelBelongsToRelationFactory(fieldType, model),
         ),
         modelFactoryDefineInput(model, createInputType),
-        modelFactoryDefineOptions(model.name, filterRequiredInputObjectTypeField(createInputType).length === 0),
+        modelFactoryTrait(model),
+        modelFactoryDefineOptions(model, filterRequiredInputObjectTypeField(createInputType).length === 0),
         ...filterBelongsToField(model, createInputType).map(fieldType => isModelAssociationFactory(fieldType, model)),
         modelTraitKeys(model),
         modelFactoryInterfaceWithoutTraits(model),
