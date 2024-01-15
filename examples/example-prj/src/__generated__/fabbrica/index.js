@@ -1,12 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineCategoryFactory = exports.defineCommentFactory = exports.definePostFactory = exports.defineUserFactory = exports.resetScalarFieldValueGenerator = exports.registerScalarFieldValueGenerator = exports.resetSequence = exports.initialize = void 0;
+exports.defineCategoryFactory = exports.defineCommentFactory = exports.definePostFactory = exports.defineUserFactory = exports.reset = exports.initialize = exports.resetScalarFieldValueGenerator = exports.registerScalarFieldValueGenerator = exports.resetSequence = void 0;
 const internal_1 = require("@quramy/prisma-fabbrica/lib/internal");
 var internal_2 = require("@quramy/prisma-fabbrica/lib/internal");
-Object.defineProperty(exports, "initialize", { enumerable: true, get: function () { return internal_2.initialize; } });
 Object.defineProperty(exports, "resetSequence", { enumerable: true, get: function () { return internal_2.resetSequence; } });
 Object.defineProperty(exports, "registerScalarFieldValueGenerator", { enumerable: true, get: function () { return internal_2.registerScalarFieldValueGenerator; } });
 Object.defineProperty(exports, "resetScalarFieldValueGenerator", { enumerable: true, get: function () { return internal_2.resetScalarFieldValueGenerator; } });
+const initializer = (0, internal_1.createInitializer)();
+const { getClient } = initializer;
+exports.initialize = initializer.initialize, exports.reset = initializer.reset;
 const factoryFor = Symbol("factoryFor");
 const modelFieldDefinitions = [{
         name: "User",
@@ -88,7 +90,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, traits: t
         });
         const create = async (inputData = {}) => {
             const data = await build(inputData).then(screen);
-            return await (0, internal_1.getClient)().user.create({ data });
+            return await getClient().user.create({ data });
         };
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
@@ -163,7 +165,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, traits: t
         });
         const create = async (inputData = {}) => {
             const data = await build(inputData).then(screen);
-            return await (0, internal_1.getClient)().post.create({ data });
+            return await getClient().post.create({ data });
         };
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
@@ -244,7 +246,7 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, traits
         });
         const create = async (inputData = {}) => {
             const data = await build(inputData).then(screen);
-            return await (0, internal_1.getClient)().comment.create({ data });
+            return await getClient().comment.create({ data });
         };
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
@@ -312,7 +314,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, trait
         });
         const create = async (inputData = {}) => {
             const data = await build(inputData).then(screen);
-            return await (0, internal_1.getClient)().category.create({ data });
+            return await getClient().category.create({ data });
         };
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
