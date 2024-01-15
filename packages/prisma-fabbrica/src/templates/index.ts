@@ -81,7 +81,7 @@ export const header = (prismaClientModuleSpecifier: string) =>
     import { Prisma } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
     import type { PrismaClient } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
     import {
-      getClient,
+      createInitializer,
       ModelWithFields,
       createScreener,
       getScalarFieldValueGenerator,
@@ -90,7 +90,7 @@ export const header = (prismaClientModuleSpecifier: string) =>
       normalizeList,
       getSequenceCounter,
     } from "@quramy/prisma-fabbrica/lib/internal";
-    export { initialize, resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
+    export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
   `();
 
 export const buildDataOptions = () =>
@@ -103,6 +103,13 @@ export const buildDataOptions = () =>
 export const importStatement = (specifier: string, prismaClientModuleSpecifier: string) =>
   template.statement<ts.ImportDeclaration>`
     import type { ${() => ast.identifier(specifier)} } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
+  `();
+
+export const initializer = () =>
+  template.sourceFile`
+    const initializer = createInitializer();
+    const { getClient } = initializer;
+    export const { initialize } = initializer;
   `();
 
 export const symbols = () =>
@@ -513,6 +520,7 @@ export function getSourceFile({
     ...modelEnums.map(enumName => importStatement(enumName, prismaClientModuleSpecifier)),
     ...header(prismaClientModuleSpecifier).statements,
     insertLeadingBreakMarker(buildDataOptions()),
+    ...insertLeadingBreakMarker(initializer().statements),
     ...insertLeadingBreakMarker(symbols().statements),
     insertLeadingBreakMarker(modelFieldDefinitions(document.datamodel.models)),
     ...document.datamodel.models

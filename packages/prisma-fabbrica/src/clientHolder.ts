@@ -3,18 +3,20 @@ export type PrismaClientLike = {
   $disconnect: () => PromiseLike<unknown>;
 };
 
-let _client: undefined | (() => PrismaClientLike);
+const DEFAULT_CLIENT_MAP_KEY = Symbol("scope:singleton");
+const clientMap: Map<unknown, () => PrismaClientLike> = new Map();
 
-export function resetClient() {
-  _client = undefined;
+export function resetClient(key: unknown = DEFAULT_CLIENT_MAP_KEY) {
+  clientMap.delete(key);
 }
 
-export function setClient<T extends PrismaClientLike>(client: T | (() => T)) {
-  _client = typeof client === "function" ? client : () => client;
+export function setClient<T extends PrismaClientLike>(client: T | (() => T), key: unknown = DEFAULT_CLIENT_MAP_KEY) {
+  const value = typeof client === "function" ? client : () => client;
+  clientMap.set(key, value);
 }
 
-export function getClient<T extends PrismaClientLike>() {
-  const client = _client?.();
+export function getClient<T extends PrismaClientLike>(key?: unknown) {
+  const client = (clientMap.get(key) ?? clientMap.get(DEFAULT_CLIENT_MAP_KEY))?.();
   if (!client) {
     throw new Error("No prisma client");
   }

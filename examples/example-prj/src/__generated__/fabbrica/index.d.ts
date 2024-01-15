@@ -4,10 +4,11 @@ import type { Comment } from "@prisma/client";
 import type { Category } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import { Resolver } from "@quramy/prisma-fabbrica/lib/internal";
-export { initialize, resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
+export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
 type BuildDataOptions = {
     readonly seq: number;
 };
+export declare const initialize: (options: import("@quramy/prisma-fabbrica/lib/initialize").InitializeOptions) => void;
 declare const factoryFor: unique symbol;
 type UserFactoryDefineInput = {
     id?: string;

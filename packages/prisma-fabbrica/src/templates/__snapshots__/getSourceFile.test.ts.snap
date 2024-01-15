@@ -4,12 +4,18 @@ exports[`getSourceFile generates TypeScript AST 1`] = `
 "import type { User } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import type { PrismaClient } from "@prisma/client";
-import { getClient, ModelWithFields, createScreener, getScalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
-export { initialize, resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
+import { createInitializer, ModelWithFields, createScreener, getScalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
+export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
 
 type BuildDataOptions = {
     readonly seq: number;
 };
+
+const initializer = createInitializer();
+
+const { getClient } = initializer;
+
+export const { initialize } = initializer;
 
 const factoryFor = Symbol("factoryFor");
 
