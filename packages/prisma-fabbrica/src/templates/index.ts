@@ -106,7 +106,7 @@ export const importStatement = (specifier: string, prismaClientModuleSpecifier: 
   `();
 
 export const symbols = () =>
-  template.statement`
+  template.sourceFile`
     const factoryFor = Symbol("factoryFor");
   `();
 
@@ -513,7 +513,7 @@ export function getSourceFile({
     ...modelEnums.map(enumName => importStatement(enumName, prismaClientModuleSpecifier)),
     ...header(prismaClientModuleSpecifier).statements,
     insertLeadingBreakMarker(buildDataOptions()),
-    insertLeadingBreakMarker(symbols()),
+    ...insertLeadingBreakMarker(symbols().statements),
     insertLeadingBreakMarker(modelFieldDefinitions(document.datamodel.models)),
     ...document.datamodel.models
       .reduce((acc, model) => {

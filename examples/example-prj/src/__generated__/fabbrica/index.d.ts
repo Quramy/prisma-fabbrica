@@ -5,10 +5,10 @@ import type { Category } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import { Resolver } from "@quramy/prisma-fabbrica/lib/internal";
 export { initialize, resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
-declare const factoryFor: unique symbol;
 type BuildDataOptions = {
     readonly seq: number;
 };
+declare const factoryFor: unique symbol;
 type UserFactoryDefineInput = {
     id?: string;
     email?: string;
