@@ -109,7 +109,7 @@ export const initializer = () =>
   template.sourceFile`
     const initializer = createInitializer();
     const { getClient } = initializer;
-    export const { initialize, reset } = initializer;
+    export const { initialize } = initializer;
   `();
 
 export const symbols = () =>

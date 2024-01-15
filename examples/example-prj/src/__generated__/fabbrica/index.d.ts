@@ -8,7 +8,7 @@ export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValue
 type BuildDataOptions = {
     readonly seq: number;
 };
-export declare const initialize: (options: import("@quramy/prisma-fabbrica/lib/initialize").InitializeOptions) => void, reset: () => void;
+export declare const initialize: (options: import("@quramy/prisma-fabbrica/lib/initialize").InitializeOptions) => void;
 declare const factoryFor: unique symbol;
 type UserFactoryDefineInput = {
     id?: string;

@@ -13,7 +13,7 @@ const initializer = createInitializer();
 
 const { getClient } = initializer;
 
-export const { initialize, reset } = initializer;
+export const { initialize } = initializer;
 
 const factoryFor = Symbol("factoryFor");
 
