@@ -2,12 +2,28 @@ import {
   defineUserFactory,
   definePostFactory,
   defineCommentFactory,
-  CommentFactoryInterface,
+  type PostFactoryInterface,
+  type CommentFactoryInterface,
 } from "./__generated__/fabbrica";
 
 const prisma = jestPrisma.client;
 
-export const UserFactory = defineUserFactory();
+export const UserFactory = defineUserFactory({
+  traits: {
+    withSelfCommentedPost: {
+      onAfterCreate: async user => {
+        await getPostFactory().create({
+          author: {
+            connect: user,
+          },
+          comments: {
+            create: [await getCommentFactory().build({ author: { connect: user } })],
+          },
+        });
+      },
+    },
+  },
+});
 
 export const PostFactory = definePostFactory({
   defaultData: {
@@ -43,6 +59,10 @@ export const CommentFactory = defineCommentFactory({
   },
 });
 
+function getPostFactory(): PostFactoryInterface {
+  return PostFactory;
+}
+
 function getCommentFactory(): CommentFactoryInterface {
   return CommentFactory;
 }
@@ -75,6 +95,13 @@ describe("factories", () => {
         const post2 = await PostFactory.use("withTwoComments", "withComment").create();
         await expect(prisma.comment.count({ where: { postId: post1.id } })).resolves.toBe(2);
         await expect(prisma.comment.count({ where: { postId: post2.id } })).resolves.toBe(1);
+      });
+    });
+
+    describe("trait and callback", () => {
+      test("Execute other factory in callback", async () => {
+        const { id: userId } = await UserFactory.use("withSelfCommentedPost").create();
+        await expect(prisma.comment.count({ where: { authorId: userId } })).resolves.toBe(1);
       });
     });
   });
