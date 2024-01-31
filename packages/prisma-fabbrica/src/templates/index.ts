@@ -67,7 +67,7 @@ function filterEnumFields(inputType: DMMF.InputType) {
   );
 }
 
-function extractFirstEnumValue(enums: DMMF.SchemaEnum[], field: DMMF.SchemaArg) {
+function extractFirstEnumValue(enums: readonly DMMF.SchemaEnum[], field: DMMF.SchemaArg) {
   const typeName = field.inputTypes[0].type;
   const found = enums.find(byName(typeName));
   if (!found) {
@@ -117,7 +117,7 @@ export const symbols = () =>
     const factoryFor = Symbol("factoryFor");
   `();
 
-export const modelFieldDefinitions = (models: DMMF.Model[]) =>
+export const modelFieldDefinitions = (models: readonly DMMF.Model[]) =>
   template.statement`
     const modelFieldDefinitions: ModelWithFields[] = ${() => createJSONLiteral(createFieldDefinitions(models))};
   `();
@@ -317,7 +317,7 @@ export const isModelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF
 export const autoGenerateModelScalarsOrEnumsFieldArgs = (
   model: DMMF.Model,
   field: DMMF.SchemaArg,
-  enums: DMMF.SchemaEnum[],
+  enums: readonly DMMF.SchemaEnum[],
 ) =>
   // Note: In Json sclar filed, inputTypes[0].location is not scalar but enumType
   field.inputTypes[field.inputTypes.length - 1].location === "scalar"
@@ -341,7 +341,7 @@ export const autoGenerateModelScalarsOrEnumsFieldArgs = (
 export const autoGenerateModelScalarsOrEnums = (
   model: DMMF.Model,
   inputType: DMMF.InputType,
-  enums: DMMF.SchemaEnum[],
+  enums: readonly DMMF.SchemaEnum[],
 ) =>
   template.statement<ts.FunctionDeclaration>`
     function AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS({ seq }: { readonly seq: number }): MODEL_SCALAR_OR_ENUM_FIELDS {
