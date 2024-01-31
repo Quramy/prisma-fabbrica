@@ -28,7 +28,7 @@ function isCorCChildrenList(
   return typeof def.connectOrCreate === "object" && Array.isArray(def.connectOrCreate);
 }
 
-export function createFieldDefinitions(models: DMMF.Model[]): ModelWithFields[] {
+export function createFieldDefinitions(models: readonly DMMF.Model[]): ModelWithFields[] {
   return models.map(m => ({
     name: m.name,
     fields: m.fields
