@@ -16,8 +16,6 @@ const { getClient } = initializer;
 
 export const { initialize } = initializer;
 
-const factoryFor = Symbol("factoryFor");
-
 const modelFieldDefinitions: ModelWithFields[] = [{
         name: "User",
         fields: [{
@@ -77,7 +75,7 @@ type UserFactoryDefineOptions = {
 type UserTraitKeys<TOptions extends UserFactoryDefineOptions> = keyof TOptions["traits"];
 
 export interface UserFactoryInterfaceWithoutTraits {
-    readonly [factoryFor]: "User";
+    readonly _factoryFor: "User";
     build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<Prisma.UserCreateInput[]>;
@@ -133,7 +131,7 @@ function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ 
         const createList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
         return {
-            [factoryFor]: "User" as const,
+            _factoryFor: "User" as const,
             build,
             buildList,
             buildCreateInput: build,
@@ -169,7 +167,7 @@ type PostScalarOrEnumFields = {
 };
 
 type PostauthorFactory = {
-    [factoryFor]: "User";
+    _factoryFor: "User";
     build: () => PromiseLike<Prisma.UserCreateNestedOneWithoutPostsInput["create"]>;
 };
 
@@ -190,13 +188,13 @@ type PostFactoryDefineOptions = {
 };
 
 function isPostauthorFactory(x: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput | undefined): x is PostauthorFactory {
-    return (x as any)?.[factoryFor] === "User";
+    return (x as any)?._factoryFor === "User";
 }
 
 type PostTraitKeys<TOptions extends PostFactoryDefineOptions> = keyof TOptions["traits"];
 
 export interface PostFactoryInterfaceWithoutTraits {
-    readonly [factoryFor]: "Post";
+    readonly _factoryFor: "Post";
     build(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.PostCreateInput>[]): PromiseLike<Prisma.PostCreateInput[]>;
@@ -256,7 +254,7 @@ function definePostFactoryInternal<TOptions extends PostFactoryDefineOptions>({ 
         const createList = (inputData: number | readonly Partial<Prisma.PostCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.PostCreateInput> = {}) => create(inputData).then(pickForConnect);
         return {
-            [factoryFor]: "Post" as const,
+            _factoryFor: "Post" as const,
             build,
             buildList,
             buildCreateInput: build,
@@ -292,12 +290,12 @@ type ReviewScalarOrEnumFields = {
 };
 
 type ReviewpostFactory = {
-    [factoryFor]: "Post";
+    _factoryFor: "Post";
     build: () => PromiseLike<Prisma.PostCreateNestedOneWithoutReviewsInput["create"]>;
 };
 
 type ReviewreviewerFactory = {
-    [factoryFor]: "User";
+    _factoryFor: "User";
     build: () => PromiseLike<Prisma.UserCreateNestedOneWithoutReviewsInput["create"]>;
 };
 
@@ -318,17 +316,17 @@ type ReviewFactoryDefineOptions = {
 };
 
 function isReviewpostFactory(x: ReviewpostFactory | Prisma.PostCreateNestedOneWithoutReviewsInput | undefined): x is ReviewpostFactory {
-    return (x as any)?.[factoryFor] === "Post";
+    return (x as any)?._factoryFor === "Post";
 }
 
 function isReviewreviewerFactory(x: ReviewreviewerFactory | Prisma.UserCreateNestedOneWithoutReviewsInput | undefined): x is ReviewreviewerFactory {
-    return (x as any)?.[factoryFor] === "User";
+    return (x as any)?._factoryFor === "User";
 }
 
 type ReviewTraitKeys<TOptions extends ReviewFactoryDefineOptions> = keyof TOptions["traits"];
 
 export interface ReviewFactoryInterfaceWithoutTraits {
-    readonly [factoryFor]: "Review";
+    readonly _factoryFor: "Review";
     build(inputData?: Partial<Prisma.ReviewCreateInput>): PromiseLike<Prisma.ReviewCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.ReviewCreateInput>): PromiseLike<Prisma.ReviewCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.ReviewCreateInput>[]): PromiseLike<Prisma.ReviewCreateInput[]>;
@@ -391,7 +389,7 @@ function defineReviewFactoryInternal<TOptions extends ReviewFactoryDefineOptions
         const createList = (inputData: number | readonly Partial<Prisma.ReviewCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.ReviewCreateInput> = {}) => create(inputData).then(pickForConnect);
         return {
-            [factoryFor]: "Review" as const,
+            _factoryFor: "Review" as const,
             build,
             buildList,
             buildCreateInput: build,

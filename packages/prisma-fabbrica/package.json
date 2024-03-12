@@ -31,7 +31,7 @@
     }
   },
   "scripts": {
-    "clean": "rimraf \"*.tsbuildinfo\" \"lib/**/*.{js,ts}\" coverage",
+    "clean": "rimraf -g \"*.tsbuildinfo\" \"lib/**/*.{js,ts}\" coverage",
     "test": "NODE_ENV=development jest",
     "test:ci": "NODE_ENV=development jest --coverage",
     "prepublishOnly": "cp ../../README.md ."

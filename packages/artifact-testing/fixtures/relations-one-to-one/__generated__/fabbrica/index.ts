@@ -15,8 +15,6 @@ const { getClient } = initializer;
 
 export const { initialize } = initializer;
 
-const factoryFor = Symbol("factoryFor");
-
 const modelFieldDefinitions: ModelWithFields[] = [{
         name: "User",
         fields: [{
@@ -39,7 +37,7 @@ type UserScalarOrEnumFields = {
 };
 
 type UserprofileFactory = {
-    [factoryFor]: "Profile";
+    _factoryFor: "Profile";
     build: () => PromiseLike<Prisma.ProfileCreateNestedOneWithoutUserInput["create"]>;
 };
 
@@ -59,13 +57,13 @@ type UserFactoryDefineOptions = {
 };
 
 function isUserprofileFactory(x: UserprofileFactory | Prisma.ProfileCreateNestedOneWithoutUserInput | undefined): x is UserprofileFactory {
-    return (x as any)?.[factoryFor] === "Profile";
+    return (x as any)?._factoryFor === "Profile";
 }
 
 type UserTraitKeys<TOptions extends UserFactoryDefineOptions> = keyof TOptions["traits"];
 
 export interface UserFactoryInterfaceWithoutTraits {
-    readonly [factoryFor]: "User";
+    readonly _factoryFor: "User";
     build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<Prisma.UserCreateInput[]>;
@@ -125,7 +123,7 @@ function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ 
         const createList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.UserCreateInput> = {}) => create(inputData).then(pickForConnect);
         return {
-            [factoryFor]: "User" as const,
+            _factoryFor: "User" as const,
             build,
             buildList,
             buildCreateInput: build,
@@ -160,7 +158,7 @@ type ProfileScalarOrEnumFields = {
 };
 
 type ProfileuserFactory = {
-    [factoryFor]: "User";
+    _factoryFor: "User";
     build: () => PromiseLike<Prisma.UserCreateNestedOneWithoutProfileInput["create"]>;
 };
 
@@ -179,13 +177,13 @@ type ProfileFactoryDefineOptions = {
 };
 
 function isProfileuserFactory(x: ProfileuserFactory | Prisma.UserCreateNestedOneWithoutProfileInput | undefined): x is ProfileuserFactory {
-    return (x as any)?.[factoryFor] === "User";
+    return (x as any)?._factoryFor === "User";
 }
 
 type ProfileTraitKeys<TOptions extends ProfileFactoryDefineOptions> = keyof TOptions["traits"];
 
 export interface ProfileFactoryInterfaceWithoutTraits {
-    readonly [factoryFor]: "Profile";
+    readonly _factoryFor: "Profile";
     build(inputData?: Partial<Prisma.ProfileCreateInput>): PromiseLike<Prisma.ProfileCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.ProfileCreateInput>): PromiseLike<Prisma.ProfileCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.ProfileCreateInput>[]): PromiseLike<Prisma.ProfileCreateInput[]>;
@@ -244,7 +242,7 @@ function defineProfileFactoryInternal<TOptions extends ProfileFactoryDefineOptio
         const createList = (inputData: number | readonly Partial<Prisma.ProfileCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.ProfileCreateInput> = {}) => create(inputData).then(pickForConnect);
         return {
-            [factoryFor]: "Profile" as const,
+            _factoryFor: "Profile" as const,
             build,
             buildList,
             buildCreateInput: build,
