@@ -21,16 +21,16 @@ function createObjectLiteral(obj: JSONObjLike): ts.ObjectLiteralExpression {
         typeof v === "string"
           ? ast.stringLiteral(v)
           : typeof v === "number"
-          ? ast.numericLiteral(v)
-          : typeof v === "boolean"
-          ? v
-            ? ast.true()
-            : ast.false()
-          : Array.isArray(v)
-          ? createArrayLitreral(v)
-          : typeof v === "object"
-          ? createObjectLiteral(v)
-          : (null as never),
+            ? ast.numericLiteral(v)
+            : typeof v === "boolean"
+              ? v
+                ? ast.true()
+                : ast.false()
+              : Array.isArray(v)
+                ? createArrayLitreral(v)
+                : typeof v === "object"
+                  ? createObjectLiteral(v)
+                  : (null as never),
       ),
     ),
     true,

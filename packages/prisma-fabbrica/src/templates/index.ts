@@ -518,11 +518,14 @@ export function getSourceFile({
     ...insertLeadingBreakMarker(initializer().statements),
     insertLeadingBreakMarker(modelFieldDefinitions(document.datamodel.models)),
     ...document.datamodel.models
-      .reduce((acc, model) => {
-        const createInputType = findPrismaCreateInputTypeFromModelName(document, model.name);
-        if (!createInputType) return acc;
-        return [...acc, { model, createInputType }];
-      }, [] as readonly { model: DMMF.Model; createInputType: DMMF.InputType }[])
+      .reduce(
+        (acc, model) => {
+          const createInputType = findPrismaCreateInputTypeFromModelName(document, model.name);
+          if (!createInputType) return acc;
+          return [...acc, { model, createInputType }];
+        },
+        [] as readonly { model: DMMF.Model; createInputType: DMMF.InputType }[],
+      )
       .flatMap(({ model, createInputType }) => [
         modelScalarOrEnumFields(model, createInputType),
         ...filterBelongsToField(model, createInputType).map(fieldType =>
