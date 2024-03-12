@@ -15,8 +15,6 @@ const { getClient } = initializer;
 
 export const { initialize } = initializer;
 
-const factoryFor = Symbol("factoryFor");
-
 const modelFieldDefinitions: ModelWithFields[] = [{
         name: "Post",
         fields: [{
@@ -56,7 +54,7 @@ type PostFactoryDefineOptions = {
 type PostTraitKeys<TOptions extends PostFactoryDefineOptions> = keyof TOptions["traits"];
 
 export interface PostFactoryInterfaceWithoutTraits {
-    readonly [factoryFor]: "Post";
+    readonly _factoryFor: "Post";
     build(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.PostCreateInput>[]): PromiseLike<Prisma.PostCreateInput[]>;
@@ -112,7 +110,7 @@ function definePostFactoryInternal<TOptions extends PostFactoryDefineOptions>({ 
         const createList = (inputData: number | readonly Partial<Prisma.PostCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.PostCreateInput> = {}) => create(inputData).then(pickForConnect);
         return {
-            [factoryFor]: "Post" as const,
+            _factoryFor: "Post" as const,
             build,
             buildList,
             buildCreateInput: build,
@@ -165,7 +163,7 @@ type CategoryFactoryDefineOptions = {
 type CategoryTraitKeys<TOptions extends CategoryFactoryDefineOptions> = keyof TOptions["traits"];
 
 export interface CategoryFactoryInterfaceWithoutTraits {
-    readonly [factoryFor]: "Category";
+    readonly _factoryFor: "Category";
     build(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Prisma.CategoryCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Prisma.CategoryCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]): PromiseLike<Prisma.CategoryCreateInput[]>;
@@ -221,7 +219,7 @@ function defineCategoryFactoryInternal<TOptions extends CategoryFactoryDefineOpt
         const createList = (inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.CategoryCreateInput> = {}) => create(inputData).then(pickForConnect);
         return {
-            [factoryFor]: "Category" as const,
+            _factoryFor: "Category" as const,
             build,
             buildList,
             buildCreateInput: build,

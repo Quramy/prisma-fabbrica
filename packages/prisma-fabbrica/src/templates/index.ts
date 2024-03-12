@@ -112,11 +112,6 @@ export const initializer = () =>
     export const { initialize } = initializer;
   `();
 
-export const symbols = () =>
-  template.sourceFile`
-    const factoryFor = Symbol("factoryFor");
-  `();
-
 export const modelFieldDefinitions = (models: readonly DMMF.Model[]) =>
   template.statement`
     const modelFieldDefinitions: ModelWithFields[] = ${() => createJSONLiteral(createFieldDefinitions(models))};
@@ -202,7 +197,7 @@ export const modelBelongsToRelationFactory = (fieldType: DMMF.SchemaArg, model: 
   const targetModel = model.fields.find(byName(fieldType))!;
   return template.statement<ts.TypeAliasDeclaration>`
     type ${() => ast.identifier(`${model.name}${fieldType.name}Factory`)} = {
-      [factoryFor]: ${() => ast.literalTypeNode(ast.stringLiteral(targetModel.type))};
+      _factoryFor: ${() => ast.literalTypeNode(ast.stringLiteral(targetModel.type))};
       build: () => PromiseLike<Prisma.${() => ast.identifier(fieldType.inputTypes[0].type as string)}["create"]>;
     };
   `();
@@ -270,7 +265,7 @@ export const modelTraitKeys = (model: DMMF.Model) =>
 export const modelFactoryInterfaceWithoutTraits = (model: DMMF.Model) =>
   template.statement`
     export interface MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS {
-      readonly [factoryFor]: ${() => ast.literalTypeNode(ast.stringLiteral(model.name))}
+      readonly _factoryFor: ${() => ast.literalTypeNode(ast.stringLiteral(model.name))}
       build(inputData?: Partial<Prisma.MODEL_CREATE_INPUT>): PromiseLike<Prisma.MODEL_CREATE_INPUT>
       buildCreateInput(inputData?: Partial<Prisma.MODEL_CREATE_INPUT>): PromiseLike<Prisma.MODEL_CREATE_INPUT>
       buildList(inputData: number | readonly Partial<Prisma.MODEL_CREATE_INPUT>[]): PromiseLike<Prisma.MODEL_CREATE_INPUT[]>
@@ -307,7 +302,7 @@ export const isModelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF
       x: MODEL_BELONGS_TO_RELATION_FACTORY | ${() =>
         argInputType(model, fieldType.name, fieldType.inputTypes[0])} | undefined
     ): x is MODEL_BELONGS_TO_RELATION_FACTORY {
-      return (x as any)?.[factoryFor] === ${() => ast.stringLiteral(targetModel.type)};
+      return (x as any)?._factoryFor === ${() => ast.stringLiteral(targetModel.type)};
     }
   `({
     MODEL_BELONGS_TO_RELATION_FACTORY: ast.typeReferenceNode(`${model.name}${fieldType.name}Factory`),
@@ -433,7 +428,7 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
         const createForConnect = (inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}) => create(inputData).then(pickForConnect);
 
         return {
-          [factoryFor]: ${() => ast.stringLiteral(model.name)} as const,
+          _factoryFor: ${() => ast.stringLiteral(model.name)} as const,
           build,
           buildList,
           buildCreateInput: build,
@@ -521,7 +516,6 @@ export function getSourceFile({
     ...header(prismaClientModuleSpecifier).statements,
     insertLeadingBreakMarker(buildDataOptions()),
     ...insertLeadingBreakMarker(initializer().statements),
-    ...insertLeadingBreakMarker(symbols().statements),
     insertLeadingBreakMarker(modelFieldDefinitions(document.datamodel.models)),
     ...document.datamodel.models
       .reduce((acc, model) => {

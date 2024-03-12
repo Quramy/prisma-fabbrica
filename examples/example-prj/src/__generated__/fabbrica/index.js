@@ -9,7 +9,6 @@ Object.defineProperty(exports, "resetScalarFieldValueGenerator", { enumerable: t
 const initializer = (0, internal_1.createInitializer)();
 const { getClient } = initializer;
 exports.initialize = initializer.initialize;
-const factoryFor = Symbol("factoryFor");
 const modelFieldDefinitions = [{
         name: "User",
         fields: [{
@@ -95,7 +94,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, traits: t
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
         return {
-            [factoryFor]: "User",
+            _factoryFor: "User",
             build,
             buildList,
             buildCreateInput: build,
@@ -125,7 +124,7 @@ function defineUserFactory(options) {
 }
 exports.defineUserFactory = defineUserFactory;
 function isPostauthorFactory(x) {
-    return x?.[factoryFor] === "User";
+    return x?._factoryFor === "User";
 }
 function autoGeneratePostScalarsOrEnums({ seq }) {
     return {
@@ -170,7 +169,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, traits: t
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
         return {
-            [factoryFor]: "Post",
+            _factoryFor: "Post",
             build,
             buildList,
             buildCreateInput: build,
@@ -200,10 +199,10 @@ function definePostFactory(options) {
 }
 exports.definePostFactory = definePostFactory;
 function isCommentpostFactory(x) {
-    return x?.[factoryFor] === "Post";
+    return x?._factoryFor === "Post";
 }
 function isCommentauthorFactory(x) {
-    return x?.[factoryFor] === "User";
+    return x?._factoryFor === "User";
 }
 function autoGenerateCommentScalarsOrEnums({ seq }) {
     return {
@@ -251,7 +250,7 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, traits
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
         return {
-            [factoryFor]: "Comment",
+            _factoryFor: "Comment",
             build,
             buildList,
             buildCreateInput: build,
@@ -319,7 +318,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, trait
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
         return {
-            [factoryFor]: "Category",
+            _factoryFor: "Category",
             build,
             buildList,
             buildCreateInput: build,
