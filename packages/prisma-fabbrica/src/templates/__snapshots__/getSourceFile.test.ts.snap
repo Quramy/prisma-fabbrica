@@ -2,9 +2,9 @@
 
 exports[`getSourceFile generates TypeScript AST 1`] = `
 "import type { User } from "@prisma/client";
-import { Prisma } from "@prisma/client";
-import type { PrismaClient } from "@prisma/client";
-import { createInitializer, ModelWithFields, createScreener, getScalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
+import type { Prisma, PrismaClient } from "@prisma/client";
+import { createInitializer, createScreener, getScalarFieldValueGenerator, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
+import type { ModelWithFields, Resolver, } from "@quramy/prisma-fabbrica/lib/internal";
 export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
 
 type BuildDataOptions = {

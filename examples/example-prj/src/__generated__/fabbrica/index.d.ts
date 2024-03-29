@@ -2,8 +2,8 @@ import type { User } from "@prisma/client";
 import type { Post } from "@prisma/client";
 import type { Comment } from "@prisma/client";
 import type { Category } from "@prisma/client";
-import { Prisma } from "@prisma/client";
-import { Resolver } from "@quramy/prisma-fabbrica/lib/internal";
+import type { Prisma } from "@prisma/client";
+import type { Resolver } from "@quramy/prisma-fabbrica/lib/internal";
 export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
 type BuildDataOptions = {
     readonly seq: number;

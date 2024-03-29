@@ -78,17 +78,18 @@ function extractFirstEnumValue(enums: readonly DMMF.SchemaEnum[], field: DMMF.Sc
 
 export const header = (prismaClientModuleSpecifier: string) =>
   template.sourceFile`
-    import { Prisma } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
-    import type { PrismaClient } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
+    import type { Prisma, PrismaClient } from ${() => ast.stringLiteral(prismaClientModuleSpecifier)};
     import {
       createInitializer,
-      ModelWithFields,
       createScreener,
       getScalarFieldValueGenerator,
-      Resolver,
       normalizeResolver,
       normalizeList,
       getSequenceCounter,
+    } from "@quramy/prisma-fabbrica/lib/internal";
+    import type {
+      ModelWithFields,
+      Resolver,
     } from "@quramy/prisma-fabbrica/lib/internal";
     export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
   `();

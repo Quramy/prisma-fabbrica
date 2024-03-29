@@ -1,9 +1,9 @@
 import type { User } from "../client";
 import type { Post } from "../client";
 import type { Review } from "../client";
-import { Prisma } from "../client";
-import type { PrismaClient } from "../client";
-import { createInitializer, ModelWithFields, createScreener, getScalarFieldValueGenerator, Resolver, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
+import type { Prisma, PrismaClient } from "../client";
+import { createInitializer, createScreener, getScalarFieldValueGenerator, normalizeResolver, normalizeList, getSequenceCounter, } from "@quramy/prisma-fabbrica/lib/internal";
+import type { ModelWithFields, Resolver, } from "@quramy/prisma-fabbrica/lib/internal";
 export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
 
 type BuildDataOptions = {
