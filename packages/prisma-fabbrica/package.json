@@ -39,7 +39,7 @@
   "dependencies": {
     "@prisma/generator-helper": "^5.0.0",
     "@prisma/internals": "^5.0.0",
-    "short-uuid": "4.2.2",
+    "short-uuid": "5.0.1",
     "talt": "2.4.4"
   },
   "peerDependencies": {
