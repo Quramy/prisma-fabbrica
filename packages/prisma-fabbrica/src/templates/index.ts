@@ -108,9 +108,9 @@ export const genericDeclarations = () =>
     } & TTransients;
 
     type CallbackDefineOptions<TCreated, TCreateInput, TTransients extends Record<string, unknown>> = {
-      onAfterBuild?: (createInput: TCreateInput & TTransients) => void | PromiseLike<void>;
-      onBeforeCreate?: (createInput: TCreateInput & TTransients) => void | PromiseLike<void>;
-      onAfterCreate?: (created: TCreated & TTransients) => void | PromiseLike<void>;
+      onAfterBuild?: (createInput: TCreateInput, transientFields: TTransients) => void | PromiseLike<void>;
+      onBeforeCreate?: (createInput: TCreateInput, transientFields: TTransients) => void | PromiseLike<void>;
+      onAfterCreate?: (created: TCreated, transientFields: TTransients) => void | PromiseLike<void>;
     };
 
     const initializer = createInitializer();
@@ -273,7 +273,7 @@ export const modelFactoryDefineOptions = (model: DMMF.Model, isOpionalDefaultDat
 
 export const modelTraitKeys = (model: DMMF.Model) =>
   template.statement`
-    type MODEL_TRAIT_KEYS<TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<Record<string, unknown>>> = keyof TOptions["traits"];
+    type MODEL_TRAIT_KEYS<TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<any>> = keyof TOptions["traits"];
   `({
     MODEL_TRAIT_KEYS: ast.identifier(`${model.name}TraitKeys`),
     MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
@@ -283,18 +283,21 @@ export const modelFactoryInterfaceWithoutTraits = (model: DMMF.Model) =>
   template.statement`
     export interface MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS<TTransients extends Record<string, unknown> {
       readonly _factoryFor: ${() => ast.literalTypeNode(ast.stringLiteral(model.name))}
-      build(inputData?: Partial<Prisma.MODEL_CREATE_INPUT & TTransients>): PromiseLike<Prisma.MODEL_CREATE_INPUT>
-      buildCreateInput(inputData?: Partial<Prisma.MODEL_CREATE_INPUT>): PromiseLike<Prisma.MODEL_CREATE_INPUT>
-      buildList(inputData: number | readonly Partial<Prisma.MODEL_CREATE_INPUT>[]): PromiseLike<Prisma.MODEL_CREATE_INPUT[]>
+      build(inputData?: CREATE_INPUT_TYPE): PromiseLike<Prisma.MODEL_CREATE_INPUT>
+      buildCreateInput(inputData?: CREATE_INPUT_TYPE): PromiseLike<Prisma.MODEL_CREATE_INPUT>
+      buildList(inputData: number | readonly CREATE_INPUT_TYPE[]): PromiseLike<Prisma.MODEL_CREATE_INPUT[]>
       pickForConnect(inputData: MODEL_TYPE): Pick<MODEL_TYPE, MODEL_ID_COLS>
-      create(inputData?: Partial<Prisma.MODEL_CREATE_INPUT & TTransients>): PromiseLike<MODEL_TYPE>
-      createList(inputData: number | readonly Partial<Prisma.MODEL_CREATE_INPUT>[]): PromiseLike<MODEL_TYPE[]>
-      createForConnect(inputData?: Partial<Prisma.MODEL_CREATE_INPUT>): PromiseLike<Pick<MODEL_TYPE, MODEL_ID_COLS>>
+      create(inputData?: CREATE_INPUT_TYPE): PromiseLike<MODEL_TYPE>
+      createList(inputData: number | readonly CREATE_INPUT_TYPE[]): PromiseLike<MODEL_TYPE[]>
+      createForConnect(inputData?: CREATE_INPUT_TYPE): PromiseLike<Pick<MODEL_TYPE, MODEL_ID_COLS>>
     }
   `({
     MODEL_TYPE: ast.identifier(model.name),
     MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS: ast.identifier(`${model.name}FactoryInterfaceWithoutTraits`),
     MODEL_CREATE_INPUT: ast.identifier(`${model.name}CreateInput`),
+    CREATE_INPUT_TYPE: template.typeNode`Partial<Prisma.MODEL_CREATE_INPUT & TTransients>`({
+      MODEL_CREATE_INPUT: ast.identifier(`${model.name}CreateInput`),
+    }),
     MODEL_ID_COLS: ast.unionTypeNode(
       getIdFieldNames(model).map(fieldName => ast.literalTypeNode(ast.stringLiteral(fieldName))),
     ),
@@ -304,7 +307,7 @@ export const modelFactoryInterface = (model: DMMF.Model) =>
   template.statement`
     export interface MODEL_FACTORY_INTERFACE<
       TTransients extends Record<string, unknown> = Record<string, unknown>,
-      TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<any> = MODEL_FACTORY_DEFINE_OPTIONS
+      TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<TTransients> = MODEL_FACTORY_DEFINE_OPTIONS<TTransients>
     > extends MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS<TTransients> {
       use(name: MODEL_TRAIT_KEYS<TOptions>, ...names: readonly MODEL_TRAIT_KEYS<TOptions>[]): MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS<TTransients>;
     }
@@ -375,7 +378,7 @@ export const autoGenerateModelScalarsOrEnums = (
 
 export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.InputType) =>
   template.statement<ts.FunctionDeclaration>`
-    function DEFINE_MODEL_FACTORY_INTERNAL<TTransients extends Record<string, unknown>, TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<any>>({
+    function DEFINE_MODEL_FACTORY_INTERNAL<TTransients extends Record<string, unknown>, TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<TTransients>>({
       defaultData: defaultDataResolver,
       onAfterBuild,
       onBeforeCreate,
@@ -404,16 +407,16 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
         ]);
 
         const build = async (
-          inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
+          inputData: CREATE_INPUT_TYPE = {}
         ) => {
           const seq = getSeq();
           const requiredScalarData = AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS({ seq });
           const resolveValue = normalizeResolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions<any>>(DEFALUT_DATA_RESOLVER);
-          const transients = synthesize(defaultTransientFieldValues, inputData);
-          const resolverInput = { seq, ...transients };
+          const transientFields = synthesize(defaultTransientFieldValues, inputData);
+          const resolverInput = { seq, ...transientFields };
           const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
             const acc = await queue;
-            const resolveTraitValue = normalizeResolver<Partial<MODEL_FACTORY_DEFINE_INPUT>, BuildDataOptions<any>>(traitsDefs[traitKey]?.data ?? {});
+            const resolveTraitValue = normalizeResolver<Partial<MODEL_FACTORY_DEFINE_INPUT>, BuildDataOptions<TTransients>>(traitsDefs[traitKey]?.data ?? {});
             const traitData = await resolveTraitValue(resolverInput);
             return {
               ...acc,
@@ -437,13 +440,13 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
               ),
               true,
             )};
-          const data: Prisma.MODEL_CREATE_INPUT = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData};
-          await handleAfterBuild({ ...data, ...transients });
+          const data: Prisma.MODEL_CREATE_INPUT = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+          await handleAfterBuild(data, transientFields);
           return data;
         };
 
         const buildList = (
-          inputData: number | readonly Partial<Prisma.MODEL_CREATE_INPUT>[]
+          inputData: number | readonly CREATE_INPUT_TYPE[]
         ) => Promise.all(normalizeList(inputData).map(data => build(data)));
 
         const pickForConnect = (inputData: ${() => ast.typeReferenceNode(model.name)}) => (
@@ -457,20 +460,21 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
         );
 
         const create = async (
-          inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}
+          inputData: CREATE_INPUT_TYPE = {}
         ) => {
           const data = await build(inputData).then(screen);
-          await handleBeforeCreate(data);
+          const transientFields = synthesize(defaultTransientFieldValues, inputData);
+          await handleBeforeCreate(data, transientFields);
           const createdData = await getClient<PrismaClient>().MODEL_KEY.create({ data });
-          await handleAfterCreate(createdData);
+          await handleAfterCreate(createdData, transientFields);
           return createdData;
         };
 
         const createList = (
-          inputData: number | readonly Partial<Prisma.MODEL_CREATE_INPUT>[]
+          inputData: number | readonly CREATE_INPUT_TYPE[]
         ) => Promise.all(normalizeList(inputData).map(data => create(data)));
 
-        const createForConnect = (inputData: Partial<Prisma.MODEL_CREATE_INPUT> = {}) => create(inputData).then(pickForConnect);
+        const createForConnect = (inputData: CREATE_INPUT_TYPE = {}) => create(inputData).then(pickForConnect);
 
         return {
           _factoryFor: ${() => ast.stringLiteral(model.name)} as const,
@@ -501,6 +505,9 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
     MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
     MODEL_CREATE_INPUT: ast.identifier(`${model.name}CreateInput`),
     AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS: ast.identifier(`autoGenerate${model.name}ScalarsOrEnums`),
+    CREATE_INPUT_TYPE: template.typeNode`Partial<Prisma.MODEL_CREATE_INPUT & TTransients>`({
+      MODEL_CREATE_INPUT: ast.identifier(`${model.name}CreateInput`),
+    }),
     DEFALUT_DATA_RESOLVER: filterRequiredInputObjectTypeField(inputType).length
       ? template.expression(`defaultDataResolver`)({})
       : template.expression(`defaultDataResolver ?? {}`)({}),
