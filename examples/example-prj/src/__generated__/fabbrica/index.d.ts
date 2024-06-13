@@ -1,4 +1,5 @@
 import type { User } from "@prisma/client";
+import type { LoginLog } from "@prisma/client";
 import type { Post } from "@prisma/client";
 import type { Comment } from "@prisma/client";
 import type { Category } from "@prisma/client";
@@ -57,6 +58,46 @@ interface UserFactoryBuilder {
  * @returns factory {@link UserFactoryInterface}
  */
 export declare const defineUserFactory: UserFactoryBuilder;
+type LoginLogFactoryDefineInput = {
+    id?: string;
+    userId?: string;
+    clientId?: string;
+    createdAt?: Date;
+};
+type LoginLogFactoryTrait<TTransients extends Record<string, unknown>> = {
+    data?: Resolver<Partial<LoginLogFactoryDefineInput>, BuildDataOptions<TTransients>>;
+} & CallbackDefineOptions<LoginLog, Prisma.LoginLogCreateInput, TTransients>;
+type LoginLogFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
+    defaultData?: Resolver<LoginLogFactoryDefineInput, BuildDataOptions<TTransients>>;
+    traits?: {
+        [traitName: string | symbol]: LoginLogFactoryTrait<TTransients>;
+    };
+} & CallbackDefineOptions<LoginLog, Prisma.LoginLogCreateInput, TTransients>;
+type LoginLogTraitKeys<TOptions extends LoginLogFactoryDefineOptions<any>> = keyof TOptions["traits"];
+export interface LoginLogFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
+    readonly _factoryFor: "LoginLog";
+    build(inputData?: Partial<Prisma.LoginLogCreateInput & TTransients>): PromiseLike<Prisma.LoginLogCreateInput>;
+    buildCreateInput(inputData?: Partial<Prisma.LoginLogCreateInput & TTransients>): PromiseLike<Prisma.LoginLogCreateInput>;
+    buildList(inputData: number | readonly Partial<Prisma.LoginLogCreateInput & TTransients>[]): PromiseLike<Prisma.LoginLogCreateInput[]>;
+    pickForConnect(inputData: LoginLog): Pick<LoginLog, "id">;
+    create(inputData?: Partial<Prisma.LoginLogCreateInput & TTransients>): PromiseLike<LoginLog>;
+    createList(inputData: number | readonly Partial<Prisma.LoginLogCreateInput & TTransients>[]): PromiseLike<LoginLog[]>;
+    createForConnect(inputData?: Partial<Prisma.LoginLogCreateInput & TTransients>): PromiseLike<Pick<LoginLog, "id">>;
+}
+export interface LoginLogFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends LoginLogFactoryDefineOptions<TTransients> = LoginLogFactoryDefineOptions<TTransients>> extends LoginLogFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: LoginLogTraitKeys<TOptions>, ...names: readonly LoginLogTraitKeys<TOptions>[]): LoginLogFactoryInterfaceWithoutTraits<TTransients>;
+}
+interface LoginLogFactoryBuilder {
+    <TOptions extends LoginLogFactoryDefineOptions>(options?: TOptions): LoginLogFactoryInterface<{}, TOptions>;
+    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends LoginLogFactoryDefineOptions<TTransients>>(options?: TOptions) => LoginLogFactoryInterface<TTransients, TOptions>;
+}
+/**
+ * Define factory for {@link LoginLog} model.
+ *
+ * @param options
+ * @returns factory {@link LoginLogFactoryInterface}
+ */
+export declare const defineLoginLogFactory: LoginLogFactoryBuilder;
 type PostauthorFactory = {
     _factoryFor: "User";
     build: () => PromiseLike<Prisma.UserCreateNestedOneWithoutPostsInput["create"]>;

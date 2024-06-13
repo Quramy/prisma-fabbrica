@@ -1,13 +1,14 @@
-export function synthesize<T extends Record<string, unknown>, S extends Record<string, unknown> | null | undefined>(
+export function synthesize<T extends Record<string, unknown>, S extends Record<string, unknown>>(
   defaultValues: T,
-  inputData: S,
+  inputData: S | null | undefined,
 ) {
   const merged = { ...defaultValues } as any;
-  if (!inputData) return merged as T;
+  const filteredInputData = (inputData ?? {}) as S;
   for (const key of Object.keys(defaultValues)) {
-    if (inputData[key] != null) {
-      merged[key] = inputData[key];
+    if (filteredInputData[key] != null) {
+      merged[key] = filteredInputData[key];
+      delete filteredInputData[key];
     }
   }
-  return merged as T;
+  return [merged, filteredInputData] as [T, S];
 }

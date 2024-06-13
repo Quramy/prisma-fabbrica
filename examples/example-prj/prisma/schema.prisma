@@ -21,6 +21,13 @@ model User {
   createdAt DateTime  @default(now())
 }
 
+model LoginLog {
+  id        String @id @default(cuid())
+  userId    String
+  clientId  String
+  createdAt DateTime @default(now())
+}
+
 model Post {
   id         String     @id
   title      String

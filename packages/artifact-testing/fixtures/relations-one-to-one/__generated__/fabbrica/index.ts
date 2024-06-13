@@ -115,7 +115,7 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
             const seq = getSeq();
             const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
             const resolveValue = normalizeResolver<UserFactoryDefineInput, BuildDataOptions<any>>(defaultDataResolver ?? {});
-            const transientFields = synthesize(defaultTransientFieldValues, inputData);
+            const [transientFields, filteredInputData] = synthesize(defaultTransientFieldValues, inputData);
             const resolverInput = { seq, ...transientFields };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
@@ -131,7 +131,7 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
                     create: await defaultData.profile.build()
                 } : defaultData.profile
             };
-            const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;
         };
@@ -140,8 +140,8 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
             id: inputData.id
         });
         const create = async (inputData: Partial<Prisma.UserCreateInput & TTransients> = {}) => {
+            const [transientFields] = synthesize(defaultTransientFieldValues, inputData);
             const data = await build(inputData).then(screen);
-            const transientFields = synthesize(defaultTransientFieldValues, inputData);
             await handleBeforeCreate(data, transientFields);
             const createdData = await getClient<PrismaClient>().user.create({ data });
             await handleAfterCreate(createdData, transientFields);
@@ -262,7 +262,7 @@ function defineProfileFactoryInternal<TTransients extends Record<string, unknown
             const seq = getSeq();
             const requiredScalarData = autoGenerateProfileScalarsOrEnums({ seq });
             const resolveValue = normalizeResolver<ProfileFactoryDefineInput, BuildDataOptions<any>>(defaultDataResolver);
-            const transientFields = synthesize(defaultTransientFieldValues, inputData);
+            const [transientFields, filteredInputData] = synthesize(defaultTransientFieldValues, inputData);
             const resolverInput = { seq, ...transientFields };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
@@ -278,7 +278,7 @@ function defineProfileFactoryInternal<TTransients extends Record<string, unknown
                     create: await defaultData.user.build()
                 } : defaultData.user
             };
-            const data: Prisma.ProfileCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            const data: Prisma.ProfileCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;
         };
@@ -287,8 +287,8 @@ function defineProfileFactoryInternal<TTransients extends Record<string, unknown
             id: inputData.id
         });
         const create = async (inputData: Partial<Prisma.ProfileCreateInput & TTransients> = {}) => {
+            const [transientFields] = synthesize(defaultTransientFieldValues, inputData);
             const data = await build(inputData).then(screen);
-            const transientFields = synthesize(defaultTransientFieldValues, inputData);
             await handleBeforeCreate(data, transientFields);
             const createdData = await getClient<PrismaClient>().profile.create({ data });
             await handleAfterCreate(createdData, transientFields);
