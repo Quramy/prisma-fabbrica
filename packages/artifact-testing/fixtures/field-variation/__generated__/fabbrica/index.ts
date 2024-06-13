@@ -5,18 +5,18 @@ import type { NoPkModel } from "../client";
 import type { Role } from "../client";
 import type { Status } from "../client";
 import type { Prisma, PrismaClient } from "../client";
-import { createInitializer, createScreener, getScalarFieldValueGenerator, normalizeResolver, normalizeList, getSequenceCounter, createCallbackChain, } from "@quramy/prisma-fabbrica/lib/internal";
+import { createInitializer, createScreener, getScalarFieldValueGenerator, normalizeResolver, normalizeList, getSequenceCounter, createCallbackChain, synthesize, } from "@quramy/prisma-fabbrica/lib/internal";
 import type { ModelWithFields, Resolver, } from "@quramy/prisma-fabbrica/lib/internal";
 export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
 
-type BuildDataOptions = {
+type BuildDataOptions<TTransients extends Record<string, unknown>> = {
     readonly seq: number;
-};
+} & TTransients;
 
-type CallbackDefineOptions<TCreated, TCreateInput> = {
-    onAfterBuild?: (createInput: TCreateInput) => void | PromiseLike<void>;
-    onBeforeCreate?: (createInput: TCreateInput) => void | PromiseLike<void>;
-    onAfterCreate?: (created: TCreated) => void | PromiseLike<void>;
+type CallbackDefineOptions<TCreated, TCreateInput, TTransients extends Record<string, unknown>> = {
+    onAfterBuild?: (createInput: TCreateInput & TTransients) => void | PromiseLike<void>;
+    onBeforeCreate?: (createInput: TCreateInput & TTransients) => void | PromiseLike<void>;
+    onAfterCreate?: (created: TCreated & TTransients) => void | PromiseLike<void>;
 };
 
 const initializer = createInitializer();
@@ -55,32 +55,32 @@ type UserFactoryDefineInput = {
     status?: Status | null;
 };
 
-type UserFactoryTrait = {
-    data?: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions>;
-} & CallbackDefineOptions<User, Prisma.UserCreateInput>;
+type UserFactoryTrait<TTransients extends Record<string, unknown>> = {
+    data?: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions<TTransients>>;
+} & CallbackDefineOptions<User, Prisma.UserCreateInput, TTransients>;
 
-type UserFactoryDefineOptions = {
-    defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
+type UserFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
+    defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions<TTransients>>;
     traits?: {
-        [traitName: string | symbol]: UserFactoryTrait;
+        [traitName: string | symbol]: UserFactoryTrait<TTransients>;
     };
-} & CallbackDefineOptions<User, Prisma.UserCreateInput>;
+} & CallbackDefineOptions<User, Prisma.UserCreateInput, TTransients>;
 
-type UserTraitKeys<TOptions extends UserFactoryDefineOptions> = keyof TOptions["traits"];
+type UserTraitKeys<TOptions extends UserFactoryDefineOptions<Record<string, unknown>>> = keyof TOptions["traits"];
 
-export interface UserFactoryInterfaceWithoutTraits {
+export interface UserFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "User";
-    build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
+    build(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Prisma.UserCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<Prisma.UserCreateInput[]>;
     pickForConnect(inputData: User): Pick<User, "id">;
-    create(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<User>;
+    create(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<User>;
     createList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<User[]>;
     createForConnect(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Pick<User, "id">>;
 }
 
-export interface UserFactoryInterface<TOptions extends UserFactoryDefineOptions = UserFactoryDefineOptions> extends UserFactoryInterfaceWithoutTraits {
-    use(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits;
+export interface UserFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends UserFactoryDefineOptions<any> = UserFactoryDefineOptions> extends UserFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits<TTransients>;
 }
 
 function autoGenerateUserScalarsOrEnums({ seq }: {
@@ -92,7 +92,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
     };
 }
 
-function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions): UserFactoryInterface<TOptions> {
+function defineUserFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends UserFactoryDefineOptions<any>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): UserFactoryInterface<TTransients, TOptions> {
     const getFactoryWithTraits = (traitKeys: readonly UserTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
@@ -112,19 +112,21 @@ function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ 
         const build = async (inputData: Partial<Prisma.UserCreateInput> = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
-            const resolveValue = normalizeResolver<UserFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+            const resolveValue = normalizeResolver<UserFactoryDefineInput, BuildDataOptions<any>>(defaultDataResolver ?? {});
+            const transients = synthesize(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transients };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
-                const resolveTraitValue = normalizeResolver<Partial<UserFactoryDefineInput>, BuildDataOptions>(traitsDefs[traitKey]?.data ?? {});
-                const traitData = await resolveTraitValue({ seq });
+                const resolveTraitValue = normalizeResolver<Partial<UserFactoryDefineInput>, BuildDataOptions<any>>(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue(resolverInput);
                 return {
                     ...acc,
                     ...traitData,
                 };
-            }, resolveValue({ seq }));
+            }, resolveValue(resolverInput));
             const defaultAssociations = {};
             const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-            await handleAfterBuild(data);
+            await handleAfterBuild({ ...data, ...transients });
             return data;
         };
         const buildList = (inputData: number | readonly Partial<Prisma.UserCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
@@ -161,15 +163,22 @@ function defineUserFactoryInternal<TOptions extends UserFactoryDefineOptions>({ 
     };
 }
 
+interface UserFactoryBuilder {
+    <TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<{}, TOptions>;
+    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, TOptions>;
+}
+
 /**
  * Define factory for {@link User} model.
  *
  * @param options
  * @returns factory {@link UserFactoryInterface}
  */
-export function defineUserFactory<TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<TOptions> {
-    return defineUserFactoryInternal(options ?? {});
-}
+export const defineUserFactory = (<TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<TOptions> => {
+    return defineUserFactoryInternal(options ?? {}, {});
+}) as UserFactoryBuilder;
+
+defineUserFactory.withTransientFields = defaultTransientFieldValues => options => defineUserFactoryInternal(options ?? {}, defaultTransientFieldValues);
 
 type ComplexIdModelScalarOrEnumFields = {
     firstName: string;
@@ -181,32 +190,32 @@ type ComplexIdModelFactoryDefineInput = {
     lastName?: string;
 };
 
-type ComplexIdModelFactoryTrait = {
-    data?: Resolver<Partial<ComplexIdModelFactoryDefineInput>, BuildDataOptions>;
-} & CallbackDefineOptions<ComplexIdModel, Prisma.ComplexIdModelCreateInput>;
+type ComplexIdModelFactoryTrait<TTransients extends Record<string, unknown>> = {
+    data?: Resolver<Partial<ComplexIdModelFactoryDefineInput>, BuildDataOptions<TTransients>>;
+} & CallbackDefineOptions<ComplexIdModel, Prisma.ComplexIdModelCreateInput, TTransients>;
 
-type ComplexIdModelFactoryDefineOptions = {
-    defaultData?: Resolver<ComplexIdModelFactoryDefineInput, BuildDataOptions>;
+type ComplexIdModelFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
+    defaultData?: Resolver<ComplexIdModelFactoryDefineInput, BuildDataOptions<TTransients>>;
     traits?: {
-        [traitName: string | symbol]: ComplexIdModelFactoryTrait;
+        [traitName: string | symbol]: ComplexIdModelFactoryTrait<TTransients>;
     };
-} & CallbackDefineOptions<ComplexIdModel, Prisma.ComplexIdModelCreateInput>;
+} & CallbackDefineOptions<ComplexIdModel, Prisma.ComplexIdModelCreateInput, TTransients>;
 
-type ComplexIdModelTraitKeys<TOptions extends ComplexIdModelFactoryDefineOptions> = keyof TOptions["traits"];
+type ComplexIdModelTraitKeys<TOptions extends ComplexIdModelFactoryDefineOptions<Record<string, unknown>>> = keyof TOptions["traits"];
 
-export interface ComplexIdModelFactoryInterfaceWithoutTraits {
+export interface ComplexIdModelFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "ComplexIdModel";
-    build(inputData?: Partial<Prisma.ComplexIdModelCreateInput>): PromiseLike<Prisma.ComplexIdModelCreateInput>;
+    build(inputData?: Partial<Prisma.ComplexIdModelCreateInput & TTransients>): PromiseLike<Prisma.ComplexIdModelCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.ComplexIdModelCreateInput>): PromiseLike<Prisma.ComplexIdModelCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.ComplexIdModelCreateInput>[]): PromiseLike<Prisma.ComplexIdModelCreateInput[]>;
     pickForConnect(inputData: ComplexIdModel): Pick<ComplexIdModel, "firstName" | "lastName">;
-    create(inputData?: Partial<Prisma.ComplexIdModelCreateInput>): PromiseLike<ComplexIdModel>;
+    create(inputData?: Partial<Prisma.ComplexIdModelCreateInput & TTransients>): PromiseLike<ComplexIdModel>;
     createList(inputData: number | readonly Partial<Prisma.ComplexIdModelCreateInput>[]): PromiseLike<ComplexIdModel[]>;
     createForConnect(inputData?: Partial<Prisma.ComplexIdModelCreateInput>): PromiseLike<Pick<ComplexIdModel, "firstName" | "lastName">>;
 }
 
-export interface ComplexIdModelFactoryInterface<TOptions extends ComplexIdModelFactoryDefineOptions = ComplexIdModelFactoryDefineOptions> extends ComplexIdModelFactoryInterfaceWithoutTraits {
-    use(name: ComplexIdModelTraitKeys<TOptions>, ...names: readonly ComplexIdModelTraitKeys<TOptions>[]): ComplexIdModelFactoryInterfaceWithoutTraits;
+export interface ComplexIdModelFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends ComplexIdModelFactoryDefineOptions<any> = ComplexIdModelFactoryDefineOptions> extends ComplexIdModelFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: ComplexIdModelTraitKeys<TOptions>, ...names: readonly ComplexIdModelTraitKeys<TOptions>[]): ComplexIdModelFactoryInterfaceWithoutTraits<TTransients>;
 }
 
 function autoGenerateComplexIdModelScalarsOrEnums({ seq }: {
@@ -218,7 +227,7 @@ function autoGenerateComplexIdModelScalarsOrEnums({ seq }: {
     };
 }
 
-function defineComplexIdModelFactoryInternal<TOptions extends ComplexIdModelFactoryDefineOptions>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions): ComplexIdModelFactoryInterface<TOptions> {
+function defineComplexIdModelFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends ComplexIdModelFactoryDefineOptions<any>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): ComplexIdModelFactoryInterface<TTransients, TOptions> {
     const getFactoryWithTraits = (traitKeys: readonly ComplexIdModelTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
@@ -238,19 +247,21 @@ function defineComplexIdModelFactoryInternal<TOptions extends ComplexIdModelFact
         const build = async (inputData: Partial<Prisma.ComplexIdModelCreateInput> = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateComplexIdModelScalarsOrEnums({ seq });
-            const resolveValue = normalizeResolver<ComplexIdModelFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+            const resolveValue = normalizeResolver<ComplexIdModelFactoryDefineInput, BuildDataOptions<any>>(defaultDataResolver ?? {});
+            const transients = synthesize(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transients };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
-                const resolveTraitValue = normalizeResolver<Partial<ComplexIdModelFactoryDefineInput>, BuildDataOptions>(traitsDefs[traitKey]?.data ?? {});
-                const traitData = await resolveTraitValue({ seq });
+                const resolveTraitValue = normalizeResolver<Partial<ComplexIdModelFactoryDefineInput>, BuildDataOptions<any>>(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue(resolverInput);
                 return {
                     ...acc,
                     ...traitData,
                 };
-            }, resolveValue({ seq }));
+            }, resolveValue(resolverInput));
             const defaultAssociations = {};
             const data: Prisma.ComplexIdModelCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-            await handleAfterBuild(data);
+            await handleAfterBuild({ ...data, ...transients });
             return data;
         };
         const buildList = (inputData: number | readonly Partial<Prisma.ComplexIdModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
@@ -288,15 +299,22 @@ function defineComplexIdModelFactoryInternal<TOptions extends ComplexIdModelFact
     };
 }
 
+interface ComplexIdModelFactoryBuilder {
+    <TOptions extends ComplexIdModelFactoryDefineOptions>(options?: TOptions): ComplexIdModelFactoryInterface<{}, TOptions>;
+    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends ComplexIdModelFactoryDefineOptions<TTransients>>(options?: TOptions) => ComplexIdModelFactoryInterface<TTransients, TOptions>;
+}
+
 /**
  * Define factory for {@link ComplexIdModel} model.
  *
  * @param options
  * @returns factory {@link ComplexIdModelFactoryInterface}
  */
-export function defineComplexIdModelFactory<TOptions extends ComplexIdModelFactoryDefineOptions>(options?: TOptions): ComplexIdModelFactoryInterface<TOptions> {
-    return defineComplexIdModelFactoryInternal(options ?? {});
-}
+export const defineComplexIdModelFactory = (<TOptions extends ComplexIdModelFactoryDefineOptions>(options?: TOptions): ComplexIdModelFactoryInterface<TOptions> => {
+    return defineComplexIdModelFactoryInternal(options ?? {}, {});
+}) as ComplexIdModelFactoryBuilder;
+
+defineComplexIdModelFactory.withTransientFields = defaultTransientFieldValues => options => defineComplexIdModelFactoryInternal(options ?? {}, defaultTransientFieldValues);
 
 type FieldTypePatternModelScalarOrEnumFields = {
     id: number;
@@ -332,32 +350,32 @@ type FieldTypePatternModelFactoryDefineInput = {
     nullableBigInt?: (bigint | number) | null;
 };
 
-type FieldTypePatternModelFactoryTrait = {
-    data?: Resolver<Partial<FieldTypePatternModelFactoryDefineInput>, BuildDataOptions>;
-} & CallbackDefineOptions<FieldTypePatternModel, Prisma.FieldTypePatternModelCreateInput>;
+type FieldTypePatternModelFactoryTrait<TTransients extends Record<string, unknown>> = {
+    data?: Resolver<Partial<FieldTypePatternModelFactoryDefineInput>, BuildDataOptions<TTransients>>;
+} & CallbackDefineOptions<FieldTypePatternModel, Prisma.FieldTypePatternModelCreateInput, TTransients>;
 
-type FieldTypePatternModelFactoryDefineOptions = {
-    defaultData?: Resolver<FieldTypePatternModelFactoryDefineInput, BuildDataOptions>;
+type FieldTypePatternModelFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
+    defaultData?: Resolver<FieldTypePatternModelFactoryDefineInput, BuildDataOptions<TTransients>>;
     traits?: {
-        [traitName: string | symbol]: FieldTypePatternModelFactoryTrait;
+        [traitName: string | symbol]: FieldTypePatternModelFactoryTrait<TTransients>;
     };
-} & CallbackDefineOptions<FieldTypePatternModel, Prisma.FieldTypePatternModelCreateInput>;
+} & CallbackDefineOptions<FieldTypePatternModel, Prisma.FieldTypePatternModelCreateInput, TTransients>;
 
-type FieldTypePatternModelTraitKeys<TOptions extends FieldTypePatternModelFactoryDefineOptions> = keyof TOptions["traits"];
+type FieldTypePatternModelTraitKeys<TOptions extends FieldTypePatternModelFactoryDefineOptions<Record<string, unknown>>> = keyof TOptions["traits"];
 
-export interface FieldTypePatternModelFactoryInterfaceWithoutTraits {
+export interface FieldTypePatternModelFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "FieldTypePatternModel";
-    build(inputData?: Partial<Prisma.FieldTypePatternModelCreateInput>): PromiseLike<Prisma.FieldTypePatternModelCreateInput>;
+    build(inputData?: Partial<Prisma.FieldTypePatternModelCreateInput & TTransients>): PromiseLike<Prisma.FieldTypePatternModelCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.FieldTypePatternModelCreateInput>): PromiseLike<Prisma.FieldTypePatternModelCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.FieldTypePatternModelCreateInput>[]): PromiseLike<Prisma.FieldTypePatternModelCreateInput[]>;
     pickForConnect(inputData: FieldTypePatternModel): Pick<FieldTypePatternModel, "id">;
-    create(inputData?: Partial<Prisma.FieldTypePatternModelCreateInput>): PromiseLike<FieldTypePatternModel>;
+    create(inputData?: Partial<Prisma.FieldTypePatternModelCreateInput & TTransients>): PromiseLike<FieldTypePatternModel>;
     createList(inputData: number | readonly Partial<Prisma.FieldTypePatternModelCreateInput>[]): PromiseLike<FieldTypePatternModel[]>;
     createForConnect(inputData?: Partial<Prisma.FieldTypePatternModelCreateInput>): PromiseLike<Pick<FieldTypePatternModel, "id">>;
 }
 
-export interface FieldTypePatternModelFactoryInterface<TOptions extends FieldTypePatternModelFactoryDefineOptions = FieldTypePatternModelFactoryDefineOptions> extends FieldTypePatternModelFactoryInterfaceWithoutTraits {
-    use(name: FieldTypePatternModelTraitKeys<TOptions>, ...names: readonly FieldTypePatternModelTraitKeys<TOptions>[]): FieldTypePatternModelFactoryInterfaceWithoutTraits;
+export interface FieldTypePatternModelFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends FieldTypePatternModelFactoryDefineOptions<any> = FieldTypePatternModelFactoryDefineOptions> extends FieldTypePatternModelFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: FieldTypePatternModelTraitKeys<TOptions>, ...names: readonly FieldTypePatternModelTraitKeys<TOptions>[]): FieldTypePatternModelFactoryInterfaceWithoutTraits<TTransients>;
 }
 
 function autoGenerateFieldTypePatternModelScalarsOrEnums({ seq }: {
@@ -376,7 +394,7 @@ function autoGenerateFieldTypePatternModelScalarsOrEnums({ seq }: {
     };
 }
 
-function defineFieldTypePatternModelFactoryInternal<TOptions extends FieldTypePatternModelFactoryDefineOptions>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions): FieldTypePatternModelFactoryInterface<TOptions> {
+function defineFieldTypePatternModelFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends FieldTypePatternModelFactoryDefineOptions<any>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): FieldTypePatternModelFactoryInterface<TTransients, TOptions> {
     const getFactoryWithTraits = (traitKeys: readonly FieldTypePatternModelTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
@@ -396,19 +414,21 @@ function defineFieldTypePatternModelFactoryInternal<TOptions extends FieldTypePa
         const build = async (inputData: Partial<Prisma.FieldTypePatternModelCreateInput> = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateFieldTypePatternModelScalarsOrEnums({ seq });
-            const resolveValue = normalizeResolver<FieldTypePatternModelFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+            const resolveValue = normalizeResolver<FieldTypePatternModelFactoryDefineInput, BuildDataOptions<any>>(defaultDataResolver ?? {});
+            const transients = synthesize(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transients };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
-                const resolveTraitValue = normalizeResolver<Partial<FieldTypePatternModelFactoryDefineInput>, BuildDataOptions>(traitsDefs[traitKey]?.data ?? {});
-                const traitData = await resolveTraitValue({ seq });
+                const resolveTraitValue = normalizeResolver<Partial<FieldTypePatternModelFactoryDefineInput>, BuildDataOptions<any>>(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue(resolverInput);
                 return {
                     ...acc,
                     ...traitData,
                 };
-            }, resolveValue({ seq }));
+            }, resolveValue(resolverInput));
             const defaultAssociations = {};
             const data: Prisma.FieldTypePatternModelCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-            await handleAfterBuild(data);
+            await handleAfterBuild({ ...data, ...transients });
             return data;
         };
         const buildList = (inputData: number | readonly Partial<Prisma.FieldTypePatternModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
@@ -445,15 +465,22 @@ function defineFieldTypePatternModelFactoryInternal<TOptions extends FieldTypePa
     };
 }
 
+interface FieldTypePatternModelFactoryBuilder {
+    <TOptions extends FieldTypePatternModelFactoryDefineOptions>(options?: TOptions): FieldTypePatternModelFactoryInterface<{}, TOptions>;
+    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends FieldTypePatternModelFactoryDefineOptions<TTransients>>(options?: TOptions) => FieldTypePatternModelFactoryInterface<TTransients, TOptions>;
+}
+
 /**
  * Define factory for {@link FieldTypePatternModel} model.
  *
  * @param options
  * @returns factory {@link FieldTypePatternModelFactoryInterface}
  */
-export function defineFieldTypePatternModelFactory<TOptions extends FieldTypePatternModelFactoryDefineOptions>(options?: TOptions): FieldTypePatternModelFactoryInterface<TOptions> {
-    return defineFieldTypePatternModelFactoryInternal(options ?? {});
-}
+export const defineFieldTypePatternModelFactory = (<TOptions extends FieldTypePatternModelFactoryDefineOptions>(options?: TOptions): FieldTypePatternModelFactoryInterface<TOptions> => {
+    return defineFieldTypePatternModelFactoryInternal(options ?? {}, {});
+}) as FieldTypePatternModelFactoryBuilder;
+
+defineFieldTypePatternModelFactory.withTransientFields = defaultTransientFieldValues => options => defineFieldTypePatternModelFactoryInternal(options ?? {}, defaultTransientFieldValues);
 
 type NoPkModelScalarOrEnumFields = {
     id: number;
@@ -463,32 +490,32 @@ type NoPkModelFactoryDefineInput = {
     id?: number;
 };
 
-type NoPkModelFactoryTrait = {
-    data?: Resolver<Partial<NoPkModelFactoryDefineInput>, BuildDataOptions>;
-} & CallbackDefineOptions<NoPkModel, Prisma.NoPkModelCreateInput>;
+type NoPkModelFactoryTrait<TTransients extends Record<string, unknown>> = {
+    data?: Resolver<Partial<NoPkModelFactoryDefineInput>, BuildDataOptions<TTransients>>;
+} & CallbackDefineOptions<NoPkModel, Prisma.NoPkModelCreateInput, TTransients>;
 
-type NoPkModelFactoryDefineOptions = {
-    defaultData?: Resolver<NoPkModelFactoryDefineInput, BuildDataOptions>;
+type NoPkModelFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
+    defaultData?: Resolver<NoPkModelFactoryDefineInput, BuildDataOptions<TTransients>>;
     traits?: {
-        [traitName: string | symbol]: NoPkModelFactoryTrait;
+        [traitName: string | symbol]: NoPkModelFactoryTrait<TTransients>;
     };
-} & CallbackDefineOptions<NoPkModel, Prisma.NoPkModelCreateInput>;
+} & CallbackDefineOptions<NoPkModel, Prisma.NoPkModelCreateInput, TTransients>;
 
-type NoPkModelTraitKeys<TOptions extends NoPkModelFactoryDefineOptions> = keyof TOptions["traits"];
+type NoPkModelTraitKeys<TOptions extends NoPkModelFactoryDefineOptions<Record<string, unknown>>> = keyof TOptions["traits"];
 
-export interface NoPkModelFactoryInterfaceWithoutTraits {
+export interface NoPkModelFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "NoPkModel";
-    build(inputData?: Partial<Prisma.NoPkModelCreateInput>): PromiseLike<Prisma.NoPkModelCreateInput>;
+    build(inputData?: Partial<Prisma.NoPkModelCreateInput & TTransients>): PromiseLike<Prisma.NoPkModelCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.NoPkModelCreateInput>): PromiseLike<Prisma.NoPkModelCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.NoPkModelCreateInput>[]): PromiseLike<Prisma.NoPkModelCreateInput[]>;
     pickForConnect(inputData: NoPkModel): Pick<NoPkModel, "id">;
-    create(inputData?: Partial<Prisma.NoPkModelCreateInput>): PromiseLike<NoPkModel>;
+    create(inputData?: Partial<Prisma.NoPkModelCreateInput & TTransients>): PromiseLike<NoPkModel>;
     createList(inputData: number | readonly Partial<Prisma.NoPkModelCreateInput>[]): PromiseLike<NoPkModel[]>;
     createForConnect(inputData?: Partial<Prisma.NoPkModelCreateInput>): PromiseLike<Pick<NoPkModel, "id">>;
 }
 
-export interface NoPkModelFactoryInterface<TOptions extends NoPkModelFactoryDefineOptions = NoPkModelFactoryDefineOptions> extends NoPkModelFactoryInterfaceWithoutTraits {
-    use(name: NoPkModelTraitKeys<TOptions>, ...names: readonly NoPkModelTraitKeys<TOptions>[]): NoPkModelFactoryInterfaceWithoutTraits;
+export interface NoPkModelFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends NoPkModelFactoryDefineOptions<any> = NoPkModelFactoryDefineOptions> extends NoPkModelFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: NoPkModelTraitKeys<TOptions>, ...names: readonly NoPkModelTraitKeys<TOptions>[]): NoPkModelFactoryInterfaceWithoutTraits<TTransients>;
 }
 
 function autoGenerateNoPkModelScalarsOrEnums({ seq }: {
@@ -499,7 +526,7 @@ function autoGenerateNoPkModelScalarsOrEnums({ seq }: {
     };
 }
 
-function defineNoPkModelFactoryInternal<TOptions extends NoPkModelFactoryDefineOptions>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions): NoPkModelFactoryInterface<TOptions> {
+function defineNoPkModelFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends NoPkModelFactoryDefineOptions<any>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): NoPkModelFactoryInterface<TTransients, TOptions> {
     const getFactoryWithTraits = (traitKeys: readonly NoPkModelTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
@@ -519,19 +546,21 @@ function defineNoPkModelFactoryInternal<TOptions extends NoPkModelFactoryDefineO
         const build = async (inputData: Partial<Prisma.NoPkModelCreateInput> = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateNoPkModelScalarsOrEnums({ seq });
-            const resolveValue = normalizeResolver<NoPkModelFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+            const resolveValue = normalizeResolver<NoPkModelFactoryDefineInput, BuildDataOptions<any>>(defaultDataResolver ?? {});
+            const transients = synthesize(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transients };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
-                const resolveTraitValue = normalizeResolver<Partial<NoPkModelFactoryDefineInput>, BuildDataOptions>(traitsDefs[traitKey]?.data ?? {});
-                const traitData = await resolveTraitValue({ seq });
+                const resolveTraitValue = normalizeResolver<Partial<NoPkModelFactoryDefineInput>, BuildDataOptions<any>>(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue(resolverInput);
                 return {
                     ...acc,
                     ...traitData,
                 };
-            }, resolveValue({ seq }));
+            }, resolveValue(resolverInput));
             const defaultAssociations = {};
             const data: Prisma.NoPkModelCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-            await handleAfterBuild(data);
+            await handleAfterBuild({ ...data, ...transients });
             return data;
         };
         const buildList = (inputData: number | readonly Partial<Prisma.NoPkModelCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
@@ -568,12 +597,19 @@ function defineNoPkModelFactoryInternal<TOptions extends NoPkModelFactoryDefineO
     };
 }
 
+interface NoPkModelFactoryBuilder {
+    <TOptions extends NoPkModelFactoryDefineOptions>(options?: TOptions): NoPkModelFactoryInterface<{}, TOptions>;
+    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends NoPkModelFactoryDefineOptions<TTransients>>(options?: TOptions) => NoPkModelFactoryInterface<TTransients, TOptions>;
+}
+
 /**
  * Define factory for {@link NoPkModel} model.
  *
  * @param options
  * @returns factory {@link NoPkModelFactoryInterface}
  */
-export function defineNoPkModelFactory<TOptions extends NoPkModelFactoryDefineOptions>(options?: TOptions): NoPkModelFactoryInterface<TOptions> {
-    return defineNoPkModelFactoryInternal(options ?? {});
-}
+export const defineNoPkModelFactory = (<TOptions extends NoPkModelFactoryDefineOptions>(options?: TOptions): NoPkModelFactoryInterface<TOptions> => {
+    return defineNoPkModelFactoryInternal(options ?? {}, {});
+}) as NoPkModelFactoryBuilder;
+
+defineNoPkModelFactory.withTransientFields = defaultTransientFieldValues => options => defineNoPkModelFactoryInternal(options ?? {}, defaultTransientFieldValues);
