@@ -412,7 +412,7 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
           const seq = getSeq();
           const requiredScalarData = AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS({ seq });
           const resolveValue = normalizeResolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions<any>>(defaultDataResolver ?? {});
-          const transientFields = synthesize(defaultTransientFieldValues, inputData);
+          const [transientFields, filteredInputData] = synthesize(defaultTransientFieldValues, inputData);
           const resolverInput = { seq, ...transientFields };
           const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
             const acc = await queue;
@@ -440,7 +440,7 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
               ),
               true,
             )};
-          const data: Prisma.MODEL_CREATE_INPUT = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+          const data: Prisma.MODEL_CREATE_INPUT = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
           await handleAfterBuild(data, transientFields);
           return data;
         };
@@ -462,8 +462,8 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
         const create = async (
           inputData: CREATE_INPUT_TYPE = {}
         ) => {
+          const [transientFields] = synthesize(defaultTransientFieldValues, inputData);
           const data = await build(inputData).then(screen);
-          const transientFields = synthesize(defaultTransientFieldValues, inputData);
           await handleBeforeCreate(data, transientFields);
           const createdData = await getClient<PrismaClient>().MODEL_KEY.create({ data });
           await handleAfterCreate(createdData, transientFields);
