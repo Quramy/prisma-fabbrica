@@ -61,7 +61,7 @@ function autoGenerateUserScalarsOrEnums({ seq }) {
         name: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
     };
 }
-function defineUserFactoryInternal({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }) {
+function defineUserFactoryInternal({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }, defaultTransientFieldValues) {
     const getFactoryWithTraits = (traitKeys = []) => {
         const seqKey = {};
         const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
@@ -82,18 +82,20 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
             const seq = getSeq();
             const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
             const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const transients = (0, internal_1.synthesize)(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transients };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
                 const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
-                const traitData = await resolveTraitValue({ seq });
+                const traitData = await resolveTraitValue(resolverInput);
                 return {
                     ...acc,
                     ...traitData,
                 };
-            }, resolveValue({ seq }));
+            }, resolveValue(resolverInput));
             const defaultAssociations = {};
             const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-            await handleAfterBuild(data);
+            await handleAfterBuild({ ...data, ...transients });
             return data;
         };
         const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
@@ -135,10 +137,10 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
  * @param options
  * @returns factory {@link UserFactoryInterface}
  */
-function defineUserFactory(options) {
-    return defineUserFactoryInternal(options ?? {});
-}
-exports.defineUserFactory = defineUserFactory;
+exports.defineUserFactory = ((options) => {
+    return defineUserFactoryInternal(options ?? {}, {});
+});
+exports.defineUserFactory.withTransientFields = defaultTransientFieldValues => options => defineUserFactoryInternal(options ?? {}, defaultTransientFieldValues);
 function isPostauthorFactory(x) {
     return x?._factoryFor === "User";
 }
@@ -148,7 +150,7 @@ function autoGeneratePostScalarsOrEnums({ seq }) {
         title: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Post", fieldName: "title", isId: false, isUnique: false, seq })
     };
 }
-function definePostFactoryInternal({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }) {
+function definePostFactoryInternal({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }, defaultTransientFieldValues) {
     const getFactoryWithTraits = (traitKeys = []) => {
         const seqKey = {};
         const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
@@ -169,22 +171,24 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
             const seq = getSeq();
             const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
             const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const transients = (0, internal_1.synthesize)(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transients };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
                 const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
-                const traitData = await resolveTraitValue({ seq });
+                const traitData = await resolveTraitValue(resolverInput);
                 return {
                     ...acc,
                     ...traitData,
                 };
-            }, resolveValue({ seq }));
+            }, resolveValue(resolverInput));
             const defaultAssociations = {
                 author: isPostauthorFactory(defaultData.author) ? {
                     create: await defaultData.author.build()
                 } : defaultData.author
             };
             const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-            await handleAfterBuild(data);
+            await handleAfterBuild({ ...data, ...transients });
             return data;
         };
         const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
@@ -226,10 +230,10 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
  * @param options
  * @returns factory {@link PostFactoryInterface}
  */
-function definePostFactory(options) {
-    return definePostFactoryInternal(options);
-}
-exports.definePostFactory = definePostFactory;
+exports.definePostFactory = ((options) => {
+    return definePostFactoryInternal(options, {});
+});
+exports.definePostFactory.withTransientFields = defaultTransientFieldValues => options => definePostFactoryInternal(options, defaultTransientFieldValues);
 function isCommentpostFactory(x) {
     return x?._factoryFor === "Post";
 }
@@ -242,7 +246,7 @@ function autoGenerateCommentScalarsOrEnums({ seq }) {
         body: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Comment", fieldName: "body", isId: false, isUnique: false, seq })
     };
 }
-function defineCommentFactoryInternal({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }) {
+function defineCommentFactoryInternal({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }, defaultTransientFieldValues) {
     const getFactoryWithTraits = (traitKeys = []) => {
         const seqKey = {};
         const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
@@ -263,15 +267,17 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, onAfte
             const seq = getSeq();
             const requiredScalarData = autoGenerateCommentScalarsOrEnums({ seq });
             const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const transients = (0, internal_1.synthesize)(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transients };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
                 const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
-                const traitData = await resolveTraitValue({ seq });
+                const traitData = await resolveTraitValue(resolverInput);
                 return {
                     ...acc,
                     ...traitData,
                 };
-            }, resolveValue({ seq }));
+            }, resolveValue(resolverInput));
             const defaultAssociations = {
                 post: isCommentpostFactory(defaultData.post) ? {
                     create: await defaultData.post.build()
@@ -281,7 +287,7 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, onAfte
                 } : defaultData.author
             };
             const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-            await handleAfterBuild(data);
+            await handleAfterBuild({ ...data, ...transients });
             return data;
         };
         const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
@@ -323,17 +329,17 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, onAfte
  * @param options
  * @returns factory {@link CommentFactoryInterface}
  */
-function defineCommentFactory(options) {
-    return defineCommentFactoryInternal(options);
-}
-exports.defineCommentFactory = defineCommentFactory;
+exports.defineCommentFactory = ((options) => {
+    return defineCommentFactoryInternal(options, {});
+});
+exports.defineCommentFactory.withTransientFields = defaultTransientFieldValues => options => defineCommentFactoryInternal(options, defaultTransientFieldValues);
 function autoGenerateCategoryScalarsOrEnums({ seq }) {
     return {
         id: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Category", fieldName: "id", isId: true, isUnique: false, seq }),
         name: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Category", fieldName: "name", isId: false, isUnique: true, seq })
     };
 }
-function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }) {
+function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }, defaultTransientFieldValues) {
     const getFactoryWithTraits = (traitKeys = []) => {
         const seqKey = {};
         const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
@@ -354,18 +360,20 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, onAft
             const seq = getSeq();
             const requiredScalarData = autoGenerateCategoryScalarsOrEnums({ seq });
             const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const transients = (0, internal_1.synthesize)(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transients };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
                 const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
-                const traitData = await resolveTraitValue({ seq });
+                const traitData = await resolveTraitValue(resolverInput);
                 return {
                     ...acc,
                     ...traitData,
                 };
-            }, resolveValue({ seq }));
+            }, resolveValue(resolverInput));
             const defaultAssociations = {};
             const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-            await handleAfterBuild(data);
+            await handleAfterBuild({ ...data, ...transients });
             return data;
         };
         const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
@@ -407,7 +415,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, onAft
  * @param options
  * @returns factory {@link CategoryFactoryInterface}
  */
-function defineCategoryFactory(options) {
-    return defineCategoryFactoryInternal(options ?? {});
-}
-exports.defineCategoryFactory = defineCategoryFactory;
+exports.defineCategoryFactory = ((options) => {
+    return defineCategoryFactoryInternal(options ?? {}, {});
+});
+exports.defineCategoryFactory.withTransientFields = defaultTransientFieldValues => options => defineCategoryFactoryInternal(options ?? {}, defaultTransientFieldValues);
