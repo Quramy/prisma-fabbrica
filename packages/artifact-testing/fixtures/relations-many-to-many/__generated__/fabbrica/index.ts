@@ -1,18 +1,18 @@
 import type { Post } from "../client";
 import type { Category } from "../client";
 import type { Prisma, PrismaClient } from "../client";
-import { createInitializer, createScreener, getScalarFieldValueGenerator, normalizeResolver, normalizeList, getSequenceCounter, createCallbackChain, } from "@quramy/prisma-fabbrica/lib/internal";
+import { createInitializer, createScreener, getScalarFieldValueGenerator, normalizeResolver, normalizeList, getSequenceCounter, createCallbackChain, synthesize, } from "@quramy/prisma-fabbrica/lib/internal";
 import type { ModelWithFields, Resolver, } from "@quramy/prisma-fabbrica/lib/internal";
 export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
 
-type BuildDataOptions = {
+type BuildDataOptions<TTransients extends Record<string, unknown>> = {
     readonly seq: number;
-};
+} & TTransients;
 
-type CallbackDefineOptions<TCreated, TCreateInput> = {
-    onAfterBuild?: (createInput: TCreateInput) => void | PromiseLike<void>;
-    onBeforeCreate?: (createInput: TCreateInput) => void | PromiseLike<void>;
-    onAfterCreate?: (created: TCreated) => void | PromiseLike<void>;
+type CallbackDefineOptions<TCreated, TCreateInput, TTransients extends Record<string, unknown>> = {
+    onAfterBuild?: (createInput: TCreateInput & TTransients) => void | PromiseLike<void>;
+    onBeforeCreate?: (createInput: TCreateInput & TTransients) => void | PromiseLike<void>;
+    onAfterCreate?: (created: TCreated & TTransients) => void | PromiseLike<void>;
 };
 
 const initializer = createInitializer();
@@ -48,32 +48,32 @@ type PostFactoryDefineInput = {
     categories?: Prisma.CategoryCreateNestedManyWithoutPostsInput;
 };
 
-type PostFactoryTrait = {
-    data?: Resolver<Partial<PostFactoryDefineInput>, BuildDataOptions>;
-} & CallbackDefineOptions<Post, Prisma.PostCreateInput>;
+type PostFactoryTrait<TTransients extends Record<string, unknown>> = {
+    data?: Resolver<Partial<PostFactoryDefineInput>, BuildDataOptions<TTransients>>;
+} & CallbackDefineOptions<Post, Prisma.PostCreateInput, TTransients>;
 
-type PostFactoryDefineOptions = {
-    defaultData?: Resolver<PostFactoryDefineInput, BuildDataOptions>;
+type PostFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
+    defaultData?: Resolver<PostFactoryDefineInput, BuildDataOptions<TTransients>>;
     traits?: {
-        [traitName: string | symbol]: PostFactoryTrait;
+        [traitName: string | symbol]: PostFactoryTrait<TTransients>;
     };
-} & CallbackDefineOptions<Post, Prisma.PostCreateInput>;
+} & CallbackDefineOptions<Post, Prisma.PostCreateInput, TTransients>;
 
-type PostTraitKeys<TOptions extends PostFactoryDefineOptions> = keyof TOptions["traits"];
+type PostTraitKeys<TOptions extends PostFactoryDefineOptions<Record<string, unknown>>> = keyof TOptions["traits"];
 
-export interface PostFactoryInterfaceWithoutTraits {
+export interface PostFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "Post";
-    build(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
+    build(inputData?: Partial<Prisma.PostCreateInput & TTransients>): PromiseLike<Prisma.PostCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Prisma.PostCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.PostCreateInput>[]): PromiseLike<Prisma.PostCreateInput[]>;
     pickForConnect(inputData: Post): Pick<Post, "id">;
-    create(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Post>;
+    create(inputData?: Partial<Prisma.PostCreateInput & TTransients>): PromiseLike<Post>;
     createList(inputData: number | readonly Partial<Prisma.PostCreateInput>[]): PromiseLike<Post[]>;
     createForConnect(inputData?: Partial<Prisma.PostCreateInput>): PromiseLike<Pick<Post, "id">>;
 }
 
-export interface PostFactoryInterface<TOptions extends PostFactoryDefineOptions = PostFactoryDefineOptions> extends PostFactoryInterfaceWithoutTraits {
-    use(name: PostTraitKeys<TOptions>, ...names: readonly PostTraitKeys<TOptions>[]): PostFactoryInterfaceWithoutTraits;
+export interface PostFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends PostFactoryDefineOptions<any> = PostFactoryDefineOptions> extends PostFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: PostTraitKeys<TOptions>, ...names: readonly PostTraitKeys<TOptions>[]): PostFactoryInterfaceWithoutTraits<TTransients>;
 }
 
 function autoGeneratePostScalarsOrEnums({ seq }: {
@@ -85,7 +85,7 @@ function autoGeneratePostScalarsOrEnums({ seq }: {
     };
 }
 
-function definePostFactoryInternal<TOptions extends PostFactoryDefineOptions>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions): PostFactoryInterface<TOptions> {
+function definePostFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends PostFactoryDefineOptions<any>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): PostFactoryInterface<TTransients, TOptions> {
     const getFactoryWithTraits = (traitKeys: readonly PostTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
@@ -105,19 +105,21 @@ function definePostFactoryInternal<TOptions extends PostFactoryDefineOptions>({ 
         const build = async (inputData: Partial<Prisma.PostCreateInput> = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
-            const resolveValue = normalizeResolver<PostFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+            const resolveValue = normalizeResolver<PostFactoryDefineInput, BuildDataOptions<any>>(defaultDataResolver ?? {});
+            const transients = synthesize(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transients };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
-                const resolveTraitValue = normalizeResolver<Partial<PostFactoryDefineInput>, BuildDataOptions>(traitsDefs[traitKey]?.data ?? {});
-                const traitData = await resolveTraitValue({ seq });
+                const resolveTraitValue = normalizeResolver<Partial<PostFactoryDefineInput>, BuildDataOptions<any>>(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue(resolverInput);
                 return {
                     ...acc,
                     ...traitData,
                 };
-            }, resolveValue({ seq }));
+            }, resolveValue(resolverInput));
             const defaultAssociations = {};
             const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-            await handleAfterBuild(data);
+            await handleAfterBuild({ ...data, ...transients });
             return data;
         };
         const buildList = (inputData: number | readonly Partial<Prisma.PostCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
@@ -154,15 +156,22 @@ function definePostFactoryInternal<TOptions extends PostFactoryDefineOptions>({ 
     };
 }
 
+interface PostFactoryBuilder {
+    <TOptions extends PostFactoryDefineOptions>(options?: TOptions): PostFactoryInterface<{}, TOptions>;
+    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends PostFactoryDefineOptions<TTransients>>(options?: TOptions) => PostFactoryInterface<TTransients, TOptions>;
+}
+
 /**
  * Define factory for {@link Post} model.
  *
  * @param options
  * @returns factory {@link PostFactoryInterface}
  */
-export function definePostFactory<TOptions extends PostFactoryDefineOptions>(options?: TOptions): PostFactoryInterface<TOptions> {
-    return definePostFactoryInternal(options ?? {});
-}
+export const definePostFactory = (<TOptions extends PostFactoryDefineOptions>(options?: TOptions): PostFactoryInterface<TOptions> => {
+    return definePostFactoryInternal(options ?? {}, {});
+}) as PostFactoryBuilder;
+
+definePostFactory.withTransientFields = defaultTransientFieldValues => options => definePostFactoryInternal(options ?? {}, defaultTransientFieldValues);
 
 type CategoryScalarOrEnumFields = {
     id: string;
@@ -175,32 +184,32 @@ type CategoryFactoryDefineInput = {
     posts?: Prisma.PostCreateNestedManyWithoutCategoriesInput;
 };
 
-type CategoryFactoryTrait = {
-    data?: Resolver<Partial<CategoryFactoryDefineInput>, BuildDataOptions>;
-} & CallbackDefineOptions<Category, Prisma.CategoryCreateInput>;
+type CategoryFactoryTrait<TTransients extends Record<string, unknown>> = {
+    data?: Resolver<Partial<CategoryFactoryDefineInput>, BuildDataOptions<TTransients>>;
+} & CallbackDefineOptions<Category, Prisma.CategoryCreateInput, TTransients>;
 
-type CategoryFactoryDefineOptions = {
-    defaultData?: Resolver<CategoryFactoryDefineInput, BuildDataOptions>;
+type CategoryFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
+    defaultData?: Resolver<CategoryFactoryDefineInput, BuildDataOptions<TTransients>>;
     traits?: {
-        [traitName: string | symbol]: CategoryFactoryTrait;
+        [traitName: string | symbol]: CategoryFactoryTrait<TTransients>;
     };
-} & CallbackDefineOptions<Category, Prisma.CategoryCreateInput>;
+} & CallbackDefineOptions<Category, Prisma.CategoryCreateInput, TTransients>;
 
-type CategoryTraitKeys<TOptions extends CategoryFactoryDefineOptions> = keyof TOptions["traits"];
+type CategoryTraitKeys<TOptions extends CategoryFactoryDefineOptions<Record<string, unknown>>> = keyof TOptions["traits"];
 
-export interface CategoryFactoryInterfaceWithoutTraits {
+export interface CategoryFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "Category";
-    build(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Prisma.CategoryCreateInput>;
+    build(inputData?: Partial<Prisma.CategoryCreateInput & TTransients>): PromiseLike<Prisma.CategoryCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Prisma.CategoryCreateInput>;
     buildList(inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]): PromiseLike<Prisma.CategoryCreateInput[]>;
     pickForConnect(inputData: Category): Pick<Category, "id">;
-    create(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Category>;
+    create(inputData?: Partial<Prisma.CategoryCreateInput & TTransients>): PromiseLike<Category>;
     createList(inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]): PromiseLike<Category[]>;
     createForConnect(inputData?: Partial<Prisma.CategoryCreateInput>): PromiseLike<Pick<Category, "id">>;
 }
 
-export interface CategoryFactoryInterface<TOptions extends CategoryFactoryDefineOptions = CategoryFactoryDefineOptions> extends CategoryFactoryInterfaceWithoutTraits {
-    use(name: CategoryTraitKeys<TOptions>, ...names: readonly CategoryTraitKeys<TOptions>[]): CategoryFactoryInterfaceWithoutTraits;
+export interface CategoryFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends CategoryFactoryDefineOptions<any> = CategoryFactoryDefineOptions> extends CategoryFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: CategoryTraitKeys<TOptions>, ...names: readonly CategoryTraitKeys<TOptions>[]): CategoryFactoryInterfaceWithoutTraits<TTransients>;
 }
 
 function autoGenerateCategoryScalarsOrEnums({ seq }: {
@@ -212,7 +221,7 @@ function autoGenerateCategoryScalarsOrEnums({ seq }: {
     };
 }
 
-function defineCategoryFactoryInternal<TOptions extends CategoryFactoryDefineOptions>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions): CategoryFactoryInterface<TOptions> {
+function defineCategoryFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends CategoryFactoryDefineOptions<any>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): CategoryFactoryInterface<TTransients, TOptions> {
     const getFactoryWithTraits = (traitKeys: readonly CategoryTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
@@ -232,19 +241,21 @@ function defineCategoryFactoryInternal<TOptions extends CategoryFactoryDefineOpt
         const build = async (inputData: Partial<Prisma.CategoryCreateInput> = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateCategoryScalarsOrEnums({ seq });
-            const resolveValue = normalizeResolver<CategoryFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+            const resolveValue = normalizeResolver<CategoryFactoryDefineInput, BuildDataOptions<any>>(defaultDataResolver ?? {});
+            const transients = synthesize(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transients };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
-                const resolveTraitValue = normalizeResolver<Partial<CategoryFactoryDefineInput>, BuildDataOptions>(traitsDefs[traitKey]?.data ?? {});
-                const traitData = await resolveTraitValue({ seq });
+                const resolveTraitValue = normalizeResolver<Partial<CategoryFactoryDefineInput>, BuildDataOptions<any>>(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue(resolverInput);
                 return {
                     ...acc,
                     ...traitData,
                 };
-            }, resolveValue({ seq }));
+            }, resolveValue(resolverInput));
             const defaultAssociations = {};
             const data: Prisma.CategoryCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-            await handleAfterBuild(data);
+            await handleAfterBuild({ ...data, ...transients });
             return data;
         };
         const buildList = (inputData: number | readonly Partial<Prisma.CategoryCreateInput>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
@@ -281,12 +292,19 @@ function defineCategoryFactoryInternal<TOptions extends CategoryFactoryDefineOpt
     };
 }
 
+interface CategoryFactoryBuilder {
+    <TOptions extends CategoryFactoryDefineOptions>(options?: TOptions): CategoryFactoryInterface<{}, TOptions>;
+    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends CategoryFactoryDefineOptions<TTransients>>(options?: TOptions) => CategoryFactoryInterface<TTransients, TOptions>;
+}
+
 /**
  * Define factory for {@link Category} model.
  *
  * @param options
  * @returns factory {@link CategoryFactoryInterface}
  */
-export function defineCategoryFactory<TOptions extends CategoryFactoryDefineOptions>(options?: TOptions): CategoryFactoryInterface<TOptions> {
-    return defineCategoryFactoryInternal(options ?? {});
-}
+export const defineCategoryFactory = (<TOptions extends CategoryFactoryDefineOptions>(options?: TOptions): CategoryFactoryInterface<TOptions> => {
+    return defineCategoryFactoryInternal(options ?? {}, {});
+}) as CategoryFactoryBuilder;
+
+defineCategoryFactory.withTransientFields = defaultTransientFieldValues => options => defineCategoryFactoryInternal(options ?? {}, defaultTransientFieldValues);
