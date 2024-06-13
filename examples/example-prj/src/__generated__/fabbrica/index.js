@@ -82,8 +82,8 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
             const seq = getSeq();
             const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
             const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
-            const transients = (0, internal_1.synthesize)(defaultTransientFieldValues, inputData);
-            const resolverInput = { seq, ...transients };
+            const transientFields = (0, internal_1.synthesize)(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transientFields };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
                 const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
@@ -95,7 +95,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
             }, resolveValue(resolverInput));
             const defaultAssociations = {};
             const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-            await handleAfterBuild({ ...data, ...transients });
+            await handleAfterBuild(data, transientFields);
             return data;
         };
         const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
@@ -104,9 +104,10 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
         });
         const create = async (inputData = {}) => {
             const data = await build(inputData).then(screen);
-            await handleBeforeCreate(data);
+            const transientFields = (0, internal_1.synthesize)(defaultTransientFieldValues, inputData);
+            await handleBeforeCreate(data, transientFields);
             const createdData = await getClient().user.create({ data });
-            await handleAfterCreate(createdData);
+            await handleAfterCreate(createdData, transientFields);
             return createdData;
         };
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
@@ -171,8 +172,8 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
             const seq = getSeq();
             const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
             const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
-            const transients = (0, internal_1.synthesize)(defaultTransientFieldValues, inputData);
-            const resolverInput = { seq, ...transients };
+            const transientFields = (0, internal_1.synthesize)(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transientFields };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
                 const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
@@ -188,7 +189,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
                 } : defaultData.author
             };
             const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-            await handleAfterBuild({ ...data, ...transients });
+            await handleAfterBuild(data, transientFields);
             return data;
         };
         const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
@@ -197,9 +198,10 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
         });
         const create = async (inputData = {}) => {
             const data = await build(inputData).then(screen);
-            await handleBeforeCreate(data);
+            const transientFields = (0, internal_1.synthesize)(defaultTransientFieldValues, inputData);
+            await handleBeforeCreate(data, transientFields);
             const createdData = await getClient().post.create({ data });
-            await handleAfterCreate(createdData);
+            await handleAfterCreate(createdData, transientFields);
             return createdData;
         };
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
@@ -267,8 +269,8 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, onAfte
             const seq = getSeq();
             const requiredScalarData = autoGenerateCommentScalarsOrEnums({ seq });
             const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
-            const transients = (0, internal_1.synthesize)(defaultTransientFieldValues, inputData);
-            const resolverInput = { seq, ...transients };
+            const transientFields = (0, internal_1.synthesize)(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transientFields };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
                 const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
@@ -287,7 +289,7 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, onAfte
                 } : defaultData.author
             };
             const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-            await handleAfterBuild({ ...data, ...transients });
+            await handleAfterBuild(data, transientFields);
             return data;
         };
         const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
@@ -296,9 +298,10 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, onAfte
         });
         const create = async (inputData = {}) => {
             const data = await build(inputData).then(screen);
-            await handleBeforeCreate(data);
+            const transientFields = (0, internal_1.synthesize)(defaultTransientFieldValues, inputData);
+            await handleBeforeCreate(data, transientFields);
             const createdData = await getClient().comment.create({ data });
-            await handleAfterCreate(createdData);
+            await handleAfterCreate(createdData, transientFields);
             return createdData;
         };
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
@@ -360,8 +363,8 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, onAft
             const seq = getSeq();
             const requiredScalarData = autoGenerateCategoryScalarsOrEnums({ seq });
             const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
-            const transients = (0, internal_1.synthesize)(defaultTransientFieldValues, inputData);
-            const resolverInput = { seq, ...transients };
+            const transientFields = (0, internal_1.synthesize)(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transientFields };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
                 const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
@@ -373,7 +376,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, onAft
             }, resolveValue(resolverInput));
             const defaultAssociations = {};
             const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
-            await handleAfterBuild({ ...data, ...transients });
+            await handleAfterBuild(data, transientFields);
             return data;
         };
         const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
@@ -382,9 +385,10 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, onAft
         });
         const create = async (inputData = {}) => {
             const data = await build(inputData).then(screen);
-            await handleBeforeCreate(data);
+            const transientFields = (0, internal_1.synthesize)(defaultTransientFieldValues, inputData);
+            await handleBeforeCreate(data, transientFields);
             const createdData = await getClient().category.create({ data });
-            await handleAfterCreate(createdData);
+            await handleAfterCreate(createdData, transientFields);
             return createdData;
         };
         const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
