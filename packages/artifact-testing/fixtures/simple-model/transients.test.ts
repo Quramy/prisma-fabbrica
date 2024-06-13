@@ -14,7 +14,7 @@ describe("Generated functions", () => {
       expect(UserFactory.build()).resolves.toMatchObject({ name: "user_0" });
     });
 
-    test("with transiend field", async () => {
+    test("with transient field", async () => {
       expect(UserFactory.build({ loginCount: 100 })).resolves.toMatchObject({ name: "user_100" });
     });
 
