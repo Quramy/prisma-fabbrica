@@ -93,7 +93,8 @@ async function seed() {
 seed();
 ```
 
-Note: The factories use Prisma client instance passed by `initialize` function.
+> [!NOTE]
+> The factories use Prisma client instance passed by `initialize` function.
 
 If you want to use factories in your test code see [Works with jest-prisma](#works-with-jest-prisma) section below.
 
@@ -124,7 +125,8 @@ await UserFactory.create(); // Insert record with auto filled id, email, firstNa
 
 See https://github.com/Quramy/prisma-fabbrica/blob/main/packages/prisma-fabbrica/src/scalar/gen.ts if you want auto filling rule details.
 
-Note: prisma-fabbrica auto filling does not affect fields with `@default()` function.
+> [!NOTE]
+> prisma-fabbrica auto filling does not affect fields with `@default()` function.
 
 Default filling rule also can be overwritten.
 
@@ -317,7 +319,8 @@ await UserFactory.create({
 console.log(await prisma.post.count()); // -> 2
 ```
 
-Note: In the above example, `PostFactory.build()` resolves JSON data such as:
+> [!NOTE]
+> In the above example, `PostFactory.build()` resolves JSON data such as:
 
 ```ts
 {
@@ -418,7 +421,8 @@ await UserFactory.create();
 await UserFactory.use("withComment").create();
 ```
 
-Note: The above code is to explain the callback. If you want to create association, first consider to use `defaultData` and `trait.data` option as in [has-many / has-one relation](#has-many--has-one-relation).
+> [!NOTE]
+> The above code is to explain the callback. If you want to create association, first consider to use `defaultData` and `trait.data` option as in [has-many / has-one relation](#has-many--has-one-relation).
 
 The following three types are available as callback function:
 
