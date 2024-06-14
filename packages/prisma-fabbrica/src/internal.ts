@@ -6,7 +6,7 @@ export {
   normalizeList,
   getSequenceCounter,
   createCallbackChain,
-  synthesize,
+  destructure,
 } from "./helpers";
 export { createInitializer, initialize, resetSequence } from "./initialize";
 export type { InitializeOptions } from "./initialize";

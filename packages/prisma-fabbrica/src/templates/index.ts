@@ -87,7 +87,7 @@ export const header = (prismaClientModuleSpecifier: string) =>
       normalizeList,
       getSequenceCounter,
       createCallbackChain,
-      synthesize,
+      destructure
     } from "@quramy/prisma-fabbrica/lib/internal";
     import type {
       ModelWithFields,
@@ -412,7 +412,7 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
           const seq = getSeq();
           const requiredScalarData = AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS({ seq });
           const resolveValue = normalizeResolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions<any>>(DEFALUT_DATA_RESOLVER);
-          const [transientFields, filteredInputData] = synthesize(defaultTransientFieldValues, inputData);
+          const [transientFields, filteredInputData] = destructure(defaultTransientFieldValues, inputData);
           const resolverInput = { seq, ...transientFields };
           const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
             const acc = await queue;
@@ -462,7 +462,7 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
         const create = async (
           inputData: CREATE_INPUT_TYPE = {}
         ) => {
-          const [transientFields] = synthesize(defaultTransientFieldValues, inputData);
+          const [transientFields] = destructure(defaultTransientFieldValues, inputData);
           const data = await build(inputData).then(screen);
           await handleBeforeCreate(data, transientFields);
           const createdData = await getClient<PrismaClient>().MODEL_KEY.create({ data });
