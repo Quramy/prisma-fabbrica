@@ -448,7 +448,7 @@ const UserFactory = defineUserFactory.withTransientFields({
   },
 });
 
-UserFactory.create({ name: "Bob", loginCount: 10 });
+await UserFactory.create({ name: "Bob", loginCount: 10 });
 ```
 
 Transient fields passed from factories' `create` method don't affect Prisma's `create` result.
