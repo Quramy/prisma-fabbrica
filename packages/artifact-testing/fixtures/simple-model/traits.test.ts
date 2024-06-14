@@ -26,4 +26,21 @@ describe("traits", () => {
     await expect(UserFactory.use("a", "b").build()).resolves.toMatchObject({ name: "trait b" });
     await expect(UserFactory.use("b", "a").build()).resolves.toMatchObject({ name: "trait a" });
   });
+
+  test("use transient fields from trait", async () => {
+    const UserFactory = defineUserFactory.withTransientFields({
+      hoge: 0,
+    })({
+      defaultData: {
+        name: "default",
+      },
+      traits: {
+        myTrait: {
+          data: ({ hoge }) => ({ name: `user${hoge}` }),
+        },
+      },
+    });
+
+    await expect(UserFactory.use("myTrait").build({ hoge: 1 })).resolves.toMatchObject({ name: "user1" });
+  });
 });
