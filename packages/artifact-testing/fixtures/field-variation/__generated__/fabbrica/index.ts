@@ -55,6 +55,8 @@ type UserFactoryDefineInput = {
     status?: Status | null;
 };
 
+type UserTransientFields = Record<string, unknown> & Partial<Record<keyof UserFactoryDefineInput, never>>;
+
 type UserFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions<TTransients>>;
 } & CallbackDefineOptions<User, Prisma.UserCreateInput, TTransients>;
@@ -166,7 +168,7 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
 
 interface UserFactoryBuilder {
     <TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends UserTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, TOptions>;
 }
 
 /**
@@ -190,6 +192,8 @@ type ComplexIdModelFactoryDefineInput = {
     firstName?: string;
     lastName?: string;
 };
+
+type ComplexIdModelTransientFields = Record<string, unknown> & Partial<Record<keyof ComplexIdModelFactoryDefineInput, never>>;
 
 type ComplexIdModelFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<ComplexIdModelFactoryDefineInput>, BuildDataOptions<TTransients>>;
@@ -303,7 +307,7 @@ function defineComplexIdModelFactoryInternal<TTransients extends Record<string, 
 
 interface ComplexIdModelFactoryBuilder {
     <TOptions extends ComplexIdModelFactoryDefineOptions>(options?: TOptions): ComplexIdModelFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends ComplexIdModelFactoryDefineOptions<TTransients>>(options?: TOptions) => ComplexIdModelFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends ComplexIdModelTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends ComplexIdModelFactoryDefineOptions<TTransients>>(options?: TOptions) => ComplexIdModelFactoryInterface<TTransients, TOptions>;
 }
 
 /**
@@ -351,6 +355,8 @@ type FieldTypePatternModelFactoryDefineInput = {
     requiredBigInt?: (bigint | number);
     nullableBigInt?: (bigint | number) | null;
 };
+
+type FieldTypePatternModelTransientFields = Record<string, unknown> & Partial<Record<keyof FieldTypePatternModelFactoryDefineInput, never>>;
 
 type FieldTypePatternModelFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<FieldTypePatternModelFactoryDefineInput>, BuildDataOptions<TTransients>>;
@@ -470,7 +476,7 @@ function defineFieldTypePatternModelFactoryInternal<TTransients extends Record<s
 
 interface FieldTypePatternModelFactoryBuilder {
     <TOptions extends FieldTypePatternModelFactoryDefineOptions>(options?: TOptions): FieldTypePatternModelFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends FieldTypePatternModelFactoryDefineOptions<TTransients>>(options?: TOptions) => FieldTypePatternModelFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends FieldTypePatternModelTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends FieldTypePatternModelFactoryDefineOptions<TTransients>>(options?: TOptions) => FieldTypePatternModelFactoryInterface<TTransients, TOptions>;
 }
 
 /**
@@ -492,6 +498,8 @@ type NoPkModelScalarOrEnumFields = {
 type NoPkModelFactoryDefineInput = {
     id?: number;
 };
+
+type NoPkModelTransientFields = Record<string, unknown> & Partial<Record<keyof NoPkModelFactoryDefineInput, never>>;
 
 type NoPkModelFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<NoPkModelFactoryDefineInput>, BuildDataOptions<TTransients>>;
@@ -603,7 +611,7 @@ function defineNoPkModelFactoryInternal<TTransients extends Record<string, unkno
 
 interface NoPkModelFactoryBuilder {
     <TOptions extends NoPkModelFactoryDefineOptions>(options?: TOptions): NoPkModelFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends NoPkModelFactoryDefineOptions<TTransients>>(options?: TOptions) => NoPkModelFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends NoPkModelTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends NoPkModelFactoryDefineOptions<TTransients>>(options?: TOptions) => NoPkModelFactoryInterface<TTransients, TOptions>;
 }
 
 /**
