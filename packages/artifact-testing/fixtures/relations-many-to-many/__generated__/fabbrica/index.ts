@@ -1,7 +1,7 @@
 import type { Post } from "../client";
 import type { Category } from "../client";
 import type { Prisma, PrismaClient } from "../client";
-import { createInitializer, createScreener, getScalarFieldValueGenerator, normalizeResolver, normalizeList, getSequenceCounter, createCallbackChain, synthesize, } from "@quramy/prisma-fabbrica/lib/internal";
+import { createInitializer, createScreener, getScalarFieldValueGenerator, normalizeResolver, normalizeList, getSequenceCounter, createCallbackChain, destructure } from "@quramy/prisma-fabbrica/lib/internal";
 import type { ModelWithFields, Resolver, } from "@quramy/prisma-fabbrica/lib/internal";
 export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
 
@@ -106,7 +106,7 @@ function definePostFactoryInternal<TTransients extends Record<string, unknown>, 
             const seq = getSeq();
             const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
             const resolveValue = normalizeResolver<PostFactoryDefineInput, BuildDataOptions<any>>(defaultDataResolver ?? {});
-            const [transientFields, filteredInputData] = synthesize(defaultTransientFieldValues, inputData);
+            const [transientFields, filteredInputData] = destructure(defaultTransientFieldValues, inputData);
             const resolverInput = { seq, ...transientFields };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
@@ -127,7 +127,7 @@ function definePostFactoryInternal<TTransients extends Record<string, unknown>, 
             id: inputData.id
         });
         const create = async (inputData: Partial<Prisma.PostCreateInput & TTransients> = {}) => {
-            const [transientFields] = synthesize(defaultTransientFieldValues, inputData);
+            const [transientFields] = destructure(defaultTransientFieldValues, inputData);
             const data = await build(inputData).then(screen);
             await handleBeforeCreate(data, transientFields);
             const createdData = await getClient<PrismaClient>().post.create({ data });
@@ -243,7 +243,7 @@ function defineCategoryFactoryInternal<TTransients extends Record<string, unknow
             const seq = getSeq();
             const requiredScalarData = autoGenerateCategoryScalarsOrEnums({ seq });
             const resolveValue = normalizeResolver<CategoryFactoryDefineInput, BuildDataOptions<any>>(defaultDataResolver ?? {});
-            const [transientFields, filteredInputData] = synthesize(defaultTransientFieldValues, inputData);
+            const [transientFields, filteredInputData] = destructure(defaultTransientFieldValues, inputData);
             const resolverInput = { seq, ...transientFields };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
@@ -264,7 +264,7 @@ function defineCategoryFactoryInternal<TTransients extends Record<string, unknow
             id: inputData.id
         });
         const create = async (inputData: Partial<Prisma.CategoryCreateInput & TTransients> = {}) => {
-            const [transientFields] = synthesize(defaultTransientFieldValues, inputData);
+            const [transientFields] = destructure(defaultTransientFieldValues, inputData);
             const data = await build(inputData).then(screen);
             await handleBeforeCreate(data, transientFields);
             const createdData = await getClient<PrismaClient>().category.create({ data });
