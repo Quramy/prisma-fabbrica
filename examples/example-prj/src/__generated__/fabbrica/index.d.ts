@@ -24,6 +24,7 @@ type UserFactoryDefineInput = {
     posts?: Prisma.PostCreateNestedManyWithoutAuthorInput;
     comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput;
 };
+type UserTransientFields = Record<string, unknown> & Partial<Record<keyof UserFactoryDefineInput, never>>;
 type UserFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions<TTransients>>;
 } & CallbackDefineOptions<User, Prisma.UserCreateInput, TTransients>;
@@ -49,7 +50,7 @@ export interface UserFactoryInterface<TTransients extends Record<string, unknown
 }
 interface UserFactoryBuilder {
     <TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends UserTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, TOptions>;
 }
 /**
  * Define factory for {@link User} model.
@@ -64,6 +65,7 @@ type LoginLogFactoryDefineInput = {
     clientId?: string;
     createdAt?: Date;
 };
+type LoginLogTransientFields = Record<string, unknown> & Partial<Record<keyof LoginLogFactoryDefineInput, never>>;
 type LoginLogFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<LoginLogFactoryDefineInput>, BuildDataOptions<TTransients>>;
 } & CallbackDefineOptions<LoginLog, Prisma.LoginLogCreateInput, TTransients>;
@@ -89,7 +91,7 @@ export interface LoginLogFactoryInterface<TTransients extends Record<string, unk
 }
 interface LoginLogFactoryBuilder {
     <TOptions extends LoginLogFactoryDefineOptions>(options?: TOptions): LoginLogFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends LoginLogFactoryDefineOptions<TTransients>>(options?: TOptions) => LoginLogFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends LoginLogTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends LoginLogFactoryDefineOptions<TTransients>>(options?: TOptions) => LoginLogFactoryInterface<TTransients, TOptions>;
 }
 /**
  * Define factory for {@link LoginLog} model.
@@ -111,6 +113,7 @@ type PostFactoryDefineInput = {
     comments?: Prisma.CommentCreateNestedManyWithoutPostInput;
     categories?: Prisma.CategoryCreateNestedManyWithoutPostsInput;
 };
+type PostTransientFields = Record<string, unknown> & Partial<Record<keyof PostFactoryDefineInput, never>>;
 type PostFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<PostFactoryDefineInput>, BuildDataOptions<TTransients>>;
 } & CallbackDefineOptions<Post, Prisma.PostCreateInput, TTransients>;
@@ -136,7 +139,7 @@ export interface PostFactoryInterface<TTransients extends Record<string, unknown
 }
 interface PostFactoryBuilder {
     <TOptions extends PostFactoryDefineOptions>(options: TOptions): PostFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends PostFactoryDefineOptions<TTransients>>(options: TOptions) => PostFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends PostTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends PostFactoryDefineOptions<TTransients>>(options: TOptions) => PostFactoryInterface<TTransients, TOptions>;
 }
 /**
  * Define factory for {@link Post} model.
@@ -161,6 +164,7 @@ type CommentFactoryDefineInput = {
     post: CommentpostFactory | Prisma.PostCreateNestedOneWithoutCommentsInput;
     author: CommentauthorFactory | Prisma.UserCreateNestedOneWithoutCommentsInput;
 };
+type CommentTransientFields = Record<string, unknown> & Partial<Record<keyof CommentFactoryDefineInput, never>>;
 type CommentFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<CommentFactoryDefineInput>, BuildDataOptions<TTransients>>;
 } & CallbackDefineOptions<Comment, Prisma.CommentCreateInput, TTransients>;
@@ -186,7 +190,7 @@ export interface CommentFactoryInterface<TTransients extends Record<string, unkn
 }
 interface CommentFactoryBuilder {
     <TOptions extends CommentFactoryDefineOptions>(options: TOptions): CommentFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends CommentFactoryDefineOptions<TTransients>>(options: TOptions) => CommentFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends CommentTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends CommentFactoryDefineOptions<TTransients>>(options: TOptions) => CommentFactoryInterface<TTransients, TOptions>;
 }
 /**
  * Define factory for {@link Comment} model.
@@ -200,6 +204,7 @@ type CategoryFactoryDefineInput = {
     name?: string;
     posts?: Prisma.PostCreateNestedManyWithoutCategoriesInput;
 };
+type CategoryTransientFields = Record<string, unknown> & Partial<Record<keyof CategoryFactoryDefineInput, never>>;
 type CategoryFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<CategoryFactoryDefineInput>, BuildDataOptions<TTransients>>;
 } & CallbackDefineOptions<Category, Prisma.CategoryCreateInput, TTransients>;
@@ -225,7 +230,7 @@ export interface CategoryFactoryInterface<TTransients extends Record<string, unk
 }
 interface CategoryFactoryBuilder {
     <TOptions extends CategoryFactoryDefineOptions>(options?: TOptions): CategoryFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends CategoryFactoryDefineOptions<TTransients>>(options?: TOptions) => CategoryFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends CategoryTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends CategoryFactoryDefineOptions<TTransients>>(options?: TOptions) => CategoryFactoryInterface<TTransients, TOptions>;
 }
 /**
  * Define factory for {@link Category} model.

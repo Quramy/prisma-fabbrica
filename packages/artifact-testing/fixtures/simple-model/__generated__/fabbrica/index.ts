@@ -35,6 +35,8 @@ type UserFactoryDefineInput = {
     name?: string;
 };
 
+type UserTransientFields = Record<string, unknown> & Partial<Record<keyof UserFactoryDefineInput, never>>;
+
 type UserFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions<TTransients>>;
 } & CallbackDefineOptions<User, Prisma.UserCreateInput, TTransients>;
@@ -146,7 +148,7 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
 
 interface UserFactoryBuilder {
     <TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends UserTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, TOptions>;
 }
 
 /**
