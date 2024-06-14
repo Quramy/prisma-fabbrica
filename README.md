@@ -22,6 +22,7 @@ Prisma generator for model factories.
   - [Custom scalar field generation](#custom-scalar-field-generation)
   - [Traits](#traits)
   - [Callbacks](#callbacks)
+  - [Transient fields](#transient-fields)
   - [Field value precedence](#field-value-precedence)
   - [More examples](#more-examples)
 - [Generator configuration](#generator-configuration)
@@ -433,6 +434,47 @@ And here, the parameter types are:
 
 - `createInput` is assignable to model create function parameter (e.g. `Prsima.UserCreateInput`).
 - `createdData` is resolved object by model create function (e.g. `User` model type)
+
+### Transient fields
+
+Transient fields allow to define arbitrary parameters to factory and to pass them when calling `create` or `build`.
+
+```ts
+const UserFactory = defineUserFactory.withTransientFields({
+  loginCount: 0, // `0` is default value of this parameter
+})({
+  defaultData: async ({ loginCount }) => {
+    // using loginCount
+  },
+});
+
+UserFactory.create({ name: "Bob", loginCount: 10 });
+```
+
+Transient fields passed from factories' `create` method don't affect Prisma's `create` result.
+
+> [!NOTE]
+> You can't use model field names defined in your schema.prisma as transient parameters because they're not passed to `prisma.user.create` method.
+
+Transient fields also can be accessed from [traits](#traits) or [callbacks](#callbacks).
+
+```ts
+const UserFactory = defineUserFactory.withTransientFields({
+  loginCount: 0,
+})({
+  // Transient fields are passed to callback functions as the 2nd argument.
+  onAfterCreate: async (createdUser, { loginCount }) => {
+    for (let i = 0; i < loginCount; i++) {
+      await writeLoginLog(craetedUser.id);
+    }
+  },
+  traits: {
+    data: async ({ loginCount }) => {
+      // using loginCount
+    },
+  },
+});
+```
 
 ### Field value precedence
 
