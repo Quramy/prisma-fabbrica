@@ -1,6 +1,6 @@
-import { synthesize } from "./transientFields";
+import { destructure } from "./transientFields";
 
-describe(synthesize, () => {
+describe(destructure, () => {
   const defaultValues = {
     a: 1,
   };
@@ -12,6 +12,6 @@ describe(synthesize, () => {
     { inputData: { a: 2 }, expected: [{ a: 2 }, {}] },
     { inputData: { b: 1 }, expected: [{ a: 1 }, { b: 1 }] },
   ])("works with $inputData", ({ inputData, expected }) => {
-    expect(synthesize(defaultValues, inputData)).toEqual(expected);
+    expect(destructure(defaultValues, inputData)).toEqual(expected);
   });
 });

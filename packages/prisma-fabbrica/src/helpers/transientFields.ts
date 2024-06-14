@@ -1,4 +1,4 @@
-export function synthesize<T extends Record<string, unknown>, S extends Record<string, unknown>>(
+export function destructure<T extends Record<string, unknown>, S extends Record<string, unknown>>(
   defaultValues: T,
   inputData: S | null | undefined,
 ) {
