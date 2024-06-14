@@ -103,5 +103,55 @@ describe("Generated functions", () => {
       expect(mock).toHaveBeenNthCalledWith(8, "trait a", "onAfterCreate");
       expect(mock).toHaveBeenNthCalledWith(9, "trait b", "onAfterCreate");
     });
+
+    describe("callbacks with transient fields", () => {
+      test("onAfterBuild", async () => {
+        const mock = jest.fn();
+        const UserFactory = defineUserFactory.withTransientFields({
+          hoge: 0,
+        })({
+          onAfterBuild: (_, { hoge }) => {
+            mock(hoge);
+          },
+        });
+
+        await UserFactory.build({ hoge: 100 });
+
+        expect(mock).toBeCalledTimes(1);
+        expect(mock).toBeCalledWith(100);
+      });
+
+      test("onBeforeCreate", async () => {
+        const mock = jest.fn();
+        const UserFactory = defineUserFactory.withTransientFields({
+          hoge: 0,
+        })({
+          onBeforeCreate: (_, { hoge }) => {
+            mock(hoge);
+          },
+        });
+
+        await UserFactory.create({ hoge: 100 });
+
+        expect(mock).toBeCalledTimes(1);
+        expect(mock).toBeCalledWith(100);
+      });
+
+      test("onAfterCreate", async () => {
+        const mock = jest.fn();
+        const UserFactory = defineUserFactory.withTransientFields({
+          hoge: 0,
+        })({
+          onAfterCreate: (_, { hoge }) => {
+            mock(hoge);
+          },
+        });
+
+        await UserFactory.create({ hoge: 100 });
+
+        expect(mock).toBeCalledTimes(1);
+        expect(mock).toBeCalledWith(100);
+      });
+    });
   });
 });
