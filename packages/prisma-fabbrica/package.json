@@ -1,6 +1,6 @@
 {
   "name": "@quramy/prisma-fabbrica",
-  "version": "2.1.4",
+  "version": "2.2.0-alpha.0",
   "description": " Prisma generator for model factories",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
