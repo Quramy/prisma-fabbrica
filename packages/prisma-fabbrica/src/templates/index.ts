@@ -232,6 +232,14 @@ export const modelFactoryDefineInput = (model: DMMF.Model, inputType: DMMF.Input
     MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${model.name}FactoryDefineInput`),
   });
 
+export const modelTransientFields = (model: DMMF.Model) =>
+  template.statement<ts.TypeAliasDeclaration>`
+    type MODEL_TRANSIENT_FIELDS = Record<string, unknown> & Partial<Record<keyof MODEL_FACTORY_DEFINE_INPUT, never>>;
+  `({
+    MODEL_TRANSIENT_FIELDS: ast.identifier(`${model.name}TransientFields`),
+    MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${model.name}FactoryDefineInput`),
+  });
+
 export const modelFactoryTrait = (model: DMMF.Model) =>
   template.statement<ts.TypeAliasDeclaration>`
     type MODEL_FACTORY_TRAIT<TTransients extends Record<string, unknown>> = {
@@ -515,17 +523,18 @@ export const modelFactoryBuilder = (model: DMMF.Model, inputType: DMMF.InputType
     ? template.statement<ts.InterfaceDeclaration>`
         interface MODEL_FACTORY_BUILDER {
           <TOptions extends MODEL_FACTORY_DEFINE_OPTIONS>(options: TOptions): MODEL_FACTORY_INTERFACE<{}, TOptions>;
-          withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<TTransients>>(options: TOptions) => MODEL_FACTORY_INTERFACE<TTransients, TOptions>
+          withTransientFields: <TTransients extends MODEL_TRANSIENT_FIELDS>(defaultTransientFieldValues: TTransients) => <TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<TTransients>>(options: TOptions) => MODEL_FACTORY_INTERFACE<TTransients, TOptions>
         }`
     : template.statement<ts.InterfaceDeclaration>`
         interface MODEL_FACTORY_BUILDER {
           <TOptions extends MODEL_FACTORY_DEFINE_OPTIONS>(options?: TOptions): MODEL_FACTORY_INTERFACE<{}, TOptions>;
-          withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<TTransients>>(options?: TOptions) => MODEL_FACTORY_INTERFACE<TTransients, TOptions>
+          withTransientFields: <TTransients extends MODEL_TRANSIENT_FIELDS>(defaultTransientFieldValues: TTransients) => <TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<TTransients>>(options?: TOptions) => MODEL_FACTORY_INTERFACE<TTransients, TOptions>
         }`;
   return compiled({
     MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
     MODEL_FACTORY_INTERFACE: ast.identifier(`${model.name}FactoryInterface`),
     MODEL_FACTORY_BUILDER: ast.identifier(`${model.name}FactoryBuilder`),
+    MODEL_TRANSIENT_FIELDS: ast.identifier(`${model.name}TransientFields`),
   });
 };
 
@@ -617,6 +626,7 @@ export function getSourceFile({
           modelBelongsToRelationFactory(fieldType, model),
         ),
         modelFactoryDefineInput(model, createInputType),
+        modelTransientFields(model),
         modelFactoryTrait(model),
         modelFactoryDefineOptions(model, filterRequiredInputObjectTypeField(createInputType).length === 0),
         ...filterBelongsToField(model, createInputType).map(fieldType => isModelAssociationFactory(fieldType, model)),
