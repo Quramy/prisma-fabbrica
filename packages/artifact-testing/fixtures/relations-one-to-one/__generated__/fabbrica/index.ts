@@ -53,6 +53,8 @@ type UserFactoryDefineInput = {
     profile?: UserprofileFactory | Prisma.ProfileCreateNestedOneWithoutUserInput;
 };
 
+type UserTransientFields = Record<string, unknown> & Partial<Record<keyof UserFactoryDefineInput, never>>;
+
 type UserFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions<TTransients>>;
 } & CallbackDefineOptions<User, Prisma.UserCreateInput, TTransients>;
@@ -172,7 +174,7 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
 
 interface UserFactoryBuilder {
     <TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends UserTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, TOptions>;
 }
 
 /**
@@ -200,6 +202,8 @@ type ProfileFactoryDefineInput = {
     id?: string;
     user: ProfileuserFactory | Prisma.UserCreateNestedOneWithoutProfileInput;
 };
+
+type ProfileTransientFields = Record<string, unknown> & Partial<Record<keyof ProfileFactoryDefineInput, never>>;
 
 type ProfileFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<ProfileFactoryDefineInput>, BuildDataOptions<TTransients>>;
@@ -319,7 +323,7 @@ function defineProfileFactoryInternal<TTransients extends Record<string, unknown
 
 interface ProfileFactoryBuilder {
     <TOptions extends ProfileFactoryDefineOptions>(options: TOptions): ProfileFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends ProfileFactoryDefineOptions<TTransients>>(options: TOptions) => ProfileFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends ProfileTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends ProfileFactoryDefineOptions<TTransients>>(options: TOptions) => ProfileFactoryInterface<TTransients, TOptions>;
 }
 
 /**

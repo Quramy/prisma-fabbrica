@@ -69,6 +69,8 @@ type UserFactoryDefineInput = {
     reviews?: Prisma.ReviewCreateNestedManyWithoutReviewerInput;
 };
 
+type UserTransientFields = Record<string, unknown> & Partial<Record<keyof UserFactoryDefineInput, never>>;
+
 type UserFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions<TTransients>>;
 } & CallbackDefineOptions<User, Prisma.UserCreateInput, TTransients>;
@@ -180,7 +182,7 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
 
 interface UserFactoryBuilder {
     <TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends UserTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, TOptions>;
 }
 
 /**
@@ -211,6 +213,8 @@ type PostFactoryDefineInput = {
     author?: PostauthorFactory | Prisma.UserCreateNestedOneWithoutPostsInput;
     reviews?: Prisma.ReviewCreateNestedManyWithoutPostInput;
 };
+
+type PostTransientFields = Record<string, unknown> & Partial<Record<keyof PostFactoryDefineInput, never>>;
 
 type PostFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<PostFactoryDefineInput>, BuildDataOptions<TTransients>>;
@@ -331,7 +335,7 @@ function definePostFactoryInternal<TTransients extends Record<string, unknown>, 
 
 interface PostFactoryBuilder {
     <TOptions extends PostFactoryDefineOptions>(options?: TOptions): PostFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends PostFactoryDefineOptions<TTransients>>(options?: TOptions) => PostFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends PostTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends PostFactoryDefineOptions<TTransients>>(options?: TOptions) => PostFactoryInterface<TTransients, TOptions>;
 }
 
 /**
@@ -367,6 +371,8 @@ type ReviewFactoryDefineInput = {
     post: ReviewpostFactory | Prisma.PostCreateNestedOneWithoutReviewsInput;
     reviewer: ReviewreviewerFactory | Prisma.UserCreateNestedOneWithoutReviewsInput;
 };
+
+type ReviewTransientFields = Record<string, unknown> & Partial<Record<keyof ReviewFactoryDefineInput, never>>;
 
 type ReviewFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<ReviewFactoryDefineInput>, BuildDataOptions<TTransients>>;
@@ -494,7 +500,7 @@ function defineReviewFactoryInternal<TTransients extends Record<string, unknown>
 
 interface ReviewFactoryBuilder {
     <TOptions extends ReviewFactoryDefineOptions>(options: TOptions): ReviewFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends ReviewFactoryDefineOptions<TTransients>>(options: TOptions) => ReviewFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends ReviewTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends ReviewFactoryDefineOptions<TTransients>>(options: TOptions) => ReviewFactoryInterface<TTransients, TOptions>;
 }
 
 /**
