@@ -48,6 +48,8 @@ type PostFactoryDefineInput = {
     categories?: Prisma.CategoryCreateNestedManyWithoutPostsInput;
 };
 
+type PostTransientFields = Record<string, unknown> & Partial<Record<keyof PostFactoryDefineInput, never>>;
+
 type PostFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<PostFactoryDefineInput>, BuildDataOptions<TTransients>>;
 } & CallbackDefineOptions<Post, Prisma.PostCreateInput, TTransients>;
@@ -159,7 +161,7 @@ function definePostFactoryInternal<TTransients extends Record<string, unknown>, 
 
 interface PostFactoryBuilder {
     <TOptions extends PostFactoryDefineOptions>(options?: TOptions): PostFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends PostFactoryDefineOptions<TTransients>>(options?: TOptions) => PostFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends PostTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends PostFactoryDefineOptions<TTransients>>(options?: TOptions) => PostFactoryInterface<TTransients, TOptions>;
 }
 
 /**
@@ -184,6 +186,8 @@ type CategoryFactoryDefineInput = {
     name?: string;
     posts?: Prisma.PostCreateNestedManyWithoutCategoriesInput;
 };
+
+type CategoryTransientFields = Record<string, unknown> & Partial<Record<keyof CategoryFactoryDefineInput, never>>;
 
 type CategoryFactoryTrait<TTransients extends Record<string, unknown>> = {
     data?: Resolver<Partial<CategoryFactoryDefineInput>, BuildDataOptions<TTransients>>;
@@ -296,7 +300,7 @@ function defineCategoryFactoryInternal<TTransients extends Record<string, unknow
 
 interface CategoryFactoryBuilder {
     <TOptions extends CategoryFactoryDefineOptions>(options?: TOptions): CategoryFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends Record<string, unknown>>(defaultTransientFieldValues: TTransients) => <TOptions extends CategoryFactoryDefineOptions<TTransients>>(options?: TOptions) => CategoryFactoryInterface<TTransients, TOptions>;
+    withTransientFields: <TTransients extends CategoryTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends CategoryFactoryDefineOptions<TTransients>>(options?: TOptions) => CategoryFactoryInterface<TTransients, TOptions>;
 }
 
 /**
