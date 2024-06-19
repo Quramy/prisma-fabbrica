@@ -54,10 +54,12 @@ export interface UserFactoryInterfaceWithoutTraits<TTransients extends Record<st
     readonly _factoryFor: "User";
     build(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Prisma.UserCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Prisma.UserCreateInput>;
-    buildList(inputData: number | readonly Partial<Prisma.UserCreateInput & TTransients>[]): PromiseLike<Prisma.UserCreateInput[]>;
+    buildList(list: readonly Partial<Prisma.UserCreateInput & TTransients>[]): PromiseLike<Prisma.UserCreateInput[]>;
+    buildList(count: number, item?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Prisma.UserCreateInput[]>;
     pickForConnect(inputData: User): Pick<User, "id">;
     create(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<User>;
-    createList(inputData: number | readonly Partial<Prisma.UserCreateInput & TTransients>[]): PromiseLike<User[]>;
+    createList(list: readonly Partial<Prisma.UserCreateInput & TTransients>[]): PromiseLike<User[]>;
+    createList(count: number, item?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<User[]>;
     createForConnect(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Pick<User, "id">>;
 }
 
@@ -111,7 +113,7 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
             await handleAfterBuild(data, transientFields);
             return data;
         };
-        const buildList = (inputData: number | readonly Partial<Prisma.UserCreateInput & TTransients>[]) => Promise.all(normalizeList(inputData).map(data => build(data)));
+        const buildList = (...args: unknown[]) => Promise.all(normalizeList<Partial<Prisma.UserCreateInput & TTransients>>(...args).map(data => build(data)));
         const pickForConnect = (inputData: User) => ({
             id: inputData.id
         });
@@ -123,7 +125,7 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
             await handleAfterCreate(createdData, transientFields);
             return createdData;
         };
-        const createList = (inputData: number | readonly Partial<Prisma.UserCreateInput & TTransients>[]) => Promise.all(normalizeList(inputData).map(data => create(data)));
+        const createList = (...args: unknown[]) => Promise.all(normalizeList<Partial<Prisma.UserCreateInput & TTransients>>(...args).map(data => create(data)));
         const createForConnect = (inputData: Partial<Prisma.UserCreateInput & TTransients> = {}) => create(inputData).then(pickForConnect);
         return {
             _factoryFor: "User" as const,

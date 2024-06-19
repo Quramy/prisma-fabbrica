@@ -1,7 +1,10 @@
-export function normalizeList<T extends Record<string, unknown>>(input: number | readonly T[]) {
-  if (typeof input === "number") {
-    return [...new Array(input).keys()].map(() => ({}) as T);
+export function normalizeList<T extends Record<string, unknown>>(...args: any[]): T[] {
+  const [countOrList, item = {}] = args;
+  if (typeof countOrList === "number") {
+    return [...new Array(countOrList).keys()].map(() => item) as T[];
+  } else if (Array.isArray(countOrList)) {
+    return countOrList as T[];
   } else {
-    return input;
+    throw new Error("Illegal Argument");
   }
 }
