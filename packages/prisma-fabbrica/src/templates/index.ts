@@ -293,10 +293,12 @@ export const modelFactoryInterfaceWithoutTraits = (model: DMMF.Model) =>
       readonly _factoryFor: ${() => ast.literalTypeNode(ast.stringLiteral(model.name))}
       build(inputData?: CREATE_INPUT_TYPE): PromiseLike<Prisma.MODEL_CREATE_INPUT>
       buildCreateInput(inputData?: CREATE_INPUT_TYPE): PromiseLike<Prisma.MODEL_CREATE_INPUT>
-      buildList(inputData: number | readonly CREATE_INPUT_TYPE[]): PromiseLike<Prisma.MODEL_CREATE_INPUT[]>
+      buildList(list: readonly CREATE_INPUT_TYPE[]): PromiseLike<Prisma.MODEL_CREATE_INPUT[]>
+      buildList(count: number, item?: CREATE_INPUT_TYPE): PromiseLike<Prisma.MODEL_CREATE_INPUT[]>
       pickForConnect(inputData: MODEL_TYPE): Pick<MODEL_TYPE, MODEL_ID_COLS>
       create(inputData?: CREATE_INPUT_TYPE): PromiseLike<MODEL_TYPE>
-      createList(inputData: number | readonly CREATE_INPUT_TYPE[]): PromiseLike<MODEL_TYPE[]>
+      createList(list: readonly CREATE_INPUT_TYPE[]): PromiseLike<MODEL_TYPE[]>
+      createList(count: number, item?: CREATE_INPUT_TYPE): PromiseLike<MODEL_TYPE[]>
       createForConnect(inputData?: CREATE_INPUT_TYPE): PromiseLike<Pick<MODEL_TYPE, MODEL_ID_COLS>>
     }
   `({
@@ -453,9 +455,7 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
           return data;
         };
 
-        const buildList = (
-          inputData: number | readonly CREATE_INPUT_TYPE[]
-        ) => Promise.all(normalizeList(inputData).map(data => build(data)));
+        const buildList = (...args: unknown[]) => Promise.all(normalizeList<CREATE_INPUT_TYPE>(...args).map(data => build(data)));
 
         const pickForConnect = (inputData: ${() => ast.typeReferenceNode(model.name)}) => (
           ${() =>
@@ -478,9 +478,7 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
           return createdData;
         };
 
-        const createList = (
-          inputData: number | readonly CREATE_INPUT_TYPE[]
-        ) => Promise.all(normalizeList(inputData).map(data => create(data)));
+        const createList = (...args: unknown[]) => Promise.all(normalizeList<CREATE_INPUT_TYPE>(...args).map(data => create(data)));
 
         const createForConnect = (inputData: CREATE_INPUT_TYPE = {}) => create(inputData).then(pickForConnect);
 
