@@ -176,6 +176,12 @@ await UserFactory.createList(3);
 await Promise.all([0, 1, 2].map(() => UserFactory.create()));
 ```
 
+The 2nd argument(optional) accepts an object which is assignable to `Partial<Prisma.UserCreateInput>` :
+
+```ts
+await UserFactory.createList(3, { name: "Bob" });
+```
+
 You can also pass list data assignable to `Partial<Prisma.UserCreateInput>[]` :
 
 ```ts
