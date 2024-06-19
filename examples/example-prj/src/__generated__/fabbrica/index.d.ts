@@ -39,10 +39,12 @@ export interface UserFactoryInterfaceWithoutTraits<TTransients extends Record<st
     readonly _factoryFor: "User";
     build(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Prisma.UserCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Prisma.UserCreateInput>;
-    buildList(inputData: number | readonly Partial<Prisma.UserCreateInput & TTransients>[]): PromiseLike<Prisma.UserCreateInput[]>;
+    buildList(list: readonly Partial<Prisma.UserCreateInput & TTransients>[]): PromiseLike<Prisma.UserCreateInput[]>;
+    buildList(count: number, item?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Prisma.UserCreateInput[]>;
     pickForConnect(inputData: User): Pick<User, "id">;
     create(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<User>;
-    createList(inputData: number | readonly Partial<Prisma.UserCreateInput & TTransients>[]): PromiseLike<User[]>;
+    createList(list: readonly Partial<Prisma.UserCreateInput & TTransients>[]): PromiseLike<User[]>;
+    createList(count: number, item?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<User[]>;
     createForConnect(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Pick<User, "id">>;
 }
 export interface UserFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends UserFactoryDefineOptions<TTransients> = UserFactoryDefineOptions<TTransients>> extends UserFactoryInterfaceWithoutTraits<TTransients> {
@@ -80,10 +82,12 @@ export interface LoginLogFactoryInterfaceWithoutTraits<TTransients extends Recor
     readonly _factoryFor: "LoginLog";
     build(inputData?: Partial<Prisma.LoginLogCreateInput & TTransients>): PromiseLike<Prisma.LoginLogCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.LoginLogCreateInput & TTransients>): PromiseLike<Prisma.LoginLogCreateInput>;
-    buildList(inputData: number | readonly Partial<Prisma.LoginLogCreateInput & TTransients>[]): PromiseLike<Prisma.LoginLogCreateInput[]>;
+    buildList(list: readonly Partial<Prisma.LoginLogCreateInput & TTransients>[]): PromiseLike<Prisma.LoginLogCreateInput[]>;
+    buildList(count: number, item?: Partial<Prisma.LoginLogCreateInput & TTransients>): PromiseLike<Prisma.LoginLogCreateInput[]>;
     pickForConnect(inputData: LoginLog): Pick<LoginLog, "id">;
     create(inputData?: Partial<Prisma.LoginLogCreateInput & TTransients>): PromiseLike<LoginLog>;
-    createList(inputData: number | readonly Partial<Prisma.LoginLogCreateInput & TTransients>[]): PromiseLike<LoginLog[]>;
+    createList(list: readonly Partial<Prisma.LoginLogCreateInput & TTransients>[]): PromiseLike<LoginLog[]>;
+    createList(count: number, item?: Partial<Prisma.LoginLogCreateInput & TTransients>): PromiseLike<LoginLog[]>;
     createForConnect(inputData?: Partial<Prisma.LoginLogCreateInput & TTransients>): PromiseLike<Pick<LoginLog, "id">>;
 }
 export interface LoginLogFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends LoginLogFactoryDefineOptions<TTransients> = LoginLogFactoryDefineOptions<TTransients>> extends LoginLogFactoryInterfaceWithoutTraits<TTransients> {
@@ -128,10 +132,12 @@ export interface PostFactoryInterfaceWithoutTraits<TTransients extends Record<st
     readonly _factoryFor: "Post";
     build(inputData?: Partial<Prisma.PostCreateInput & TTransients>): PromiseLike<Prisma.PostCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.PostCreateInput & TTransients>): PromiseLike<Prisma.PostCreateInput>;
-    buildList(inputData: number | readonly Partial<Prisma.PostCreateInput & TTransients>[]): PromiseLike<Prisma.PostCreateInput[]>;
+    buildList(list: readonly Partial<Prisma.PostCreateInput & TTransients>[]): PromiseLike<Prisma.PostCreateInput[]>;
+    buildList(count: number, item?: Partial<Prisma.PostCreateInput & TTransients>): PromiseLike<Prisma.PostCreateInput[]>;
     pickForConnect(inputData: Post): Pick<Post, "id">;
     create(inputData?: Partial<Prisma.PostCreateInput & TTransients>): PromiseLike<Post>;
-    createList(inputData: number | readonly Partial<Prisma.PostCreateInput & TTransients>[]): PromiseLike<Post[]>;
+    createList(list: readonly Partial<Prisma.PostCreateInput & TTransients>[]): PromiseLike<Post[]>;
+    createList(count: number, item?: Partial<Prisma.PostCreateInput & TTransients>): PromiseLike<Post[]>;
     createForConnect(inputData?: Partial<Prisma.PostCreateInput & TTransients>): PromiseLike<Pick<Post, "id">>;
 }
 export interface PostFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends PostFactoryDefineOptions<TTransients> = PostFactoryDefineOptions<TTransients>> extends PostFactoryInterfaceWithoutTraits<TTransients> {
@@ -179,10 +185,12 @@ export interface CommentFactoryInterfaceWithoutTraits<TTransients extends Record
     readonly _factoryFor: "Comment";
     build(inputData?: Partial<Prisma.CommentCreateInput & TTransients>): PromiseLike<Prisma.CommentCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.CommentCreateInput & TTransients>): PromiseLike<Prisma.CommentCreateInput>;
-    buildList(inputData: number | readonly Partial<Prisma.CommentCreateInput & TTransients>[]): PromiseLike<Prisma.CommentCreateInput[]>;
+    buildList(list: readonly Partial<Prisma.CommentCreateInput & TTransients>[]): PromiseLike<Prisma.CommentCreateInput[]>;
+    buildList(count: number, item?: Partial<Prisma.CommentCreateInput & TTransients>): PromiseLike<Prisma.CommentCreateInput[]>;
     pickForConnect(inputData: Comment): Pick<Comment, "id">;
     create(inputData?: Partial<Prisma.CommentCreateInput & TTransients>): PromiseLike<Comment>;
-    createList(inputData: number | readonly Partial<Prisma.CommentCreateInput & TTransients>[]): PromiseLike<Comment[]>;
+    createList(list: readonly Partial<Prisma.CommentCreateInput & TTransients>[]): PromiseLike<Comment[]>;
+    createList(count: number, item?: Partial<Prisma.CommentCreateInput & TTransients>): PromiseLike<Comment[]>;
     createForConnect(inputData?: Partial<Prisma.CommentCreateInput & TTransients>): PromiseLike<Pick<Comment, "id">>;
 }
 export interface CommentFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends CommentFactoryDefineOptions<TTransients> = CommentFactoryDefineOptions<TTransients>> extends CommentFactoryInterfaceWithoutTraits<TTransients> {
@@ -219,10 +227,12 @@ export interface CategoryFactoryInterfaceWithoutTraits<TTransients extends Recor
     readonly _factoryFor: "Category";
     build(inputData?: Partial<Prisma.CategoryCreateInput & TTransients>): PromiseLike<Prisma.CategoryCreateInput>;
     buildCreateInput(inputData?: Partial<Prisma.CategoryCreateInput & TTransients>): PromiseLike<Prisma.CategoryCreateInput>;
-    buildList(inputData: number | readonly Partial<Prisma.CategoryCreateInput & TTransients>[]): PromiseLike<Prisma.CategoryCreateInput[]>;
+    buildList(list: readonly Partial<Prisma.CategoryCreateInput & TTransients>[]): PromiseLike<Prisma.CategoryCreateInput[]>;
+    buildList(count: number, item?: Partial<Prisma.CategoryCreateInput & TTransients>): PromiseLike<Prisma.CategoryCreateInput[]>;
     pickForConnect(inputData: Category): Pick<Category, "id">;
     create(inputData?: Partial<Prisma.CategoryCreateInput & TTransients>): PromiseLike<Category>;
-    createList(inputData: number | readonly Partial<Prisma.CategoryCreateInput & TTransients>[]): PromiseLike<Category[]>;
+    createList(list: readonly Partial<Prisma.CategoryCreateInput & TTransients>[]): PromiseLike<Category[]>;
+    createList(count: number, item?: Partial<Prisma.CategoryCreateInput & TTransients>): PromiseLike<Category[]>;
     createForConnect(inputData?: Partial<Prisma.CategoryCreateInput & TTransients>): PromiseLike<Pick<Category, "id">>;
 }
 export interface CategoryFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends CategoryFactoryDefineOptions<TTransients> = CategoryFactoryDefineOptions<TTransients>> extends CategoryFactoryInterfaceWithoutTraits<TTransients> {
