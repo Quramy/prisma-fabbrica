@@ -8,7 +8,7 @@ const UserFactory = defineUserFactory.withTransientFields({
   loginCount: 0,
 })({
   onAfterCreate: async (user, { loginCount }) => {
-    await LoginLogFactory.createList([...new Array(loginCount).keys()].map(() => ({ userId: user.id })));
+    await LoginLogFactory.createList(loginCount, { userId: user.id });
   },
 });
 

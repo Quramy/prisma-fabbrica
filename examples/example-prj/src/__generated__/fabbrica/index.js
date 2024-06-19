@@ -101,7 +101,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
             await handleAfterBuild(data, transientFields);
             return data;
         };
-        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const buildList = (...args) => Promise.all((0, internal_1.normalizeList)(...args).map(data => build(data)));
         const pickForConnect = (inputData) => ({
             id: inputData.id
         });
@@ -113,7 +113,7 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
             await handleAfterCreate(createdData, transientFields);
             return createdData;
         };
-        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createList = (...args) => Promise.all((0, internal_1.normalizeList)(...args).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
         return {
             _factoryFor: "User",
@@ -188,7 +188,7 @@ function defineLoginLogFactoryInternal({ defaultData: defaultDataResolver, onAft
             await handleAfterBuild(data, transientFields);
             return data;
         };
-        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const buildList = (...args) => Promise.all((0, internal_1.normalizeList)(...args).map(data => build(data)));
         const pickForConnect = (inputData) => ({
             id: inputData.id
         });
@@ -200,7 +200,7 @@ function defineLoginLogFactoryInternal({ defaultData: defaultDataResolver, onAft
             await handleAfterCreate(createdData, transientFields);
             return createdData;
         };
-        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createList = (...args) => Promise.all((0, internal_1.normalizeList)(...args).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
         return {
             _factoryFor: "LoginLog",
@@ -282,7 +282,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
             await handleAfterBuild(data, transientFields);
             return data;
         };
-        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const buildList = (...args) => Promise.all((0, internal_1.normalizeList)(...args).map(data => build(data)));
         const pickForConnect = (inputData) => ({
             id: inputData.id
         });
@@ -294,7 +294,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
             await handleAfterCreate(createdData, transientFields);
             return createdData;
         };
-        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createList = (...args) => Promise.all((0, internal_1.normalizeList)(...args).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
         return {
             _factoryFor: "Post",
@@ -382,7 +382,7 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, onAfte
             await handleAfterBuild(data, transientFields);
             return data;
         };
-        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const buildList = (...args) => Promise.all((0, internal_1.normalizeList)(...args).map(data => build(data)));
         const pickForConnect = (inputData) => ({
             id: inputData.id
         });
@@ -394,7 +394,7 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, onAfte
             await handleAfterCreate(createdData, transientFields);
             return createdData;
         };
-        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createList = (...args) => Promise.all((0, internal_1.normalizeList)(...args).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
         return {
             _factoryFor: "Comment",
@@ -469,7 +469,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, onAft
             await handleAfterBuild(data, transientFields);
             return data;
         };
-        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const buildList = (...args) => Promise.all((0, internal_1.normalizeList)(...args).map(data => build(data)));
         const pickForConnect = (inputData) => ({
             id: inputData.id
         });
@@ -481,7 +481,7 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, onAft
             await handleAfterCreate(createdData, transientFields);
             return createdData;
         };
-        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createList = (...args) => Promise.all((0, internal_1.normalizeList)(...args).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
         return {
             _factoryFor: "Category",
