@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "noEmit": false,
+    "outDir": "built_esnext"
+  },
+  "include": ["**/__generated__/**/*"],
+  "exclude": ["built", "built_node", "built_esnext"]
+}

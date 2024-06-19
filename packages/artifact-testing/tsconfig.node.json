@@ -1,9 +1,10 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "nodenext",
     "noEmit": false,
-    "outDir": "built"
+    "outDir": "built_node"
   },
+  "include": ["**/__generated__/**/*"],
   "exclude": ["built", "built_node", "built_esnext"]
 }
