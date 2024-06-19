@@ -1,3 +1,5 @@
 fixtures/*/__generated__/client
 dmmf.json
 built/
+built_node/
+built_esnext/
