@@ -13,6 +13,8 @@ type BuildDataOptions<TTransients extends Record<string, unknown>> = {
     readonly seq: number;
 } & TTransients;
 
+type TraitName = string | symbol;
+
 type CallbackDefineOptions<TCreated, TCreateInput, TTransients extends Record<string, unknown>> = {
     onAfterBuild?: (createInput: TCreateInput, transientFields: TTransients) => void | PromiseLike<void>;
     onBeforeCreate?: (createInput: TCreateInput, transientFields: TTransients) => void | PromiseLike<void>;
@@ -64,11 +66,11 @@ type UserFactoryTrait<TTransients extends Record<string, unknown>> = {
 type UserFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions<TTransients>>;
     traits?: {
-        [traitName: string | symbol]: UserFactoryTrait<TTransients>;
+        [traitName: TraitName]: UserFactoryTrait<TTransients>;
     };
 } & CallbackDefineOptions<User, Prisma.UserCreateInput, TTransients>;
 
-type UserTraitKeys<TOptions extends UserFactoryDefineOptions<any>> = keyof TOptions["traits"];
+type UserTraitKeys<TOptions extends UserFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
 
 export interface UserFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "User";
@@ -83,8 +85,8 @@ export interface UserFactoryInterfaceWithoutTraits<TTransients extends Record<st
     createForConnect(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Pick<User, "id">>;
 }
 
-export interface UserFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends UserFactoryDefineOptions<TTransients> = UserFactoryDefineOptions<TTransients>> extends UserFactoryInterfaceWithoutTraits<TTransients> {
-    use(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits<TTransients>;
+export interface UserFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends UserFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: TTraitName, ...names: readonly TTraitName[]): UserFactoryInterfaceWithoutTraits<TTransients>;
 }
 
 function autoGenerateUserScalarsOrEnums({ seq }: {
@@ -96,7 +98,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
     };
 }
 
-function defineUserFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends UserFactoryDefineOptions<TTransients>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): UserFactoryInterface<TTransients, TOptions> {
+function defineUserFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends UserFactoryDefineOptions<TTransients>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): UserFactoryInterface<TTransients, UserTraitKeys<TOptions>> {
     const getFactoryWithTraits = (traitKeys: readonly UserTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
@@ -169,8 +171,8 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
 }
 
 interface UserFactoryBuilder {
-    <TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends UserTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, TOptions>;
+    <TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<{}, UserTraitKeys<TOptions>>;
+    withTransientFields: <TTransients extends UserTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, UserTraitKeys<TOptions>>;
 }
 
 /**
@@ -204,11 +206,11 @@ type ComplexIdModelFactoryTrait<TTransients extends Record<string, unknown>> = {
 type ComplexIdModelFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
     defaultData?: Resolver<ComplexIdModelFactoryDefineInput, BuildDataOptions<TTransients>>;
     traits?: {
-        [traitName: string | symbol]: ComplexIdModelFactoryTrait<TTransients>;
+        [traitName: TraitName]: ComplexIdModelFactoryTrait<TTransients>;
     };
 } & CallbackDefineOptions<ComplexIdModel, Prisma.ComplexIdModelCreateInput, TTransients>;
 
-type ComplexIdModelTraitKeys<TOptions extends ComplexIdModelFactoryDefineOptions<any>> = keyof TOptions["traits"];
+type ComplexIdModelTraitKeys<TOptions extends ComplexIdModelFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
 
 export interface ComplexIdModelFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "ComplexIdModel";
@@ -223,8 +225,8 @@ export interface ComplexIdModelFactoryInterfaceWithoutTraits<TTransients extends
     createForConnect(inputData?: Partial<Prisma.ComplexIdModelCreateInput & TTransients>): PromiseLike<Pick<ComplexIdModel, "firstName" | "lastName">>;
 }
 
-export interface ComplexIdModelFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends ComplexIdModelFactoryDefineOptions<TTransients> = ComplexIdModelFactoryDefineOptions<TTransients>> extends ComplexIdModelFactoryInterfaceWithoutTraits<TTransients> {
-    use(name: ComplexIdModelTraitKeys<TOptions>, ...names: readonly ComplexIdModelTraitKeys<TOptions>[]): ComplexIdModelFactoryInterfaceWithoutTraits<TTransients>;
+export interface ComplexIdModelFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends ComplexIdModelFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: TTraitName, ...names: readonly TTraitName[]): ComplexIdModelFactoryInterfaceWithoutTraits<TTransients>;
 }
 
 function autoGenerateComplexIdModelScalarsOrEnums({ seq }: {
@@ -236,7 +238,7 @@ function autoGenerateComplexIdModelScalarsOrEnums({ seq }: {
     };
 }
 
-function defineComplexIdModelFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends ComplexIdModelFactoryDefineOptions<TTransients>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): ComplexIdModelFactoryInterface<TTransients, TOptions> {
+function defineComplexIdModelFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends ComplexIdModelFactoryDefineOptions<TTransients>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): ComplexIdModelFactoryInterface<TTransients, ComplexIdModelTraitKeys<TOptions>> {
     const getFactoryWithTraits = (traitKeys: readonly ComplexIdModelTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
@@ -310,8 +312,8 @@ function defineComplexIdModelFactoryInternal<TTransients extends Record<string, 
 }
 
 interface ComplexIdModelFactoryBuilder {
-    <TOptions extends ComplexIdModelFactoryDefineOptions>(options?: TOptions): ComplexIdModelFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends ComplexIdModelTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends ComplexIdModelFactoryDefineOptions<TTransients>>(options?: TOptions) => ComplexIdModelFactoryInterface<TTransients, TOptions>;
+    <TOptions extends ComplexIdModelFactoryDefineOptions>(options?: TOptions): ComplexIdModelFactoryInterface<{}, ComplexIdModelTraitKeys<TOptions>>;
+    withTransientFields: <TTransients extends ComplexIdModelTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends ComplexIdModelFactoryDefineOptions<TTransients>>(options?: TOptions) => ComplexIdModelFactoryInterface<TTransients, ComplexIdModelTraitKeys<TOptions>>;
 }
 
 /**
@@ -369,11 +371,11 @@ type FieldTypePatternModelFactoryTrait<TTransients extends Record<string, unknow
 type FieldTypePatternModelFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
     defaultData?: Resolver<FieldTypePatternModelFactoryDefineInput, BuildDataOptions<TTransients>>;
     traits?: {
-        [traitName: string | symbol]: FieldTypePatternModelFactoryTrait<TTransients>;
+        [traitName: TraitName]: FieldTypePatternModelFactoryTrait<TTransients>;
     };
 } & CallbackDefineOptions<FieldTypePatternModel, Prisma.FieldTypePatternModelCreateInput, TTransients>;
 
-type FieldTypePatternModelTraitKeys<TOptions extends FieldTypePatternModelFactoryDefineOptions<any>> = keyof TOptions["traits"];
+type FieldTypePatternModelTraitKeys<TOptions extends FieldTypePatternModelFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
 
 export interface FieldTypePatternModelFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "FieldTypePatternModel";
@@ -388,8 +390,8 @@ export interface FieldTypePatternModelFactoryInterfaceWithoutTraits<TTransients 
     createForConnect(inputData?: Partial<Prisma.FieldTypePatternModelCreateInput & TTransients>): PromiseLike<Pick<FieldTypePatternModel, "id">>;
 }
 
-export interface FieldTypePatternModelFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends FieldTypePatternModelFactoryDefineOptions<TTransients> = FieldTypePatternModelFactoryDefineOptions<TTransients>> extends FieldTypePatternModelFactoryInterfaceWithoutTraits<TTransients> {
-    use(name: FieldTypePatternModelTraitKeys<TOptions>, ...names: readonly FieldTypePatternModelTraitKeys<TOptions>[]): FieldTypePatternModelFactoryInterfaceWithoutTraits<TTransients>;
+export interface FieldTypePatternModelFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends FieldTypePatternModelFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: TTraitName, ...names: readonly TTraitName[]): FieldTypePatternModelFactoryInterfaceWithoutTraits<TTransients>;
 }
 
 function autoGenerateFieldTypePatternModelScalarsOrEnums({ seq }: {
@@ -408,7 +410,7 @@ function autoGenerateFieldTypePatternModelScalarsOrEnums({ seq }: {
     };
 }
 
-function defineFieldTypePatternModelFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends FieldTypePatternModelFactoryDefineOptions<TTransients>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): FieldTypePatternModelFactoryInterface<TTransients, TOptions> {
+function defineFieldTypePatternModelFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends FieldTypePatternModelFactoryDefineOptions<TTransients>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): FieldTypePatternModelFactoryInterface<TTransients, FieldTypePatternModelTraitKeys<TOptions>> {
     const getFactoryWithTraits = (traitKeys: readonly FieldTypePatternModelTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
@@ -481,8 +483,8 @@ function defineFieldTypePatternModelFactoryInternal<TTransients extends Record<s
 }
 
 interface FieldTypePatternModelFactoryBuilder {
-    <TOptions extends FieldTypePatternModelFactoryDefineOptions>(options?: TOptions): FieldTypePatternModelFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends FieldTypePatternModelTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends FieldTypePatternModelFactoryDefineOptions<TTransients>>(options?: TOptions) => FieldTypePatternModelFactoryInterface<TTransients, TOptions>;
+    <TOptions extends FieldTypePatternModelFactoryDefineOptions>(options?: TOptions): FieldTypePatternModelFactoryInterface<{}, FieldTypePatternModelTraitKeys<TOptions>>;
+    withTransientFields: <TTransients extends FieldTypePatternModelTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends FieldTypePatternModelFactoryDefineOptions<TTransients>>(options?: TOptions) => FieldTypePatternModelFactoryInterface<TTransients, FieldTypePatternModelTraitKeys<TOptions>>;
 }
 
 /**
@@ -514,11 +516,11 @@ type NoPkModelFactoryTrait<TTransients extends Record<string, unknown>> = {
 type NoPkModelFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
     defaultData?: Resolver<NoPkModelFactoryDefineInput, BuildDataOptions<TTransients>>;
     traits?: {
-        [traitName: string | symbol]: NoPkModelFactoryTrait<TTransients>;
+        [traitName: TraitName]: NoPkModelFactoryTrait<TTransients>;
     };
 } & CallbackDefineOptions<NoPkModel, Prisma.NoPkModelCreateInput, TTransients>;
 
-type NoPkModelTraitKeys<TOptions extends NoPkModelFactoryDefineOptions<any>> = keyof TOptions["traits"];
+type NoPkModelTraitKeys<TOptions extends NoPkModelFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
 
 export interface NoPkModelFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "NoPkModel";
@@ -533,8 +535,8 @@ export interface NoPkModelFactoryInterfaceWithoutTraits<TTransients extends Reco
     createForConnect(inputData?: Partial<Prisma.NoPkModelCreateInput & TTransients>): PromiseLike<Pick<NoPkModel, "id">>;
 }
 
-export interface NoPkModelFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends NoPkModelFactoryDefineOptions<TTransients> = NoPkModelFactoryDefineOptions<TTransients>> extends NoPkModelFactoryInterfaceWithoutTraits<TTransients> {
-    use(name: NoPkModelTraitKeys<TOptions>, ...names: readonly NoPkModelTraitKeys<TOptions>[]): NoPkModelFactoryInterfaceWithoutTraits<TTransients>;
+export interface NoPkModelFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends NoPkModelFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: TTraitName, ...names: readonly TTraitName[]): NoPkModelFactoryInterfaceWithoutTraits<TTransients>;
 }
 
 function autoGenerateNoPkModelScalarsOrEnums({ seq }: {
@@ -545,7 +547,7 @@ function autoGenerateNoPkModelScalarsOrEnums({ seq }: {
     };
 }
 
-function defineNoPkModelFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends NoPkModelFactoryDefineOptions<TTransients>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): NoPkModelFactoryInterface<TTransients, TOptions> {
+function defineNoPkModelFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends NoPkModelFactoryDefineOptions<TTransients>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): NoPkModelFactoryInterface<TTransients, NoPkModelTraitKeys<TOptions>> {
     const getFactoryWithTraits = (traitKeys: readonly NoPkModelTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
@@ -618,8 +620,8 @@ function defineNoPkModelFactoryInternal<TTransients extends Record<string, unkno
 }
 
 interface NoPkModelFactoryBuilder {
-    <TOptions extends NoPkModelFactoryDefineOptions>(options?: TOptions): NoPkModelFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends NoPkModelTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends NoPkModelFactoryDefineOptions<TTransients>>(options?: TOptions) => NoPkModelFactoryInterface<TTransients, TOptions>;
+    <TOptions extends NoPkModelFactoryDefineOptions>(options?: TOptions): NoPkModelFactoryInterface<{}, NoPkModelTraitKeys<TOptions>>;
+    withTransientFields: <TTransients extends NoPkModelTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends NoPkModelFactoryDefineOptions<TTransients>>(options?: TOptions) => NoPkModelFactoryInterface<TTransients, NoPkModelTraitKeys<TOptions>>;
 }
 
 /**

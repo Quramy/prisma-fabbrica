@@ -29,6 +29,7 @@ Prisma generator for model factories.
 - [Tips](#tips)
   - [Works with jest-prisma](#works-with-jest-prisma)
   - [Suppress TS circular dependencies error](#suppress-ts-circular-dependencies-error)
+  - [Factory interface with types](#factory-interface-with-types)
 - [Version compatibility](#version-compatibility)
 - [License](#license)
 
@@ -559,7 +560,7 @@ const PostFactory = definePostFactory({
 });
 ```
 
-`FactoryInterface` types are available to avoid this error.
+`FactoryInterface` types are available to avoid this error. See [Factory interface with types](#factory-interface-with-types) section if you want usage of factory interface.
 
 ```ts
 import { defineUserFactory, definePostFactory, type UserFactoryInterface } from "./__generated__/fabbrica";
@@ -581,6 +582,39 @@ const PostFactory = definePostFactory({
     author: getUserFactory(),
   },
 });
+```
+
+### Factory interface with types
+
+> [!WARNING]
+> Factory interface type parameters may change in future versions without notice.
+
+Factory interface (e.g. `UserFactory` ) takes 2 optional type parameters:
+
+- `TTransientFields`: Type of [transient fields](#transient-fields) object. By default, `Record<string, unknown>` .
+- `TTraitName`: Names of available [traits](#traits). By default, `string | symbol` .
+
+For example:
+
+```ts
+// Specify transient fields type
+declare function getUserFactory(): UserFactoryInterface<{ loginCount: number }>;
+
+await getUserFactory().create({ loginCount: 10 });
+
+// @ts-expect-error
+await getUserFactory().create({ hoge: 10 });
+```
+
+```ts
+// Specify available trait names
+declare function getUserFactory(): UserFactoryInterface<{}, "someTrait" | "anotherTrait">;
+
+await getUserFactory().use("someTrait").create();
+await getUserFactory().use("anotherTrait").create();
+
+// @ts-expect-error
+await getUserFactory().use("hoge").create();
 ```
 
 ## Version compatibility
