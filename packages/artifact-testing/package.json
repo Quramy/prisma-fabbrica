@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "artifact-testing",
-  "version": "2.2.0-alpha.2",
+  "version": "2.2.0-alpha.3",
   "scripts": {
     "clean": "rimraf -g \"fixtures/*/__generated__/client\" \"fixtures/*/dmmf.json\" built \"*.tsbuildinfo\"",
     "pretest:compile": "node scripts/generateFixtures.mjs",
