@@ -9,6 +9,7 @@ export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValue
 type BuildDataOptions<TTransients extends Record<string, unknown>> = {
     readonly seq: number;
 } & TTransients;
+type TraitName = string | symbol;
 type CallbackDefineOptions<TCreated, TCreateInput, TTransients extends Record<string, unknown>> = {
     onAfterBuild?: (createInput: TCreateInput, transientFields: TTransients) => void | PromiseLike<void>;
     onBeforeCreate?: (createInput: TCreateInput, transientFields: TTransients) => void | PromiseLike<void>;
@@ -31,10 +32,10 @@ type UserFactoryTrait<TTransients extends Record<string, unknown>> = {
 type UserFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions<TTransients>>;
     traits?: {
-        [traitName: string | symbol]: UserFactoryTrait<TTransients>;
+        [traitName: TraitName]: UserFactoryTrait<TTransients>;
     };
 } & CallbackDefineOptions<User, Prisma.UserCreateInput, TTransients>;
-type UserTraitKeys<TOptions extends UserFactoryDefineOptions<any>> = keyof TOptions["traits"];
+type UserTraitKeys<TOptions extends UserFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
 export interface UserFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "User";
     build(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Prisma.UserCreateInput>;
@@ -47,12 +48,12 @@ export interface UserFactoryInterfaceWithoutTraits<TTransients extends Record<st
     createList(count: number, item?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<User[]>;
     createForConnect(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Pick<User, "id">>;
 }
-export interface UserFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends UserFactoryDefineOptions<TTransients> = UserFactoryDefineOptions<TTransients>> extends UserFactoryInterfaceWithoutTraits<TTransients> {
-    use(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits<TTransients>;
+export interface UserFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends UserFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: TTraitName, ...names: readonly TTraitName[]): UserFactoryInterfaceWithoutTraits<TTransients>;
 }
 interface UserFactoryBuilder {
-    <TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends UserTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, TOptions>;
+    <TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<{}, UserTraitKeys<TOptions>>;
+    withTransientFields: <TTransients extends UserTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, UserTraitKeys<TOptions>>;
 }
 /**
  * Define factory for {@link User} model.
@@ -74,10 +75,10 @@ type LoginLogFactoryTrait<TTransients extends Record<string, unknown>> = {
 type LoginLogFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
     defaultData?: Resolver<LoginLogFactoryDefineInput, BuildDataOptions<TTransients>>;
     traits?: {
-        [traitName: string | symbol]: LoginLogFactoryTrait<TTransients>;
+        [traitName: TraitName]: LoginLogFactoryTrait<TTransients>;
     };
 } & CallbackDefineOptions<LoginLog, Prisma.LoginLogCreateInput, TTransients>;
-type LoginLogTraitKeys<TOptions extends LoginLogFactoryDefineOptions<any>> = keyof TOptions["traits"];
+type LoginLogTraitKeys<TOptions extends LoginLogFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
 export interface LoginLogFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "LoginLog";
     build(inputData?: Partial<Prisma.LoginLogCreateInput & TTransients>): PromiseLike<Prisma.LoginLogCreateInput>;
@@ -90,12 +91,12 @@ export interface LoginLogFactoryInterfaceWithoutTraits<TTransients extends Recor
     createList(count: number, item?: Partial<Prisma.LoginLogCreateInput & TTransients>): PromiseLike<LoginLog[]>;
     createForConnect(inputData?: Partial<Prisma.LoginLogCreateInput & TTransients>): PromiseLike<Pick<LoginLog, "id">>;
 }
-export interface LoginLogFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends LoginLogFactoryDefineOptions<TTransients> = LoginLogFactoryDefineOptions<TTransients>> extends LoginLogFactoryInterfaceWithoutTraits<TTransients> {
-    use(name: LoginLogTraitKeys<TOptions>, ...names: readonly LoginLogTraitKeys<TOptions>[]): LoginLogFactoryInterfaceWithoutTraits<TTransients>;
+export interface LoginLogFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends LoginLogFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: TTraitName, ...names: readonly TTraitName[]): LoginLogFactoryInterfaceWithoutTraits<TTransients>;
 }
 interface LoginLogFactoryBuilder {
-    <TOptions extends LoginLogFactoryDefineOptions>(options?: TOptions): LoginLogFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends LoginLogTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends LoginLogFactoryDefineOptions<TTransients>>(options?: TOptions) => LoginLogFactoryInterface<TTransients, TOptions>;
+    <TOptions extends LoginLogFactoryDefineOptions>(options?: TOptions): LoginLogFactoryInterface<{}, LoginLogTraitKeys<TOptions>>;
+    withTransientFields: <TTransients extends LoginLogTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends LoginLogFactoryDefineOptions<TTransients>>(options?: TOptions) => LoginLogFactoryInterface<TTransients, LoginLogTraitKeys<TOptions>>;
 }
 /**
  * Define factory for {@link LoginLog} model.
@@ -127,7 +128,7 @@ type PostFactoryDefineOptions<TTransients extends Record<string, unknown> = Reco
         [traitName: string | symbol]: PostFactoryTrait<TTransients>;
     };
 } & CallbackDefineOptions<Post, Prisma.PostCreateInput, TTransients>;
-type PostTraitKeys<TOptions extends PostFactoryDefineOptions<any>> = keyof TOptions["traits"];
+type PostTraitKeys<TOptions extends PostFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
 export interface PostFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "Post";
     build(inputData?: Partial<Prisma.PostCreateInput & TTransients>): PromiseLike<Prisma.PostCreateInput>;
@@ -140,12 +141,12 @@ export interface PostFactoryInterfaceWithoutTraits<TTransients extends Record<st
     createList(count: number, item?: Partial<Prisma.PostCreateInput & TTransients>): PromiseLike<Post[]>;
     createForConnect(inputData?: Partial<Prisma.PostCreateInput & TTransients>): PromiseLike<Pick<Post, "id">>;
 }
-export interface PostFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends PostFactoryDefineOptions<TTransients> = PostFactoryDefineOptions<TTransients>> extends PostFactoryInterfaceWithoutTraits<TTransients> {
-    use(name: PostTraitKeys<TOptions>, ...names: readonly PostTraitKeys<TOptions>[]): PostFactoryInterfaceWithoutTraits<TTransients>;
+export interface PostFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends PostFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: TTraitName, ...names: readonly TTraitName[]): PostFactoryInterfaceWithoutTraits<TTransients>;
 }
 interface PostFactoryBuilder {
-    <TOptions extends PostFactoryDefineOptions>(options: TOptions): PostFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends PostTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends PostFactoryDefineOptions<TTransients>>(options: TOptions) => PostFactoryInterface<TTransients, TOptions>;
+    <TOptions extends PostFactoryDefineOptions>(options: TOptions): PostFactoryInterface<{}, PostTraitKeys<TOptions>>;
+    withTransientFields: <TTransients extends PostTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends PostFactoryDefineOptions<TTransients>>(options: TOptions) => PostFactoryInterface<TTransients, PostTraitKeys<TOptions>>;
 }
 /**
  * Define factory for {@link Post} model.
@@ -180,7 +181,7 @@ type CommentFactoryDefineOptions<TTransients extends Record<string, unknown> = R
         [traitName: string | symbol]: CommentFactoryTrait<TTransients>;
     };
 } & CallbackDefineOptions<Comment, Prisma.CommentCreateInput, TTransients>;
-type CommentTraitKeys<TOptions extends CommentFactoryDefineOptions<any>> = keyof TOptions["traits"];
+type CommentTraitKeys<TOptions extends CommentFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
 export interface CommentFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "Comment";
     build(inputData?: Partial<Prisma.CommentCreateInput & TTransients>): PromiseLike<Prisma.CommentCreateInput>;
@@ -193,12 +194,12 @@ export interface CommentFactoryInterfaceWithoutTraits<TTransients extends Record
     createList(count: number, item?: Partial<Prisma.CommentCreateInput & TTransients>): PromiseLike<Comment[]>;
     createForConnect(inputData?: Partial<Prisma.CommentCreateInput & TTransients>): PromiseLike<Pick<Comment, "id">>;
 }
-export interface CommentFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends CommentFactoryDefineOptions<TTransients> = CommentFactoryDefineOptions<TTransients>> extends CommentFactoryInterfaceWithoutTraits<TTransients> {
-    use(name: CommentTraitKeys<TOptions>, ...names: readonly CommentTraitKeys<TOptions>[]): CommentFactoryInterfaceWithoutTraits<TTransients>;
+export interface CommentFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends CommentFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: TTraitName, ...names: readonly TTraitName[]): CommentFactoryInterfaceWithoutTraits<TTransients>;
 }
 interface CommentFactoryBuilder {
-    <TOptions extends CommentFactoryDefineOptions>(options: TOptions): CommentFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends CommentTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends CommentFactoryDefineOptions<TTransients>>(options: TOptions) => CommentFactoryInterface<TTransients, TOptions>;
+    <TOptions extends CommentFactoryDefineOptions>(options: TOptions): CommentFactoryInterface<{}, CommentTraitKeys<TOptions>>;
+    withTransientFields: <TTransients extends CommentTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends CommentFactoryDefineOptions<TTransients>>(options: TOptions) => CommentFactoryInterface<TTransients, CommentTraitKeys<TOptions>>;
 }
 /**
  * Define factory for {@link Comment} model.
@@ -219,10 +220,10 @@ type CategoryFactoryTrait<TTransients extends Record<string, unknown>> = {
 type CategoryFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
     defaultData?: Resolver<CategoryFactoryDefineInput, BuildDataOptions<TTransients>>;
     traits?: {
-        [traitName: string | symbol]: CategoryFactoryTrait<TTransients>;
+        [traitName: TraitName]: CategoryFactoryTrait<TTransients>;
     };
 } & CallbackDefineOptions<Category, Prisma.CategoryCreateInput, TTransients>;
-type CategoryTraitKeys<TOptions extends CategoryFactoryDefineOptions<any>> = keyof TOptions["traits"];
+type CategoryTraitKeys<TOptions extends CategoryFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
 export interface CategoryFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "Category";
     build(inputData?: Partial<Prisma.CategoryCreateInput & TTransients>): PromiseLike<Prisma.CategoryCreateInput>;
@@ -235,12 +236,12 @@ export interface CategoryFactoryInterfaceWithoutTraits<TTransients extends Recor
     createList(count: number, item?: Partial<Prisma.CategoryCreateInput & TTransients>): PromiseLike<Category[]>;
     createForConnect(inputData?: Partial<Prisma.CategoryCreateInput & TTransients>): PromiseLike<Pick<Category, "id">>;
 }
-export interface CategoryFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends CategoryFactoryDefineOptions<TTransients> = CategoryFactoryDefineOptions<TTransients>> extends CategoryFactoryInterfaceWithoutTraits<TTransients> {
-    use(name: CategoryTraitKeys<TOptions>, ...names: readonly CategoryTraitKeys<TOptions>[]): CategoryFactoryInterfaceWithoutTraits<TTransients>;
+export interface CategoryFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends CategoryFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: TTraitName, ...names: readonly TTraitName[]): CategoryFactoryInterfaceWithoutTraits<TTransients>;
 }
 interface CategoryFactoryBuilder {
-    <TOptions extends CategoryFactoryDefineOptions>(options?: TOptions): CategoryFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends CategoryTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends CategoryFactoryDefineOptions<TTransients>>(options?: TOptions) => CategoryFactoryInterface<TTransients, TOptions>;
+    <TOptions extends CategoryFactoryDefineOptions>(options?: TOptions): CategoryFactoryInterface<{}, CategoryTraitKeys<TOptions>>;
+    withTransientFields: <TTransients extends CategoryTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends CategoryFactoryDefineOptions<TTransients>>(options?: TOptions) => CategoryFactoryInterface<TTransients, CategoryTraitKeys<TOptions>>;
 }
 /**
  * Define factory for {@link Category} model.

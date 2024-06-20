@@ -107,6 +107,8 @@ export const genericDeclarations = () =>
       readonly seq: number;
     } & TTransients;
 
+    type TraitName = string | symbol;
+
     type CallbackDefineOptions<TCreated, TCreateInput, TTransients extends Record<string, unknown>> = {
       onAfterBuild?: (createInput: TCreateInput, transientFields: TTransients) => void | PromiseLike<void>;
       onBeforeCreate?: (createInput: TCreateInput, transientFields: TTransients) => void | PromiseLike<void>;
@@ -258,7 +260,7 @@ export const modelFactoryDefineOptions = (model: DMMF.Model, isOpionalDefaultDat
         type MODEL_FACTORY_DEFINE_OPTIONS<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
           defaultData?: Resolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions<TTransients>>;
           traits?: {
-            [traitName: string | symbol]: MODEL_FACTORY_TRAIT<TTransients>;
+            [traitName: TraitName]: MODEL_FACTORY_TRAIT<TTransients>;
           };
         } & CallbackDefineOptions<MODEL_TYPE, Prisma.MODEL_CREATE_INPUT, TTransients>;
       `
@@ -281,7 +283,7 @@ export const modelFactoryDefineOptions = (model: DMMF.Model, isOpionalDefaultDat
 
 export const modelTraitKeys = (model: DMMF.Model) =>
   template.statement`
-    type MODEL_TRAIT_KEYS<TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<any>> = keyof TOptions["traits"];
+    type MODEL_TRAIT_KEYS<TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<any>> = Exclude<keyof TOptions["traits"], number>;
   `({
     MODEL_TRAIT_KEYS: ast.identifier(`${model.name}TraitKeys`),
     MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
@@ -317,15 +319,13 @@ export const modelFactoryInterface = (model: DMMF.Model) =>
   template.statement`
     export interface MODEL_FACTORY_INTERFACE<
       TTransients extends Record<string, unknown> = Record<string, unknown>,
-      TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<TTransients> = MODEL_FACTORY_DEFINE_OPTIONS<TTransients>
+      TTraitName extends TraitName = TraitName
     > extends MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS<TTransients> {
-      use(name: MODEL_TRAIT_KEYS<TOptions>, ...names: readonly MODEL_TRAIT_KEYS<TOptions>[]): MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS<TTransients>;
+      use(name: TTraitName, ...names: readonly TTraitName[]): MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS<TTransients>;
     }
   `({
     MODEL_FACTORY_INTERFACE: ast.identifier(`${model.name}FactoryInterface`),
     MODEL_FACTORY_INTERFACE_WITHOUT_TRAITS: ast.identifier(`${model.name}FactoryInterfaceWithoutTraits`),
-    MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
-    MODEL_TRAIT_KEYS: ast.identifier(`${model.name}TraitKeys`),
   });
 
 export const isModelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF.Model) => {
@@ -394,7 +394,7 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
       onBeforeCreate,
       onAfterCreate,
       traits: traitsDefs = {}
-    }: TOptions, defaultTransientFieldValues: TTransients): MODEL_FACTORY_INTERFACE<TTransients, TOptions> {
+    }: TOptions, defaultTransientFieldValues: TTransients): MODEL_FACTORY_INTERFACE<TTransients, MODEL_TRAIT_KEYS<TOptions>> {
       const getFactoryWithTraits = (traitKeys: readonly MODEL_TRAIT_KEYS<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
@@ -523,18 +523,19 @@ export const modelFactoryBuilder = (model: DMMF.Model, inputType: DMMF.InputType
   const compiled = filterRequiredInputObjectTypeField(inputType).length
     ? template.statement<ts.InterfaceDeclaration>`
         interface MODEL_FACTORY_BUILDER {
-          <TOptions extends MODEL_FACTORY_DEFINE_OPTIONS>(options: TOptions): MODEL_FACTORY_INTERFACE<{}, TOptions>;
-          withTransientFields: <TTransients extends MODEL_TRANSIENT_FIELDS>(defaultTransientFieldValues: TTransients) => <TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<TTransients>>(options: TOptions) => MODEL_FACTORY_INTERFACE<TTransients, TOptions>
+          <TOptions extends MODEL_FACTORY_DEFINE_OPTIONS>(options: TOptions): MODEL_FACTORY_INTERFACE<{}, MODEL_TRAIT_KEYS<TOptions>>;
+          withTransientFields: <TTransients extends MODEL_TRANSIENT_FIELDS>(defaultTransientFieldValues: TTransients) => <TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<TTransients>>(options: TOptions) => MODEL_FACTORY_INTERFACE<TTransients, MODEL_TRAIT_KEYS<TOptions>>
         }`
     : template.statement<ts.InterfaceDeclaration>`
         interface MODEL_FACTORY_BUILDER {
-          <TOptions extends MODEL_FACTORY_DEFINE_OPTIONS>(options?: TOptions): MODEL_FACTORY_INTERFACE<{}, TOptions>;
-          withTransientFields: <TTransients extends MODEL_TRANSIENT_FIELDS>(defaultTransientFieldValues: TTransients) => <TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<TTransients>>(options?: TOptions) => MODEL_FACTORY_INTERFACE<TTransients, TOptions>
+          <TOptions extends MODEL_FACTORY_DEFINE_OPTIONS>(options?: TOptions): MODEL_FACTORY_INTERFACE<{}, MODEL_TRAIT_KEYS<TOptions>>;
+          withTransientFields: <TTransients extends MODEL_TRANSIENT_FIELDS>(defaultTransientFieldValues: TTransients) => <TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<TTransients>>(options?: TOptions) => MODEL_FACTORY_INTERFACE<TTransients, MODEL_TRAIT_KEYS<TOptions>>
         }`;
   return compiled({
     MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
     MODEL_FACTORY_INTERFACE: ast.identifier(`${model.name}FactoryInterface`),
     MODEL_FACTORY_BUILDER: ast.identifier(`${model.name}FactoryBuilder`),
+    MODEL_TRAIT_KEYS: ast.identifier(`${model.name}TraitKeys`),
     MODEL_TRANSIENT_FIELDS: ast.identifier(`${model.name}TransientFields`),
   });
 };

@@ -10,6 +10,8 @@ type BuildDataOptions<TTransients extends Record<string, unknown>> = {
     readonly seq: number;
 } & TTransients;
 
+type TraitName = string | symbol;
+
 type CallbackDefineOptions<TCreated, TCreateInput, TTransients extends Record<string, unknown>> = {
     onAfterBuild?: (createInput: TCreateInput, transientFields: TTransients) => void | PromiseLike<void>;
     onBeforeCreate?: (createInput: TCreateInput, transientFields: TTransients) => void | PromiseLike<void>;
@@ -78,11 +80,11 @@ type UserFactoryTrait<TTransients extends Record<string, unknown>> = {
 type UserFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
     defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions<TTransients>>;
     traits?: {
-        [traitName: string | symbol]: UserFactoryTrait<TTransients>;
+        [traitName: TraitName]: UserFactoryTrait<TTransients>;
     };
 } & CallbackDefineOptions<User, Prisma.UserCreateInput, TTransients>;
 
-type UserTraitKeys<TOptions extends UserFactoryDefineOptions<any>> = keyof TOptions["traits"];
+type UserTraitKeys<TOptions extends UserFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
 
 export interface UserFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "User";
@@ -97,8 +99,8 @@ export interface UserFactoryInterfaceWithoutTraits<TTransients extends Record<st
     createForConnect(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Pick<User, "id">>;
 }
 
-export interface UserFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends UserFactoryDefineOptions<TTransients> = UserFactoryDefineOptions<TTransients>> extends UserFactoryInterfaceWithoutTraits<TTransients> {
-    use(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits<TTransients>;
+export interface UserFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends UserFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: TTraitName, ...names: readonly TTraitName[]): UserFactoryInterfaceWithoutTraits<TTransients>;
 }
 
 function autoGenerateUserScalarsOrEnums({ seq }: {
@@ -110,7 +112,7 @@ function autoGenerateUserScalarsOrEnums({ seq }: {
     };
 }
 
-function defineUserFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends UserFactoryDefineOptions<TTransients>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): UserFactoryInterface<TTransients, TOptions> {
+function defineUserFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends UserFactoryDefineOptions<TTransients>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): UserFactoryInterface<TTransients, UserTraitKeys<TOptions>> {
     const getFactoryWithTraits = (traitKeys: readonly UserTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
@@ -183,8 +185,8 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
 }
 
 interface UserFactoryBuilder {
-    <TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends UserTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, TOptions>;
+    <TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<{}, UserTraitKeys<TOptions>>;
+    withTransientFields: <TTransients extends UserTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, UserTraitKeys<TOptions>>;
 }
 
 /**
@@ -225,7 +227,7 @@ type PostFactoryTrait<TTransients extends Record<string, unknown>> = {
 type PostFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
     defaultData?: Resolver<PostFactoryDefineInput, BuildDataOptions<TTransients>>;
     traits?: {
-        [traitName: string | symbol]: PostFactoryTrait<TTransients>;
+        [traitName: TraitName]: PostFactoryTrait<TTransients>;
     };
 } & CallbackDefineOptions<Post, Prisma.PostCreateInput, TTransients>;
 
@@ -233,7 +235,7 @@ function isPostauthorFactory(x: PostauthorFactory | Prisma.UserCreateNestedOneWi
     return (x as any)?._factoryFor === "User";
 }
 
-type PostTraitKeys<TOptions extends PostFactoryDefineOptions<any>> = keyof TOptions["traits"];
+type PostTraitKeys<TOptions extends PostFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
 
 export interface PostFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "Post";
@@ -248,8 +250,8 @@ export interface PostFactoryInterfaceWithoutTraits<TTransients extends Record<st
     createForConnect(inputData?: Partial<Prisma.PostCreateInput & TTransients>): PromiseLike<Pick<Post, "id">>;
 }
 
-export interface PostFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends PostFactoryDefineOptions<TTransients> = PostFactoryDefineOptions<TTransients>> extends PostFactoryInterfaceWithoutTraits<TTransients> {
-    use(name: PostTraitKeys<TOptions>, ...names: readonly PostTraitKeys<TOptions>[]): PostFactoryInterfaceWithoutTraits<TTransients>;
+export interface PostFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends PostFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: TTraitName, ...names: readonly TTraitName[]): PostFactoryInterfaceWithoutTraits<TTransients>;
 }
 
 function autoGeneratePostScalarsOrEnums({ seq }: {
@@ -261,7 +263,7 @@ function autoGeneratePostScalarsOrEnums({ seq }: {
     };
 }
 
-function definePostFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends PostFactoryDefineOptions<TTransients>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): PostFactoryInterface<TTransients, TOptions> {
+function definePostFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends PostFactoryDefineOptions<TTransients>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): PostFactoryInterface<TTransients, PostTraitKeys<TOptions>> {
     const getFactoryWithTraits = (traitKeys: readonly PostTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
@@ -338,8 +340,8 @@ function definePostFactoryInternal<TTransients extends Record<string, unknown>, 
 }
 
 interface PostFactoryBuilder {
-    <TOptions extends PostFactoryDefineOptions>(options?: TOptions): PostFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends PostTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends PostFactoryDefineOptions<TTransients>>(options?: TOptions) => PostFactoryInterface<TTransients, TOptions>;
+    <TOptions extends PostFactoryDefineOptions>(options?: TOptions): PostFactoryInterface<{}, PostTraitKeys<TOptions>>;
+    withTransientFields: <TTransients extends PostTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends PostFactoryDefineOptions<TTransients>>(options?: TOptions) => PostFactoryInterface<TTransients, PostTraitKeys<TOptions>>;
 }
 
 /**
@@ -397,7 +399,7 @@ function isReviewreviewerFactory(x: ReviewreviewerFactory | Prisma.UserCreateNes
     return (x as any)?._factoryFor === "User";
 }
 
-type ReviewTraitKeys<TOptions extends ReviewFactoryDefineOptions<any>> = keyof TOptions["traits"];
+type ReviewTraitKeys<TOptions extends ReviewFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
 
 export interface ReviewFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
     readonly _factoryFor: "Review";
@@ -412,8 +414,8 @@ export interface ReviewFactoryInterfaceWithoutTraits<TTransients extends Record<
     createForConnect(inputData?: Partial<Prisma.ReviewCreateInput & TTransients>): PromiseLike<Pick<Review, "id">>;
 }
 
-export interface ReviewFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TOptions extends ReviewFactoryDefineOptions<TTransients> = ReviewFactoryDefineOptions<TTransients>> extends ReviewFactoryInterfaceWithoutTraits<TTransients> {
-    use(name: ReviewTraitKeys<TOptions>, ...names: readonly ReviewTraitKeys<TOptions>[]): ReviewFactoryInterfaceWithoutTraits<TTransients>;
+export interface ReviewFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends ReviewFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: TTraitName, ...names: readonly TTraitName[]): ReviewFactoryInterfaceWithoutTraits<TTransients>;
 }
 
 function autoGenerateReviewScalarsOrEnums({ seq }: {
@@ -425,7 +427,7 @@ function autoGenerateReviewScalarsOrEnums({ seq }: {
     };
 }
 
-function defineReviewFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends ReviewFactoryDefineOptions<TTransients>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): ReviewFactoryInterface<TTransients, TOptions> {
+function defineReviewFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends ReviewFactoryDefineOptions<TTransients>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): ReviewFactoryInterface<TTransients, ReviewTraitKeys<TOptions>> {
     const getFactoryWithTraits = (traitKeys: readonly ReviewTraitKeys<TOptions>[] = []) => {
         const seqKey = {};
         const getSeq = () => getSequenceCounter(seqKey);
@@ -505,8 +507,8 @@ function defineReviewFactoryInternal<TTransients extends Record<string, unknown>
 }
 
 interface ReviewFactoryBuilder {
-    <TOptions extends ReviewFactoryDefineOptions>(options: TOptions): ReviewFactoryInterface<{}, TOptions>;
-    withTransientFields: <TTransients extends ReviewTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends ReviewFactoryDefineOptions<TTransients>>(options: TOptions) => ReviewFactoryInterface<TTransients, TOptions>;
+    <TOptions extends ReviewFactoryDefineOptions>(options: TOptions): ReviewFactoryInterface<{}, ReviewTraitKeys<TOptions>>;
+    withTransientFields: <TTransients extends ReviewTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends ReviewFactoryDefineOptions<TTransients>>(options: TOptions) => ReviewFactoryInterface<TTransients, ReviewTraitKeys<TOptions>>;
 }
 
 /**
