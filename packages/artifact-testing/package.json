@@ -3,13 +3,13 @@
   "name": "artifact-testing",
   "version": "2.1.4",
   "scripts": {
-    "clean": "rimraf -g \"fixtures/*/__generated__/client\" \"fixtures/*/dmmf.json\" built built_node built_esnext \"*.tsbuildinfo\"",
+    "clean": "rimraf -g \"fixtures/*/__generated__/client\" \"fixtures/*/dmmf.json\" built \"*.tsbuildinfo\"",
     "pretest:compile": "node scripts/generateFixtures.mjs",
     "pretest:compile:ci": "node scripts/generateFixtures.mjs",
     "test": "npm run test:compile && npm run test:functions",
     "test:ci": "npm run test:compile:ci && npm run test:functions",
-    "test:compile": "tsc -p tsconfig.json && tsc -p tsconfig.esnext.json && tsc -p tsconfig.node.json",
-    "test:compile:ci": "tsc -p tsconfig.json && tsc -p tsconfig.esnext.json && tsc -p tsconfig.node.json",
+    "test:compile": "tsc -p tsconfig.json && tsc -p tsconfig.esnext.json && tsc -p tsconfig.node.json && tsc -p tsconfig.noNullChecks.json",
+    "test:compile:ci": "tsc -p tsconfig.json && tsc -p tsconfig.esnext.json && tsc -p tsconfig.node.json && tsc -p tsconfig.noNullChecks.json",
     "test:functions": "jest"
   },
   "devDependencies": {
