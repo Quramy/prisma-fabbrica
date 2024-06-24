@@ -213,7 +213,7 @@ function defineProfileFactoryInternal<TOptions extends ProfileFactoryDefineOptio
         const build = async (inputData: Partial<Prisma.ProfileCreateInput> = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateProfileScalarsOrEnums({ seq });
-            const resolveValue = normalizeResolver<ProfileFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+            const resolveValue = normalizeResolver<ProfileFactoryDefineInput, BuildDataOptions>(defaultDataResolver);
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
                 const resolveTraitValue = normalizeResolver<Partial<ProfileFactoryDefineInput>, BuildDataOptions>(traitsDefs[traitKey]?.data ?? {});

@@ -357,7 +357,7 @@ function defineReviewFactoryInternal<TOptions extends ReviewFactoryDefineOptions
         const build = async (inputData: Partial<Prisma.ReviewCreateInput> = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateReviewScalarsOrEnums({ seq });
-            const resolveValue = normalizeResolver<ReviewFactoryDefineInput, BuildDataOptions>(defaultDataResolver ?? {});
+            const resolveValue = normalizeResolver<ReviewFactoryDefineInput, BuildDataOptions>(defaultDataResolver);
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
                 const resolveTraitValue = normalizeResolver<Partial<ReviewFactoryDefineInput>, BuildDataOptions>(traitsDefs[traitKey]?.data ?? {});

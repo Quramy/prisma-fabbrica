@@ -370,7 +370,7 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
         ) => {
           const seq = getSeq();
           const requiredScalarData = AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS({ seq });
-          const resolveValue = normalizeResolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions>(defaultDataResolver ?? {});
+          const resolveValue = normalizeResolver<MODEL_FACTORY_DEFINE_INPUT, BuildDataOptions>(DEFALUT_DATA_RESOLVER);
           const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
             const acc = await queue;
             const resolveTraitValue = normalizeResolver<Partial<MODEL_FACTORY_DEFINE_INPUT>, BuildDataOptions>(traitsDefs[traitKey]?.data ?? {});
@@ -457,6 +457,9 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
     MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
     MODEL_CREATE_INPUT: ast.identifier(`${model.name}CreateInput`),
     AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS: ast.identifier(`autoGenerate${model.name}ScalarsOrEnums`),
+    DEFALUT_DATA_RESOLVER: filterRequiredInputObjectTypeField(inputType).length
+      ? template.expression(`defaultDataResolver`)({})
+      : template.expression(`defaultDataResolver ?? {}`)({}),
   });
 
 export const defineModelFactory = (model: DMMF.Model, inputType: DMMF.InputType) => {
