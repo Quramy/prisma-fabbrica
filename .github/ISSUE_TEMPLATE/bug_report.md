@@ -15,18 +15,26 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
+**Environment (please complete the following information):**
+
+- Database kind [e.g. PostgreSQL ]
+- Node.js version [e.g. 22.3.0]
+- `@prisma/client` version [e.g. 5.15.1]
+- TypeScript version [e.g. 5.5.2]
+
 **Your Schema**
 
 ```
 // Paste schema.prisma file.
 ```
 
-**Environment (please complete the following information):**
+**Your tsconfig.json**
 
-- Database kind [e.g. PostgreSQL ]
-- Node.js version [e.g. 16.0]
-- `@prisma/client` version [e.g. 4.2]
-- TypeScript version [e.g. 4.8.3]
+Paste TypeScript configuration if you have problem about TypeScript compilation.
+
+```json
+// Paste tsconfig.json file.
+```
 
 **Additional context**
 Add any other context about the problem here.
