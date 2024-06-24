@@ -1,10 +1,10 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "module": "nodenext",
+    "module": "commonjs",
     "noEmit": false,
-    "outDir": "built/nodenext"
+    "outDir": "built/noNullChecks",
+    "strictNullChecks": false
   },
-  "include": ["**/__generated__/**/*"],
   "exclude": ["built"]
 }

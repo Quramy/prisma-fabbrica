@@ -1,6 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineCategoryFactory = exports.defineCommentFactory = exports.definePostFactory = exports.defineUserFactory = exports.initialize = exports.resetScalarFieldValueGenerator = exports.registerScalarFieldValueGenerator = exports.resetSequence = void 0;
+exports.initialize = exports.resetScalarFieldValueGenerator = exports.registerScalarFieldValueGenerator = exports.resetSequence = void 0;
+exports.defineUserFactory = defineUserFactory;
+exports.definePostFactory = definePostFactory;
+exports.defineCommentFactory = defineCommentFactory;
+exports.defineCategoryFactory = defineCategoryFactory;
 const internal_1 = require("@quramy/prisma-fabbrica/lib/internal");
 var internal_2 = require("@quramy/prisma-fabbrica/lib/internal");
 Object.defineProperty(exports, "resetSequence", { enumerable: true, get: function () { return internal_2.resetSequence; } });
@@ -122,7 +126,6 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, traits: t
 function defineUserFactory(options) {
     return defineUserFactoryInternal(options ?? {});
 }
-exports.defineUserFactory = defineUserFactory;
 function isPostauthorFactory(x) {
     return x?._factoryFor === "User";
 }
@@ -140,7 +143,7 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, traits: t
         const build = async (inputData = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGeneratePostScalarsOrEnums({ seq });
-            const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver);
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
                 const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
@@ -197,7 +200,6 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, traits: t
 function definePostFactory(options) {
     return definePostFactoryInternal(options);
 }
-exports.definePostFactory = definePostFactory;
 function isCommentpostFactory(x) {
     return x?._factoryFor === "Post";
 }
@@ -218,7 +220,7 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, traits
         const build = async (inputData = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateCommentScalarsOrEnums({ seq });
-            const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver);
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
                 const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
@@ -278,7 +280,6 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, traits
 function defineCommentFactory(options) {
     return defineCommentFactoryInternal(options);
 }
-exports.defineCommentFactory = defineCommentFactory;
 function autoGenerateCategoryScalarsOrEnums({ seq }) {
     return {
         id: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Category", fieldName: "id", isId: true, isUnique: false, seq }),
@@ -346,4 +347,3 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, trait
 function defineCategoryFactory(options) {
     return defineCategoryFactoryInternal(options ?? {});
 }
-exports.defineCategoryFactory = defineCategoryFactory;
