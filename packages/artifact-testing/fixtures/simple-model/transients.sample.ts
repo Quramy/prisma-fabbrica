@@ -1,6 +1,6 @@
 import { defineUserFactory } from "./__generated__/fabbrica";
 
-export async function seed2() {
+export async function correctTypeTest() {
   const factoryWithoutTransientFields = defineUserFactory();
   await factoryWithoutTransientFields.create();
 
@@ -16,7 +16,7 @@ export async function seed2() {
   await factoryWithTransientFields.create();
 }
 
-export async function seed() {
+export async function invalidTypeTest() {
   const UserFactory = defineUserFactory.withTransientFields({
     // @ts-expect-error Can't use field name defined from schema as transient field name
     id: "id",
