@@ -21,12 +21,15 @@ Prisma generator for model factories.
   - [has-many / has-one relation](#has-many--has-one-relation)
   - [Custom scalar field generation](#custom-scalar-field-generation)
   - [Traits](#traits)
+  - [Callbacks](#callbacks)
+  - [Transient fields](#transient-fields)
   - [Field value precedence](#field-value-precedence)
   - [More examples](#more-examples)
 - [Generator configuration](#generator-configuration)
 - [Tips](#tips)
   - [Works with jest-prisma](#works-with-jest-prisma)
   - [Suppress TS circular dependencies error](#suppress-ts-circular-dependencies-error)
+  - [Factory interface with types](#factory-interface-with-types)
 - [Version compatibility](#version-compatibility)
 - [License](#license)
 
@@ -91,7 +94,8 @@ async function seed() {
 seed();
 ```
 
-Note: The factories use Prisma client instance passed by `initialize` function.
+> [!NOTE]
+> The factories use Prisma client instance passed by `initialize` function.
 
 If you want to use factories in your test code see [Works with jest-prisma](#works-with-jest-prisma) section below.
 
@@ -122,7 +126,8 @@ await UserFactory.create(); // Insert record with auto filled id, email, firstNa
 
 See https://github.com/Quramy/prisma-fabbrica/blob/main/packages/prisma-fabbrica/src/scalar/gen.ts if you want auto filling rule details.
 
-Note: prisma-fabbrica auto filling does not affect fields with `@default()` function.
+> [!NOTE]
+> prisma-fabbrica auto filling does not affect fields with `@default()` function.
 
 Default filling rule also can be overwritten.
 
@@ -172,6 +177,12 @@ await UserFactory.createList(3);
 // The above code is equivalent to the following
 
 await Promise.all([0, 1, 2].map(() => UserFactory.create()));
+```
+
+The 2nd argument(optional) accepts an object which is assignable to `Partial<Prisma.UserCreateInput>` :
+
+```ts
+await UserFactory.createList(3, { name: "Bob" });
 ```
 
 You can also pass list data assignable to `Partial<Prisma.UserCreateInput>[]` :
@@ -309,7 +320,8 @@ await UserFactory.create({
 console.log(await prisma.post.count()); // -> 2
 ```
 
-Note: In the above example, `PostFactory.build()` resolves JSON data such as:
+> [!NOTE]
+> In the above example, `PostFactory.build()` resolves JSON data such as:
 
 ```ts
 {
@@ -373,6 +385,106 @@ Multiple traits are also available:
 
 ```ts
 await UserFactory.use("someTrait", "anotherTrait").create();
+```
+
+### Callbacks
+
+You can set callback function before or after factory execution.
+
+```ts
+const UserFactory = defineUserFactory({
+  onAfterCreate: async user => {
+    await PostFactory.craete({
+      author: { connect: uesr },
+    });
+  },
+});
+
+await UserFactory.create();
+```
+
+Callback functions are also available within trait definition.
+
+```ts
+const UserFactory = defineUserFactory({
+  traits: {
+    withComment: {
+      onAfterCreate: async user => {
+        await PostFactory.craete({
+          author: { connect: uesr },
+        });
+      },
+    },
+  },
+});
+
+await UserFactory.create();
+await UserFactory.use("withComment").create();
+```
+
+> [!NOTE]
+> The above code is to explain the callback. If you want to create association, first consider to use `defaultData` and `trait.data` option as in [has-many / has-one relation](#has-many--has-one-relation).
+
+The following three types are available as callback function:
+
+```ts
+const UserFactory = defineUserFactory({
+  onAfterBuild: async createInput => {
+    // do something
+  },
+  onBeforeCreate: async createInput => {
+    // do something
+  },
+  onAfterCreate: async createdData => {
+    // do something
+  },
+});
+```
+
+And here, the parameter types are:
+
+- `createInput` is assignable to model create function parameter (e.g. `Prsima.UserCreateInput`).
+- `createdData` is resolved object by model create function (e.g. `User` model type)
+
+### Transient fields
+
+Transient fields allow to define arbitrary parameters to factory and to pass them when calling `create` or `build`.
+
+```ts
+const UserFactory = defineUserFactory.withTransientFields({
+  loginCount: 0, // `0` is default value of this parameter
+})({
+  defaultData: async ({ loginCount }) => {
+    // using loginCount
+  },
+});
+
+await UserFactory.create({ name: "Bob", loginCount: 10 });
+```
+
+Transient fields passed from factories' `create` method don't affect Prisma's `create` result.
+
+> [!NOTE]
+> You can't use model field names defined in your schema.prisma as transient parameters because they're not passed to `prisma.user.create` method.
+
+Transient fields also can be accessed from [traits](#traits) or [callbacks](#callbacks).
+
+```ts
+const UserFactory = defineUserFactory.withTransientFields({
+  loginCount: 0,
+})({
+  // Transient fields are passed to callback functions as the 2nd argument.
+  onAfterCreate: async (createdUser, { loginCount }) => {
+    for (let i = 0; i < loginCount; i++) {
+      await writeLoginLog(craetedUser.id);
+    }
+  },
+  traits: {
+    data: async ({ loginCount }) => {
+      // using loginCount
+    },
+  },
+});
 ```
 
 ### Field value precedence
@@ -448,7 +560,7 @@ const PostFactory = definePostFactory({
 });
 ```
 
-`FactoryInterface` types are available to avoid this error.
+`FactoryInterface` types are available to avoid this error. See [Factory interface with types](#factory-interface-with-types) section if you want usage of factory interface.
 
 ```ts
 import { defineUserFactory, definePostFactory, type UserFactoryInterface } from "./__generated__/fabbrica";
@@ -470,6 +582,39 @@ const PostFactory = definePostFactory({
     author: getUserFactory(),
   },
 });
+```
+
+### Factory interface with types
+
+> [!WARNING]
+> Factory interface type parameters may change in future versions without notice.
+
+Factory interface (e.g. `UserFactory` ) takes 2 optional type parameters:
+
+- `TTransientFields`: Type of [transient fields](#transient-fields) object. By default, `Record<string, unknown>` .
+- `TTraitName`: Names of available [traits](#traits). By default, `string | symbol` .
+
+For example:
+
+```ts
+// Specify transient fields type
+declare function getUserFactory(): UserFactoryInterface<{ loginCount: number }>;
+
+await getUserFactory().create({ loginCount: 10 });
+
+// @ts-expect-error
+await getUserFactory().create({ hoge: 10 });
+```
+
+```ts
+// Specify available trait names
+declare function getUserFactory(): UserFactoryInterface<{}, "someTrait" | "anotherTrait">;
+
+await getUserFactory().use("someTrait").create();
+await getUserFactory().use("anotherTrait").create();
+
+// @ts-expect-error
+await getUserFactory().use("hoge").create();
 ```
 
 ## Version compatibility
