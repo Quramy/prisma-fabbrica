@@ -449,7 +449,7 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
                 ),
               ),
               true,
-            )};
+            )} as Prisma.MODEL_CREATE_INPUT; // FIXME no type assertion
           const data: Prisma.MODEL_CREATE_INPUT = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
           await handleAfterBuild(data, transientFields);
           return data;

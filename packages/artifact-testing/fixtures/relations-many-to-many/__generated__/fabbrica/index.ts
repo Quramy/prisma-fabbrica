@@ -123,7 +123,7 @@ function definePostFactoryInternal<TTransients extends Record<string, unknown>, 
                     ...traitData,
                 };
             }, resolveValue(resolverInput));
-            const defaultAssociations = {};
+            const defaultAssociations = {} as Prisma.PostCreateInput;
             const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;
@@ -264,7 +264,7 @@ function defineCategoryFactoryInternal<TTransients extends Record<string, unknow
                     ...traitData,
                 };
             }, resolveValue(resolverInput));
-            const defaultAssociations = {};
+            const defaultAssociations = {} as Prisma.CategoryCreateInput;
             const data: Prisma.CategoryCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;

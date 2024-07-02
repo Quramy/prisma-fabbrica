@@ -144,7 +144,7 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
                     ...traitData,
                 };
             }, resolveValue(resolverInput));
-            const defaultAssociations = {};
+            const defaultAssociations = {} as Prisma.UserCreateInput;
             const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;
@@ -299,7 +299,7 @@ function definePostFactoryInternal<TTransients extends Record<string, unknown>, 
                 author: isPostauthorFactory(defaultData.author) ? {
                     create: await defaultData.author.build()
                 } : defaultData.author
-            };
+            } as Prisma.PostCreateInput;
             const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;
@@ -466,7 +466,7 @@ function defineReviewFactoryInternal<TTransients extends Record<string, unknown>
                 reviewer: isReviewreviewerFactory(defaultData.reviewer) ? {
                     create: await defaultData.reviewer.build()
                 } : defaultData.reviewer
-            };
+            } as Prisma.ReviewCreateInput;
             const data: Prisma.ReviewCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;

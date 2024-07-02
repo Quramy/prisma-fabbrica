@@ -136,7 +136,7 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
                 profile: isUserprofileFactory(defaultData.profile) ? {
                     create: await defaultData.profile.build()
                 } : defaultData.profile
-            };
+            } as Prisma.UserCreateInput;
             const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;
@@ -287,7 +287,7 @@ function defineProfileFactoryInternal<TTransients extends Record<string, unknown
                 user: isProfileuserFactory(defaultData.user) ? {
                     create: await defaultData.user.build()
                 } : defaultData.user
-            };
+            } as Prisma.ProfileCreateInput;
             const data: Prisma.ProfileCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;

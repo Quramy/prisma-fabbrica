@@ -6,6 +6,7 @@
     "outDir": "built/commonjs",
 
     "strict": true /* Enable all strict type-checking options. */,
+    "exactOptionalPropertyTypes": true /* Interpret optional property types as written, rather than adding 'undefined'. */,
     "noUncheckedIndexedAccess": true /* Add 'undefined' to a type when accessed using an index. */
   },
   "exclude": ["built"]
