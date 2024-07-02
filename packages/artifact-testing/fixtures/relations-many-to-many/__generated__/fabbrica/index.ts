@@ -98,15 +98,15 @@ function definePostFactoryInternal<TTransients extends Record<string, unknown>, 
         const screen = createScreener("Post", modelFieldDefinitions);
         const handleAfterBuild = createCallbackChain([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = createCallbackChain([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = createCallbackChain([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData: Partial<Prisma.PostCreateInput & TTransients> = {}) => {
             const seq = getSeq();
@@ -123,7 +123,7 @@ function definePostFactoryInternal<TTransients extends Record<string, unknown>, 
                     ...traitData,
                 };
             }, resolveValue(resolverInput));
-            const defaultAssociations = {};
+            const defaultAssociations = {} as Prisma.PostCreateInput;
             const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;
@@ -239,15 +239,15 @@ function defineCategoryFactoryInternal<TTransients extends Record<string, unknow
         const screen = createScreener("Category", modelFieldDefinitions);
         const handleAfterBuild = createCallbackChain([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = createCallbackChain([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = createCallbackChain([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData: Partial<Prisma.CategoryCreateInput & TTransients> = {}) => {
             const seq = getSeq();
@@ -264,7 +264,7 @@ function defineCategoryFactoryInternal<TTransients extends Record<string, unknow
                     ...traitData,
                 };
             }, resolveValue(resolverInput));
-            const defaultAssociations = {};
+            const defaultAssociations = {} as Prisma.CategoryCreateInput;
             const data: Prisma.CategoryCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;

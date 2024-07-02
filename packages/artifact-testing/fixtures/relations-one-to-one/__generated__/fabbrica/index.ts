@@ -107,15 +107,15 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
         const screen = createScreener("User", modelFieldDefinitions);
         const handleAfterBuild = createCallbackChain([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = createCallbackChain([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = createCallbackChain([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData: Partial<Prisma.UserCreateInput & TTransients> = {}) => {
             const seq = getSeq();
@@ -136,7 +136,7 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
                 profile: isUserprofileFactory(defaultData.profile) ? {
                     create: await defaultData.profile.build()
                 } : defaultData.profile
-            };
+            } as Prisma.UserCreateInput;
             const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;
@@ -258,15 +258,15 @@ function defineProfileFactoryInternal<TTransients extends Record<string, unknown
         const screen = createScreener("Profile", modelFieldDefinitions);
         const handleAfterBuild = createCallbackChain([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = createCallbackChain([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = createCallbackChain([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData: Partial<Prisma.ProfileCreateInput & TTransients> = {}) => {
             const seq = getSeq();
@@ -287,7 +287,7 @@ function defineProfileFactoryInternal<TTransients extends Record<string, unknown
                 user: isProfileuserFactory(defaultData.user) ? {
                     create: await defaultData.user.build()
                 } : defaultData.user
-            };
+            } as Prisma.ProfileCreateInput;
             const data: Prisma.ProfileCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;

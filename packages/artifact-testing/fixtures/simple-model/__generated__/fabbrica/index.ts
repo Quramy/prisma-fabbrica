@@ -85,15 +85,15 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
         const screen = createScreener("User", modelFieldDefinitions);
         const handleAfterBuild = createCallbackChain([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = createCallbackChain([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = createCallbackChain([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData: Partial<Prisma.UserCreateInput & TTransients> = {}) => {
             const seq = getSeq();
@@ -110,7 +110,7 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
                     ...traitData,
                 };
             }, resolveValue(resolverInput));
-            const defaultAssociations = {};
+            const defaultAssociations = {} as Prisma.UserCreateInput;
             const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;

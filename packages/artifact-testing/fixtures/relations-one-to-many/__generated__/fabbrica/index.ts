@@ -119,15 +119,15 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
         const screen = createScreener("User", modelFieldDefinitions);
         const handleAfterBuild = createCallbackChain([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = createCallbackChain([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = createCallbackChain([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData: Partial<Prisma.UserCreateInput & TTransients> = {}) => {
             const seq = getSeq();
@@ -144,7 +144,7 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
                     ...traitData,
                 };
             }, resolveValue(resolverInput));
-            const defaultAssociations = {};
+            const defaultAssociations = {} as Prisma.UserCreateInput;
             const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;
@@ -270,15 +270,15 @@ function definePostFactoryInternal<TTransients extends Record<string, unknown>, 
         const screen = createScreener("Post", modelFieldDefinitions);
         const handleAfterBuild = createCallbackChain([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = createCallbackChain([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = createCallbackChain([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData: Partial<Prisma.PostCreateInput & TTransients> = {}) => {
             const seq = getSeq();
@@ -299,7 +299,7 @@ function definePostFactoryInternal<TTransients extends Record<string, unknown>, 
                 author: isPostauthorFactory(defaultData.author) ? {
                     create: await defaultData.author.build()
                 } : defaultData.author
-            };
+            } as Prisma.PostCreateInput;
             const data: Prisma.PostCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;
@@ -434,15 +434,15 @@ function defineReviewFactoryInternal<TTransients extends Record<string, unknown>
         const screen = createScreener("Review", modelFieldDefinitions);
         const handleAfterBuild = createCallbackChain([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = createCallbackChain([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = createCallbackChain([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData: Partial<Prisma.ReviewCreateInput & TTransients> = {}) => {
             const seq = getSeq();
@@ -466,7 +466,7 @@ function defineReviewFactoryInternal<TTransients extends Record<string, unknown>
                 reviewer: isReviewreviewerFactory(defaultData.reviewer) ? {
                     create: await defaultData.reviewer.build()
                 } : defaultData.reviewer
-            };
+            } as Prisma.ReviewCreateInput;
             const data: Prisma.ReviewCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;
