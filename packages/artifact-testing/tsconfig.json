@@ -3,7 +3,10 @@
   "compilerOptions": {
     "module": "commonjs",
     "noEmit": false,
-    "outDir": "built/commonjs"
+    "outDir": "built/commonjs",
+
+    "strict": true /* Enable all strict type-checking options. */,
+    "noUncheckedIndexedAccess": true /* Add 'undefined' to a type when accessed using an index. */
   },
   "exclude": ["built"]
 }

@@ -105,15 +105,15 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
         const screen = createScreener("User", modelFieldDefinitions);
         const handleAfterBuild = createCallbackChain([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = createCallbackChain([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = createCallbackChain([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData: Partial<Prisma.UserCreateInput & TTransients> = {}) => {
             const seq = getSeq();
@@ -245,15 +245,15 @@ function defineComplexIdModelFactoryInternal<TTransients extends Record<string, 
         const screen = createScreener("ComplexIdModel", modelFieldDefinitions);
         const handleAfterBuild = createCallbackChain([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = createCallbackChain([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = createCallbackChain([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData: Partial<Prisma.ComplexIdModelCreateInput & TTransients> = {}) => {
             const seq = getSeq();
@@ -417,15 +417,15 @@ function defineFieldTypePatternModelFactoryInternal<TTransients extends Record<s
         const screen = createScreener("FieldTypePatternModel", modelFieldDefinitions);
         const handleAfterBuild = createCallbackChain([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = createCallbackChain([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = createCallbackChain([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData: Partial<Prisma.FieldTypePatternModelCreateInput & TTransients> = {}) => {
             const seq = getSeq();
@@ -554,15 +554,15 @@ function defineNoPkModelFactoryInternal<TTransients extends Record<string, unkno
         const screen = createScreener("NoPkModel", modelFieldDefinitions);
         const handleAfterBuild = createCallbackChain([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = createCallbackChain([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = createCallbackChain([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData: Partial<Prisma.NoPkModelCreateInput & TTransients> = {}) => {
             const seq = getSeq();

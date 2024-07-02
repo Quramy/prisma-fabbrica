@@ -402,18 +402,18 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
 
         const handleAfterBuild = createCallbackChain([
           onAfterBuild,
-          ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+          ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = createCallbackChain([
           ...traitKeys
             .slice()
             .reverse()
-            .map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            .map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
           onBeforeCreate,
         ]);
         const handleAfterCreate = createCallbackChain([
           onAfterCreate,
-          ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+          ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
 
         const build = async (

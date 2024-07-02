@@ -71,15 +71,15 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
         const screen = (0, internal_1.createScreener)("User", modelFieldDefinitions);
         const handleAfterBuild = (0, internal_1.createCallbackChain)([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = (0, internal_1.createCallbackChain)([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = (0, internal_1.createCallbackChain)([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData = {}) => {
             const seq = getSeq();
@@ -158,15 +158,15 @@ function defineLoginLogFactoryInternal({ defaultData: defaultDataResolver, onAft
         const screen = (0, internal_1.createScreener)("LoginLog", modelFieldDefinitions);
         const handleAfterBuild = (0, internal_1.createCallbackChain)([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = (0, internal_1.createCallbackChain)([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = (0, internal_1.createCallbackChain)([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData = {}) => {
             const seq = getSeq();
@@ -248,15 +248,15 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
         const screen = (0, internal_1.createScreener)("Post", modelFieldDefinitions);
         const handleAfterBuild = (0, internal_1.createCallbackChain)([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = (0, internal_1.createCallbackChain)([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = (0, internal_1.createCallbackChain)([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData = {}) => {
             const seq = getSeq();
@@ -345,15 +345,15 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, onAfte
         const screen = (0, internal_1.createScreener)("Comment", modelFieldDefinitions);
         const handleAfterBuild = (0, internal_1.createCallbackChain)([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = (0, internal_1.createCallbackChain)([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = (0, internal_1.createCallbackChain)([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData = {}) => {
             const seq = getSeq();
@@ -439,15 +439,15 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, onAft
         const screen = (0, internal_1.createScreener)("Category", modelFieldDefinitions);
         const handleAfterBuild = (0, internal_1.createCallbackChain)([
             onAfterBuild,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterBuild),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
         ]);
         const handleBeforeCreate = (0, internal_1.createCallbackChain)([
-            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey].onBeforeCreate),
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
             onBeforeCreate,
         ]);
         const handleAfterCreate = (0, internal_1.createCallbackChain)([
             onAfterCreate,
-            ...traitKeys.map(traitKey => traitsDefs[traitKey].onAfterCreate),
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
         ]);
         const build = async (inputData = {}) => {
             const seq = getSeq();
