@@ -230,7 +230,7 @@ The above `PostFactory` creates `User` model for each `PostFactory.create()` cal
 
 #### Manual create or connect
 
-Similar to using `prisma.post.create`, you can also use `connect` / `craete` / `createOrConnect` options.
+Similar to using `prisma.post.create`, you can also use `connect` / `create` / `createOrConnect` options.
 
 ```ts
 const PostFactory = definePostFactory({
@@ -394,7 +394,7 @@ You can set callback function before or after factory execution.
 ```ts
 const UserFactory = defineUserFactory({
   onAfterCreate: async user => {
-    await PostFactory.craete({
+    await PostFactory.create({
       author: { connect: uesr },
     });
   },
@@ -410,7 +410,7 @@ const UserFactory = defineUserFactory({
   traits: {
     withComment: {
       onAfterCreate: async user => {
-        await PostFactory.craete({
+        await PostFactory.create({
           author: { connect: uesr },
         });
       },
@@ -476,7 +476,7 @@ const UserFactory = defineUserFactory.withTransientFields({
   // Transient fields are passed to callback functions as the 2nd argument.
   onAfterCreate: async (createdUser, { loginCount }) => {
     for (let i = 0; i < loginCount; i++) {
-      await writeLoginLog(craetedUser.id);
+      await writeLoginLog(createdUser.id);
     }
   },
   traits: {
