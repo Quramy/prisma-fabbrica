@@ -17,7 +17,7 @@ function readTsConfig(tsconfigPath: string) {
     module: ts.ModuleKind.CommonJS,
   };
   return existsSync(tsconfigPath)
-    ? ts.getParsedCommandLineOfConfigFile(tsconfigPath, {}, ts.sys as any)?.options ?? opt
+    ? (ts.getParsedCommandLineOfConfigFile(tsconfigPath, {}, ts.sys as any)?.options ?? opt)
     : opt;
 }
 
@@ -70,7 +70,7 @@ generatorHandler({
       const tsconfigOptValue = options.generator.config.tsconfig;
       const tsconfigPath = path.resolve(
         path.dirname(options.schemaPath),
-        Array.isArray(tsconfigOptValue) ? tsconfigOptValue[0] : tsconfigOptValue ?? "../tsconfig.json",
+        Array.isArray(tsconfigOptValue) ? tsconfigOptValue[0] : (tsconfigOptValue ?? "../tsconfig.json"),
       );
       const compileOptions = readTsConfig(tsconfigPath);
       const output = compile(path.join(outputDirname, "index.ts"), contents, {
