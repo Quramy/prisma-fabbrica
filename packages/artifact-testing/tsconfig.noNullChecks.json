@@ -3,8 +3,8 @@
   "compilerOptions": {
     "module": "commonjs",
     "noEmit": false,
-    "outDir": "built/noNullChecks",
+    "outDir": ".built/noNullChecks",
     "strictNullChecks": false
   },
-  "exclude": ["built"]
+  "exclude": [".built"]
 }

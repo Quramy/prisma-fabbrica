@@ -3,7 +3,7 @@
   "name": "artifact-testing",
   "version": "2.2.1",
   "scripts": {
-    "clean": "rimraf -g \"fixtures/*/__generated__/client\" \"fixtures/*/dmmf.json\" built \"*.tsbuildinfo\"",
+    "clean": "rimraf -g \"fixtures/*/__generated__/client\" \"fixtures/*/dmmf.json\" .built \"*.tsbuildinfo\"",
     "pretest:compile": "node scripts/generateFixtures.mjs",
     "pretest:compile:ci": "node scripts/generateFixtures.mjs",
     "test": "npm run test:compile && npm run test:functions",
