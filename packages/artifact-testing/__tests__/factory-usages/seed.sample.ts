@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
-import { initialize, defineUserFactory } from "./__generated__/fabbrica";
+import { initialize, defineUserFactory } from "../../fixtures/simple-model/__generated__/fabbrica";
 
 const prisma = new PrismaClient();
 initialize({ prisma });

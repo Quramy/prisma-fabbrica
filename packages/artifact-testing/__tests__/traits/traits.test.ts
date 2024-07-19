@@ -1,4 +1,4 @@
-import { defineUserFactory } from "./__generated__/fabbrica";
+import { defineUserFactory } from "../../fixtures/simple-model/__generated__/fabbrica";
 
 describe("traits", () => {
   test("override default data", async () => {

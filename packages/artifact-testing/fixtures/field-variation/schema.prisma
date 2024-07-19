@@ -14,22 +14,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id           String @id
-  role         Role
-  roleDefault  Role @default(USER)
-  roles        Role[]
-  status       Status?
+model EnumModel {
+  id                      String @id
+  requiredEnum            SampleEnum
+  requiredEnumWithDefault SampleEnum @default(HOGE)
+  optionalEnum            SampleEnum?
+  enumerableEnum          SampleEnum[]
 }
 
-enum Role {
-  USER
-  ADMIN
-}
-
-enum Status {
-  Draft
-  Accepted
+enum SampleEnum {
+  HOGE
+  FUGA
 }
 
 model ComplexIdModel {

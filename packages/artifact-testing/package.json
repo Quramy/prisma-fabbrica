@@ -4,8 +4,9 @@
   "version": "2.2.1",
   "scripts": {
     "clean": "rimraf -g \"fixtures/*/__generated__/client\" \"fixtures/*/dmmf.json\" .built \"*.tsbuildinfo\"",
-    "pretest:compile": "node scripts/generateFixtures.mjs",
-    "pretest:compile:ci": "node scripts/generateFixtures.mjs",
+    "generate": "node scripts/generateFixtures.mjs",
+    "pretest:compile": "npm run generate",
+    "pretest:compile:ci": "npm run generate",
     "test": "npm run test:compile && npm run test:functions",
     "test:ci": "npm run test:compile:ci && npm run test:functions",
     "test:compile": "tsc -p tsconfig.json && tsc -p tsconfig.esnext.json && tsc -p tsconfig.node.json && tsc -p tsconfig.noNullChecks.json",
