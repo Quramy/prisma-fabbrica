@@ -3,8 +3,8 @@
   "compilerOptions": {
     "module": "nodenext",
     "noEmit": false,
-    "outDir": "built/nodenext"
+    "outDir": ".built/nodenext"
   },
   "include": ["**/__generated__/**/*"],
-  "exclude": ["built"]
+  "exclude": [".built"]
 }

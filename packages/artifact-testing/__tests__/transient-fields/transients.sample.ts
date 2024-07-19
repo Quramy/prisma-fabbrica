@@ -1,4 +1,4 @@
-import { defineUserFactory } from "./__generated__/fabbrica";
+import { defineUserFactory } from "../../fixtures/simple-model/__generated__/fabbrica";
 
 export async function correctTypeTest() {
   const factoryWithoutTransientFields = defineUserFactory();

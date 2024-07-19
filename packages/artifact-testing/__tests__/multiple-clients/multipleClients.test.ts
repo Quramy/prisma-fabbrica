@@ -1,11 +1,11 @@
-import type { PrismaClient } from "./__generated__/client";
-import { initialize, defineUserFactory } from "./__generated__/fabbrica";
+import type { PrismaClient } from "../../fixtures/simple-model/__generated__/client";
+import { initialize, defineUserFactory } from "../../fixtures/simple-model/__generated__/fabbrica";
 
-import type { PrismaClient as PrismaClientAlt } from "./__generated__/client";
+import type { PrismaClient as PrismaClientAlt } from "../../fixtures/simple-model/__generated__/client";
 import {
   initialize as initializeAlt,
-  defineUserFactory as defineAltUserFactory,
-} from "../field-variation/__generated__/fabbrica";
+  defineEnumModelFactory as defineAltModelFactory,
+} from "../../fixtures/field-variation/__generated__/fabbrica";
 
 describe("initialize function", () => {
   describe("initialize function binds prisma instance for each fabbrica script", () => {
@@ -15,12 +15,12 @@ describe("initialize function", () => {
       },
     };
     const prismaClientMockAlt = {
-      user: {
+      enumModel: {
         create: jest.fn(),
       },
     };
     const UserFactory = defineUserFactory();
-    const AltUserFactory = defineAltUserFactory();
+    const AltModelFactory = defineAltModelFactory();
 
     beforeAll(() => {
       initialize({ prisma: prismaClientMock as unknown as PrismaClient });
@@ -29,22 +29,22 @@ describe("initialize function", () => {
 
     beforeEach(() => {
       prismaClientMock.user.create.mockReset();
-      prismaClientMockAlt.user.create.mockReset();
+      prismaClientMockAlt.enumModel.create.mockReset();
     });
 
     it("should be called multiple clients called when multiple fabbrica are executed", async () => {
       await UserFactory.create();
-      await AltUserFactory.create();
+      await AltModelFactory.create();
 
       expect(prismaClientMock.user.create).toHaveBeenCalledTimes(1);
-      expect(prismaClientMockAlt.user.create).toHaveBeenCalledTimes(1);
+      expect(prismaClientMockAlt.enumModel.create).toHaveBeenCalledTimes(1);
     });
 
     it("should not be called a client unless the corresponding fabbrica is executed", async () => {
       await UserFactory.create();
 
       expect(prismaClientMock.user.create).toHaveBeenCalledTimes(1);
-      expect(prismaClientMockAlt.user.create).not.toHaveBeenCalled();
+      expect(prismaClientMockAlt.enumModel.create).not.toHaveBeenCalled();
     });
   });
 });

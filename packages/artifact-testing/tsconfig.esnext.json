@@ -5,8 +5,8 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "noEmit": false,
-    "outDir": "built/esnext"
+    "outDir": ".built/esnext"
   },
   "include": ["**/__generated__/**/*"],
-  "exclude": ["built"]
+  "exclude": [".built"]
 }

@@ -3,7 +3,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "noEmit": false,
-    "outDir": "built/commonjs",
+    "outDir": ".built/commonjs",
 
     "strict": true /* Enable all strict type-checking options. */,
     "noImplicitAny": true /* Enable error reporting for expressions and declarations with an implied 'any' type. */,
@@ -25,5 +25,5 @@
     "allowUnusedLabels": false /* Disable error reporting for unused labels. */,
     "allowUnreachableCode": false /* Disable error reporting for unreachable code. */
   },
-  "exclude": ["built"]
+  "exclude": [".built"]
 }
