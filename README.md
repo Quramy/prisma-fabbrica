@@ -133,9 +133,9 @@ Default filling rule also can be overwritten.
 
 ```ts
 const UserFactory = defineUserFactory({
-  defaultData: async () => {
+  defaultData: async () => ({
     email: await generateRandomEmailAddress(),
-  }
+  })
 })
 
 await UserFactory.create()
