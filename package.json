@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prepare": "husky install",
     "clean": "npm run clean --workspaces && rimraf -g \"*.tsbuildinfo\"",
     "bootstrap": "npm run build && npm run bootstrap --workspace examples/example-prj",
     "build": "npm run build:lib && npm run build:readme",
