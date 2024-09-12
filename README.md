@@ -135,10 +135,10 @@ Default filling rule also can be overwritten.
 const UserFactory = defineUserFactory({
   defaultData: async () => ({
     email: await generateRandomEmailAddress(),
-  })
-})
+  }),
+});
 
-await UserFactory.create()
+await UserFactory.create();
 ```
 
 ### Use sequence for scalar fields

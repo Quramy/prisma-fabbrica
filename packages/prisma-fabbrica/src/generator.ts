@@ -48,7 +48,7 @@ generatorHandler({
       logger.error("No prisma client generator.");
       return;
     }
-    const noTranspile = options.generator.config.noTranspile === "true" ?? false;
+    const noTranspile = options.generator.config.noTranspile === "true";
     const outputDirname = options.generator.output?.value;
     const clientGeneratorOutputPath = clientGeneratorConfig.output?.value;
     if (!clientGeneratorOutputPath || !outputDirname) {
