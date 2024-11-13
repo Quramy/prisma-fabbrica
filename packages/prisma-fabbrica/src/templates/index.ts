@@ -470,8 +470,8 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
         const create = async (
           inputData: CREATE_INPUT_TYPE = {}
         ) => {
+          const data = await build({ ...inputData }).then(screen);
           const [transientFields] = destructure(defaultTransientFieldValues, inputData);
-          const data = await build(inputData).then(screen);
           await handleBeforeCreate(data, transientFields);
           const createdData = await getClient<PrismaClient>().MODEL_KEY.create({ data });
           await handleAfterCreate(createdData, transientFields);

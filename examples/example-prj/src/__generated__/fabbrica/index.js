@@ -106,8 +106,8 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
             id: inputData.id
         });
         const create = async (inputData = {}) => {
+            const data = await build({ ...inputData }).then(screen);
             const [transientFields] = (0, internal_1.destructure)(defaultTransientFieldValues, inputData);
-            const data = await build(inputData).then(screen);
             await handleBeforeCreate(data, transientFields);
             const createdData = await getClient().user.create({ data });
             await handleAfterCreate(createdData, transientFields);
@@ -193,8 +193,8 @@ function defineLoginLogFactoryInternal({ defaultData: defaultDataResolver, onAft
             id: inputData.id
         });
         const create = async (inputData = {}) => {
+            const data = await build({ ...inputData }).then(screen);
             const [transientFields] = (0, internal_1.destructure)(defaultTransientFieldValues, inputData);
-            const data = await build(inputData).then(screen);
             await handleBeforeCreate(data, transientFields);
             const createdData = await getClient().loginLog.create({ data });
             await handleAfterCreate(createdData, transientFields);
@@ -287,8 +287,8 @@ function definePostFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
             id: inputData.id
         });
         const create = async (inputData = {}) => {
+            const data = await build({ ...inputData }).then(screen);
             const [transientFields] = (0, internal_1.destructure)(defaultTransientFieldValues, inputData);
-            const data = await build(inputData).then(screen);
             await handleBeforeCreate(data, transientFields);
             const createdData = await getClient().post.create({ data });
             await handleAfterCreate(createdData, transientFields);
@@ -387,8 +387,8 @@ function defineCommentFactoryInternal({ defaultData: defaultDataResolver, onAfte
             id: inputData.id
         });
         const create = async (inputData = {}) => {
+            const data = await build({ ...inputData }).then(screen);
             const [transientFields] = (0, internal_1.destructure)(defaultTransientFieldValues, inputData);
-            const data = await build(inputData).then(screen);
             await handleBeforeCreate(data, transientFields);
             const createdData = await getClient().comment.create({ data });
             await handleAfterCreate(createdData, transientFields);
@@ -474,8 +474,8 @@ function defineCategoryFactoryInternal({ defaultData: defaultDataResolver, onAft
             id: inputData.id
         });
         const create = async (inputData = {}) => {
+            const data = await build({ ...inputData }).then(screen);
             const [transientFields] = (0, internal_1.destructure)(defaultTransientFieldValues, inputData);
-            const data = await build(inputData).then(screen);
             await handleBeforeCreate(data, transientFields);
             const createdData = await getClient().category.create({ data });
             await handleAfterCreate(createdData, transientFields);
