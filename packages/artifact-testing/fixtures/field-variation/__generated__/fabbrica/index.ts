@@ -139,8 +139,8 @@ function defineEnumModelFactoryInternal<TTransients extends Record<string, unkno
             id: inputData.id
         });
         const create = async (inputData: Partial<Prisma.EnumModelCreateInput & TTransients> = {}) => {
-            const data = await build({ ...inputData }).then(screen);
             const [transientFields] = destructure(defaultTransientFieldValues, inputData);
+            const data = await build(inputData).then(screen);
             await handleBeforeCreate(data, transientFields);
             const createdData = await getClient<PrismaClient>().enumModel.create({ data });
             await handleAfterCreate(createdData, transientFields);
@@ -280,8 +280,8 @@ function defineComplexIdModelFactoryInternal<TTransients extends Record<string, 
             lastName: inputData.lastName
         });
         const create = async (inputData: Partial<Prisma.ComplexIdModelCreateInput & TTransients> = {}) => {
-            const data = await build({ ...inputData }).then(screen);
             const [transientFields] = destructure(defaultTransientFieldValues, inputData);
+            const data = await build(inputData).then(screen);
             await handleBeforeCreate(data, transientFields);
             const createdData = await getClient<PrismaClient>().complexIdModel.create({ data });
             await handleAfterCreate(createdData, transientFields);
@@ -451,8 +451,8 @@ function defineFieldTypePatternModelFactoryInternal<TTransients extends Record<s
             id: inputData.id
         });
         const create = async (inputData: Partial<Prisma.FieldTypePatternModelCreateInput & TTransients> = {}) => {
-            const data = await build({ ...inputData }).then(screen);
             const [transientFields] = destructure(defaultTransientFieldValues, inputData);
+            const data = await build(inputData).then(screen);
             await handleBeforeCreate(data, transientFields);
             const createdData = await getClient<PrismaClient>().fieldTypePatternModel.create({ data });
             await handleAfterCreate(createdData, transientFields);
@@ -588,8 +588,8 @@ function defineNoPkModelFactoryInternal<TTransients extends Record<string, unkno
             id: inputData.id
         });
         const create = async (inputData: Partial<Prisma.NoPkModelCreateInput & TTransients> = {}) => {
-            const data = await build({ ...inputData }).then(screen);
             const [transientFields] = destructure(defaultTransientFieldValues, inputData);
+            const data = await build(inputData).then(screen);
             await handleBeforeCreate(data, transientFields);
             const createdData = await getClient<PrismaClient>().noPkModel.create({ data });
             await handleAfterCreate(createdData, transientFields);

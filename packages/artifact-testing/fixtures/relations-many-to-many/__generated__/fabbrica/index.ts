@@ -133,8 +133,8 @@ function definePostFactoryInternal<TTransients extends Record<string, unknown>, 
             id: inputData.id
         });
         const create = async (inputData: Partial<Prisma.PostCreateInput & TTransients> = {}) => {
-            const data = await build({ ...inputData }).then(screen);
             const [transientFields] = destructure(defaultTransientFieldValues, inputData);
+            const data = await build(inputData).then(screen);
             await handleBeforeCreate(data, transientFields);
             const createdData = await getClient<PrismaClient>().post.create({ data });
             await handleAfterCreate(createdData, transientFields);
@@ -274,8 +274,8 @@ function defineCategoryFactoryInternal<TTransients extends Record<string, unknow
             id: inputData.id
         });
         const create = async (inputData: Partial<Prisma.CategoryCreateInput & TTransients> = {}) => {
-            const data = await build({ ...inputData }).then(screen);
             const [transientFields] = destructure(defaultTransientFieldValues, inputData);
+            const data = await build(inputData).then(screen);
             await handleBeforeCreate(data, transientFields);
             const createdData = await getClient<PrismaClient>().category.create({ data });
             await handleAfterCreate(createdData, transientFields);
