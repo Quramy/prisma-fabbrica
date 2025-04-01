@@ -13,6 +13,6 @@ export function getClientModuleSpecifier(clientGeneratorOutputPath: string | und
     .normalize(clientGeneratorOutputPosixPath)
     .endsWith(["node_modules", "@prisma", "client"].join(path.sep))
     ? "@prisma/client"
-    : path.normalize("./" + path.relative(outputPosixDirname, clientGeneratorOutputPosixPath));
+    : path.normalize(path.join(".", path.relative(outputPosixDirname, clientGeneratorOutputPosixPath), "index.js"));
   return prismaClientModuleSpecifier;
 }
