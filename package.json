@@ -21,12 +21,12 @@
   "author": "Quramy",
   "license": "MIT",
   "devDependencies": {
-    "@prisma/client": "6.5.0",
+    "@prisma/client": "6.7.0",
     "@types/node": "^22.0.0",
     "husky": "9.1.7",
     "prettier": "3.5.3",
     "pretty-quick": "4.1.1",
-    "prisma": "6.5.0",
+    "prisma": "6.7.0",
     "rimraf": "^6.0.0",
     "typescript": "5.8.3"
   },
