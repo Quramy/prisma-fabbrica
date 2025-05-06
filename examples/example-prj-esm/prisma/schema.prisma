@@ -1,0 +1,62 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/__generated__/client"
+  moduleFormat        = "esm"
+  importFileExtension = "ts"
+}
+
+generator fabbrica {
+  provider    = "prisma-fabbrica-next"
+  output      = "../src/__generated__/fabbrica"
+  noTranspile = true
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id
+  email     String    @unique
+  name      String
+  posts     Post[]
+  comments  Comment[]
+  updatedAt DateTime  @default(now()) @updatedAt
+  createdAt DateTime  @default(now())
+}
+
+model LoginLog {
+  id        String   @id @default(cuid())
+  userId    String
+  clientId  String
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id         String     @id
+  title      String
+  author     User       @relation(fields: [authorId], references: [id])
+  authorId   String
+  comments   Comment[]
+  categories Category[]
+  updatedAt  DateTime   @default(now()) @updatedAt
+  createdAt  DateTime   @default(now())
+}
+
+model Comment {
+  id        String   @id
+  body      String
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  updatedAt DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id    String @id
+  name  String @unique
+  posts Post[]
+}

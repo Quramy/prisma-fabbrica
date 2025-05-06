@@ -5,7 +5,7 @@ generatorHandler({
   onManifest: () => ({
     prettyName: "fabbrica",
     defaultOutput: "../src/__generated__/fabbrica",
-    requiresGenerators: ["prisma-client-js"],
+    requiresGenerators: ["prisma-client"],
   }),
   onGenerate,
 });
