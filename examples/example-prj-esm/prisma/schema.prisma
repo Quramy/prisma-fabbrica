@@ -6,7 +6,7 @@ generator client {
 }
 
 generator fabbrica {
-  provider    = "prisma-fabbrica-next"
+  provider    = "prisma-fabbrica"
   output      = "../src/__generated__/fabbrica"
   noTranspile = true
 }

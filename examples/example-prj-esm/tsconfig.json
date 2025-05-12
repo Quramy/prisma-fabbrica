@@ -3,9 +3,7 @@
   "compilerOptions": {
     "types": ["@types/jest", "ts-jest"],
     "noEmit": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "allowImportingTsExtensions": true
+    "module": "ESNext"
   },
-  "includes": ["src", "types", "jest.config.ts"],
+  "includes": ["src", "types", "setupAfterEnv.ts", "jest.config.ts"]
 }
