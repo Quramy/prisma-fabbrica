@@ -8,12 +8,10 @@
     "lib",
     "scripts",
     "bin.js",
-    "bin-next.js",
     "*.mjs"
   ],
   "bin": {
-    "prisma-fabbrica": "./bin.js",
-    "prisma-fabbrica-next": "./bin-next.js"
+    "prisma-fabbrica": "./bin.js"
   },
   "exports": {
     ".": {
