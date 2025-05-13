@@ -53,6 +53,9 @@ generator fabbrica {
 }
 ```
 
+> [!NOTE]
+> prisma-fabbrica also supports [`prisma-client` generator](https://www.prisma.io/blog/prisma-orm-6-6-0-esm-support-d1-migrations-and-prisma-mcp-server#esm-support-with-more-flexible-prisma-client-generator-early-access) .
+
 And run generate command.
 
 ```sh
