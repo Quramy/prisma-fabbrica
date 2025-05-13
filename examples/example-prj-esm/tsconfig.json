@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "types": ["@types/jest", "ts-jest"],
+    "noEmit": true,
+    "module": "ESNext"
+  },
+  "includes": ["src", "types", "setupAfterEnv.ts", "jest.config.ts"]
+}

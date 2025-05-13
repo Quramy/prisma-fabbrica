@@ -40,7 +40,6 @@ generatorHandler({
   onManifest: () => ({
     prettyName: "fabbrica",
     defaultOutput: "../src/__generated__/fabbrica",
-    requiresGenerators: ["prisma-client-js"],
   }),
   onGenerate: async options => {
     const clientGeneratorConfig = options.otherGenerators.find(generatorConfig => generatorConfig.name === "client");
