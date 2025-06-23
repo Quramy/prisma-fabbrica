@@ -24,7 +24,7 @@
     "@prisma/client": "6.8.2",
     "@types/node": "^22.0.0",
     "husky": "9.1.7",
-    "prettier": "3.5.3",
+    "prettier": "3.6.0",
     "pretty-quick": "4.2.2",
     "prisma": "6.8.2",
     "rimraf": "^6.0.0",
