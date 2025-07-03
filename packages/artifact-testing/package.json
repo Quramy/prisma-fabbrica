@@ -14,7 +14,7 @@
     "test:functions": "jest"
   },
   "devDependencies": {
-    "@prisma/internals": "6.8.2",
+    "@prisma/internals": "6.11.1",
     "@types/jest": "29.5.14",
     "jest": "29.7.0",
     "ts-jest": "29.4.0",
