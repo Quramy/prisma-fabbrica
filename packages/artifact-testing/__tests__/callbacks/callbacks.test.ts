@@ -20,8 +20,8 @@ describe("callback functions", () => {
 
     await UserFactory.build({ id: "id", name: "name" });
 
-    expect(mock).toBeCalledTimes(1);
-    expect(mock).toBeCalledWith({ id: "id", name: "name" });
+    expect(mock).toHaveBeenCalledTimes(1);
+    expect(mock).toHaveBeenCalledWith({ id: "id", name: "name" });
   });
 
   test("onBeforeCreate", async () => {
@@ -34,8 +34,8 @@ describe("callback functions", () => {
 
     await UserFactory.create({ id: "id", name: "name" });
 
-    expect(mock).toBeCalledTimes(1);
-    expect(mock).toBeCalledWith({ id: "id", name: "name" });
+    expect(mock).toHaveBeenCalledTimes(1);
+    expect(mock).toHaveBeenCalledWith({ id: "id", name: "name" });
   });
 
   test("onAfterCreate", async () => {
@@ -48,8 +48,8 @@ describe("callback functions", () => {
 
     await UserFactory.create();
 
-    expect(mock).toBeCalledTimes(1);
-    expect(mock).toBeCalledWith({ id: "stub id", name: "stub name" });
+    expect(mock).toHaveBeenCalledTimes(1);
+    expect(mock).toHaveBeenCalledWith({ id: "stub id", name: "stub name" });
   });
 
   describe("callbacks with transient fields", () => {
@@ -65,8 +65,8 @@ describe("callback functions", () => {
 
       await UserFactory.build({ hoge: 100 });
 
-      expect(mock).toBeCalledTimes(1);
-      expect(mock).toBeCalledWith(100);
+      expect(mock).toHaveBeenCalledTimes(1);
+      expect(mock).toHaveBeenCalledWith(100);
     });
 
     test("onBeforeCreate", async () => {
@@ -81,8 +81,8 @@ describe("callback functions", () => {
 
       await UserFactory.create({ hoge: 100 });
 
-      expect(mock).toBeCalledTimes(1);
-      expect(mock).toBeCalledWith(100);
+      expect(mock).toHaveBeenCalledTimes(1);
+      expect(mock).toHaveBeenCalledWith(100);
     });
 
     test("onAfterCreate", async () => {
@@ -97,8 +97,8 @@ describe("callback functions", () => {
 
       await UserFactory.create({ hoge: 100 });
 
-      expect(mock).toBeCalledTimes(1);
-      expect(mock).toBeCalledWith(100);
+      expect(mock).toHaveBeenCalledTimes(1);
+      expect(mock).toHaveBeenCalledWith(100);
     });
   });
 
