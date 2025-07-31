@@ -28,7 +28,7 @@
     "pretty-quick": "4.2.2",
     "prisma": "6.8.2",
     "rimraf": "^6.0.0",
-    "typescript": "5.8.3"
+    "typescript": "5.9.2"
   },
   "workspaces": [
     "packages/*",
