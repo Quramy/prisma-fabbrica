@@ -588,9 +588,11 @@ export const assignWithTransientFields = (model: DMMF.Model, inputType: DMMF.Inp
 export function getSourceFile({
   document,
   prismaClientModuleSpecifier = "@prisma/client",
+  ignoredModelNames
 }: {
   document: DMMF.Document;
   prismaClientModuleSpecifier?: string;
+  ignoredModelNames?: string[];
 }) {
   const modelEnums = [
     ...new Set(
@@ -604,7 +606,8 @@ export function getSourceFile({
         ),
     ),
   ];
-  const modelNames = document.datamodel.models
+  const modelsToGenerate = document.datamodel.models.filter(model => !ignoredModelNames?.includes(model.name));
+  const modelNames = modelsToGenerate
     .map(m => m.name)
     .filter(modelName => findPrismaCreateInputTypeFromModelName(document, modelName));
   const statements = [
@@ -612,8 +615,8 @@ export function getSourceFile({
     ...modelEnums.map(enumName => importStatement(enumName, prismaClientModuleSpecifier)),
     ...header(prismaClientModuleSpecifier).statements,
     ...insertLeadingBreakMarker(genericDeclarations().statements),
-    insertLeadingBreakMarker(modelFieldDefinitions(document.datamodel.models)),
-    ...document.datamodel.models
+    insertLeadingBreakMarker(modelFieldDefinitions(modelsToGenerate)),
+    ...modelsToGenerate
       .reduce(
         (acc, model) => {
           const createInputType = findPrismaCreateInputTypeFromModelName(document, model.name);

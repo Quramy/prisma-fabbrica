@@ -48,6 +48,11 @@ generatorHandler({
       return;
     }
     const noTranspile = options.generator.config.noTranspile === "true";
+    const ignoredModelNames = options.generator.config.ignoredModels ?? [];
+    if(!Array.isArray(ignoredModelNames)) {
+      logger.error("ignoreModels must be an array");
+      return;
+    }
     const outputDirname = options.generator.output?.value;
     const clientGeneratorOutputPath = clientGeneratorConfig.output?.value;
     if (!clientGeneratorOutputPath || !outputDirname) {
@@ -58,7 +63,7 @@ generatorHandler({
     const prismaClientModuleSpecifier = getClientModuleSpecifier(clientGeneratorOutputPath, outputDirname);
 
     const printer = createPrinter();
-    const contents = printer.print(getSourceFile({ document: options.dmmf, prismaClientModuleSpecifier }));
+    const contents = printer.print(getSourceFile({ document: options.dmmf, prismaClientModuleSpecifier, ignoredModelNames, }));
 
     await fs.rm(outputDirname, { recursive: true, force: true });
     await fs.mkdir(outputDirname, { recursive: true });
