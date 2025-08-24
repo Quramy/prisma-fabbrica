@@ -1,9 +1,9 @@
-import type { EnumModel } from "../client/index.js";
-import type { ComplexIdModel } from "../client/index.js";
-import type { FieldTypePatternModel } from "../client/index.js";
-import type { NoPkModel } from "../client/index.js";
-import type { SampleEnum } from "../client/index.js";
-import type { Prisma, PrismaClient } from "../client/index.js";
+import type { EnumModel } from "../client/client.js";
+import type { ComplexIdModel } from "../client/client.js";
+import type { FieldTypePatternModel } from "../client/client.js";
+import type { NoPkModel } from "../client/client.js";
+import type { SampleEnum } from "../client/client.js";
+import type { Prisma, PrismaClient } from "../client/client.js";
 import { createInitializer, createScreener, getScalarFieldValueGenerator, normalizeResolver, normalizeList, getSequenceCounter, createCallbackChain, destructure } from "@quramy/prisma-fabbrica/lib/internal";
 import type { ModelWithFields, Resolver, } from "@quramy/prisma-fabbrica/lib/internal";
 export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
