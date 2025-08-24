@@ -8,20 +8,27 @@ import { ast } from "./ast-tools/astShorthand";
 import { createJSONLiteral } from "./ast-tools/createJSONLiteral";
 import { wrapWithTSDoc, insertLeadingBreakMarker } from "./ast-tools/comment";
 
-export function findPrismaCreateInputTypeFromModelName(document: DMMF.Document, modelName: string, ignoredModelNames?: string[]) {
+export function findPrismaCreateInputTypeFromModelName(
+  document: DMMF.Document,
+  modelName: string,
+  ignoredModelNames?: string[],
+) {
   const search = `${modelName}CreateInput`;
   const inputType = document.schema.inputObjectTypes.prisma.find(x => x.name === search);
 
   // When model has field annotated with Unsupported type, Prisma omits to output ModelCreateInput / ModelUpdateInput to DMMF.
   if (!inputType) return null;
 
-  if(!ignoredModelNames) return inputType;
+  if (!ignoredModelNames) return inputType;
 
   return {
     ...inputType,
-    fields: inputType.fields.filter((field) => !field.inputTypes.some((inputType) =>
-        ignoredModelNames.some((ignoredModelName) => inputType.type.includes(ignoredModelName))
-    )),
+    fields: inputType.fields.filter(
+      field =>
+        !field.inputTypes.some(inputType =>
+          ignoredModelNames.some(ignoredModelName => inputType.type.includes(ignoredModelName)),
+        ),
+    ),
   };
 }
 
@@ -595,7 +602,7 @@ export const assignWithTransientFields = (model: DMMF.Model, inputType: DMMF.Inp
 export function getSourceFile({
   document,
   prismaClientModuleSpecifier = "@prisma/client",
-  ignoredModelNames
+  ignoredModelNames,
 }: {
   document: DMMF.Document;
   prismaClientModuleSpecifier?: string;
