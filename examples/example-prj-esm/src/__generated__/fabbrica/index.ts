@@ -36,6 +36,10 @@ const modelFieldDefinitions: ModelWithFields[] = [{
                 name: "comments",
                 type: "Comment",
                 relationName: "CommentToUser"
+            }, {
+                name: "stats",
+                type: "UserStats",
+                relationName: "UserToUserStats"
             }]
     }, {
         name: "LoginLog",
@@ -73,6 +77,13 @@ const modelFieldDefinitions: ModelWithFields[] = [{
                 type: "Post",
                 relationName: "CategoryToPost"
             }]
+    }, {
+        name: "UserStats",
+        fields: [{
+                name: "user",
+                type: "User",
+                relationName: "UserToUserStats"
+            }]
     }];
 
 type UserScalarOrEnumFields = {
@@ -89,6 +100,7 @@ type UserFactoryDefineInput = {
     createdAt?: Date;
     posts?: Prisma.PostCreateNestedManyWithoutAuthorInput;
     comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput;
+    stats?: Prisma.UserStatsCreateNestedOneWithoutUserInput;
 };
 
 type UserTransientFields = Record<string, unknown> & Partial<Record<keyof UserFactoryDefineInput, never>>;
@@ -165,7 +177,9 @@ function defineUserFactoryInternal<TTransients extends Record<string, unknown>, 
                     ...traitData,
                 };
             }, resolveValue(resolverInput));
-            const defaultAssociations = {} as Prisma.UserCreateInput;
+            const defaultAssociations = {
+                stats: defaultData.stats
+            } as Prisma.UserCreateInput;
             const data: Prisma.UserCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;

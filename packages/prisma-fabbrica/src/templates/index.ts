@@ -198,8 +198,8 @@ export const modelScalarOrEnumFields = (model: DMMF.Model, inputType: DMMF.Input
         ),
       )}
   `({
-    MODEL_SCALAR_OR_ENUM_FIELDS: ast.identifier(`${model.name}ScalarOrEnumFields`),
-  });
+        MODEL_SCALAR_OR_ENUM_FIELDS: ast.identifier(`${model.name}ScalarOrEnumFields`),
+      });
 
 export const modelBelongsToRelationFactory = (fieldType: DMMF.SchemaArg, model: DMMF.Model) => {
   const targetModel = model.fields.find(byName(fieldType))!;
@@ -211,7 +211,7 @@ export const modelBelongsToRelationFactory = (fieldType: DMMF.SchemaArg, model: 
   `();
 };
 
-export const modelFactoryDefineInput = (model: DMMF.Model, inputType: DMMF.InputType) =>
+export const modelFactoryDefineInput = (document: DMMF.Document, model: DMMF.Model, inputType: DMMF.InputType) =>
   template.statement<ts.TypeAliasDeclaration>`
     type MODEL_FACTORY_DEFINE_INPUT = ${() =>
       ast.typeLiteralNode(
@@ -222,7 +222,7 @@ export const modelFactoryDefineInput = (model: DMMF.Model, inputType: DMMF.Input
             !field.isRequired || isScalarOrEnumField(field) ? ast.token(ts.SyntaxKind.QuestionToken) : undefined,
             ast.unionTypeNode([
               ...((field.isRequired || model.fields.find(byName(field))!.isList === false) &&
-              isInputObjectTypeField(field)
+                isInputObjectTypeField(field) && findPrismaCreateInputTypeFromModelName(document, model.fields.find(byName(field))!.type)
                 ? [ast.typeReferenceNode(ast.identifier(`${model.name}${field.name}Factory`))]
                 : []),
               ...field.inputTypes.map(childInputType => argInputType(model, field.name, childInputType)),
@@ -231,8 +231,8 @@ export const modelFactoryDefineInput = (model: DMMF.Model, inputType: DMMF.Input
         ),
       )};
   `({
-    MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${model.name}FactoryDefineInput`),
-  });
+        MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${model.name}FactoryDefineInput`),
+      });
 
 export const modelTransientFields = (model: DMMF.Model) =>
   template.statement<ts.TypeAliasDeclaration>`
@@ -333,13 +333,13 @@ export const isModelAssociationFactory = (fieldType: DMMF.SchemaArg, model: DMMF
   return template.statement<ts.FunctionDeclaration>`
     function ${() => ast.identifier(`is${model.name}${fieldType.name}Factory`)}(
       x: MODEL_BELONGS_TO_RELATION_FACTORY | ${() =>
-        argInputType(model, fieldType.name, fieldType.inputTypes[0])} | undefined
+      argInputType(model, fieldType.name, fieldType.inputTypes[0])} | undefined
     ): x is MODEL_BELONGS_TO_RELATION_FACTORY {
       return (x as any)?._factoryFor === ${() => ast.stringLiteral(targetModel.type)};
     }
   `({
-    MODEL_BELONGS_TO_RELATION_FACTORY: ast.typeReferenceNode(`${model.name}${fieldType.name}Factory`),
-  });
+        MODEL_BELONGS_TO_RELATION_FACTORY: ast.typeReferenceNode(`${model.name}${fieldType.name}Factory`),
+      });
 };
 
 export const autoGenerateModelScalarsOrEnumsFieldArgs = (
@@ -352,18 +352,18 @@ export const autoGenerateModelScalarsOrEnumsFieldArgs = (
     ? template.expression`
         getScalarFieldValueGenerator().SCALAR_TYPE({ modelName: MODEL_NAME, fieldName: FIELD_NAME, isId: IS_ID, isUnique: IS_UNIQUE, seq })
       `({
-        SCALAR_TYPE: ast.identifier(field.inputTypes[field.inputTypes.length - 1].type as string),
-        MODEL_NAME: ast.stringLiteral(model.name),
-        FIELD_NAME: ast.stringLiteral(field.name),
-        IS_ID:
-          model.fields.find(byName(field))!.isId || model.primaryKey?.fields.includes(field.name)
-            ? ast.true()
-            : ast.false(),
-        IS_UNIQUE:
-          model.fields.find(byName(field))!.isUnique || model.uniqueFields.flat().includes(field.name)
-            ? ast.true()
-            : ast.false(),
-      })
+      SCALAR_TYPE: ast.identifier(field.inputTypes[field.inputTypes.length - 1].type as string),
+      MODEL_NAME: ast.stringLiteral(model.name),
+      FIELD_NAME: ast.stringLiteral(field.name),
+      IS_ID:
+        model.fields.find(byName(field))!.isId || model.primaryKey?.fields.includes(field.name)
+          ? ast.true()
+          : ast.false(),
+      IS_UNIQUE:
+        model.fields.find(byName(field))!.isUnique || model.uniqueFields.flat().includes(field.name)
+          ? ast.true()
+          : ast.false(),
+    })
     : ast.stringLiteral(extractFirstEnumValue(enums, field));
 
 export const autoGenerateModelScalarsOrEnums = (
@@ -374,19 +374,19 @@ export const autoGenerateModelScalarsOrEnums = (
   template.statement<ts.FunctionDeclaration>`
     function AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS({ seq }: { readonly seq: number }): MODEL_SCALAR_OR_ENUM_FIELDS {
       return ${() =>
-        ast.objectLiteralExpression(
-          filterRequiredScalarOrEnumFields(inputType).map(field =>
-            ast.propertyAssignment(field.name, autoGenerateModelScalarsOrEnumsFieldArgs(model, field, enums)),
-          ),
-          true,
-        )};
+      ast.objectLiteralExpression(
+        filterRequiredScalarOrEnumFields(inputType).map(field =>
+          ast.propertyAssignment(field.name, autoGenerateModelScalarsOrEnumsFieldArgs(model, field, enums)),
+        ),
+        true,
+      )};
     }
   `({
-    AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS: ast.identifier(`autoGenerate${model.name}ScalarsOrEnums`),
-    MODEL_SCALAR_OR_ENUM_FIELDS: ast.identifier(`${model.name}ScalarOrEnumFields`),
-  });
+        AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS: ast.identifier(`autoGenerate${model.name}ScalarsOrEnums`),
+        MODEL_SCALAR_OR_ENUM_FIELDS: ast.identifier(`${model.name}ScalarOrEnumFields`),
+      });
 
-export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.InputType) =>
+export const defineModelFactoryInternal = (document: DMMF.Document, model: DMMF.Model, inputType: DMMF.InputType) =>
   template.statement<ts.FunctionDeclaration>`
     function DEFINE_MODEL_FACTORY_INTERNAL<TTransients extends Record<string, unknown>, TOptions extends MODEL_FACTORY_DEFINE_OPTIONS<TTransients>>({
       defaultData: defaultDataResolver,
@@ -434,22 +434,25 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
             };
           }, resolveValue(resolverInput);
           const defaultAssociations = ${() =>
-            ast.objectLiteralExpression(
-              filterBelongsToField(model, inputType).map(field =>
-                ast.propertyAssignment(
-                  field.name,
-                  template.expression`
+      ast.objectLiteralExpression(
+        filterBelongsToField(model, inputType).map(field =>
+          ast.propertyAssignment(
+            field.name,
+            findPrismaCreateInputTypeFromModelName(document, model.fields.find(byName(field))!.type) ?
+              template.expression`
                     IS_MODEL_BELONGS_TO_RELATION_FACTORY(defaultData.FIELD_NAME) ? {
                       create: await defaultData.FIELD_NAME.build()
                     } : defaultData.FIELD_NAME
                   `({
-                    IS_MODEL_BELONGS_TO_RELATION_FACTORY: ast.identifier(`is${model.name}${field.name}Factory`),
-                    FIELD_NAME: ast.identifier(field.name),
-                  }),
-                ),
-              ),
-              true,
-            )} as Prisma.MODEL_CREATE_INPUT; // FIXME no type assertion
+                IS_MODEL_BELONGS_TO_RELATION_FACTORY: ast.identifier(`is${model.name}${field.name}Factory`),
+                FIELD_NAME: ast.identifier(field.name),
+              }) : template.expression`defaultData.FIELD_NAME`({
+                FIELD_NAME: ast.identifier(field.name),
+              })
+          ),
+        ),
+        true,
+      )} as Prisma.MODEL_CREATE_INPUT; // FIXME no type assertion
           const data: Prisma.MODEL_CREATE_INPUT = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
           await handleAfterBuild(data, transientFields);
           return data;
@@ -459,12 +462,12 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
 
         const pickForConnect = (inputData: ${() => ast.typeReferenceNode(model.name)}) => (
           ${() =>
-            ast.objectLiteralExpression(
-              getIdFieldNames(model).map(fieldName =>
-                ast.propertyAssignment(fieldName, template.expression`inputData.${() => ast.identifier(fieldName)}`()),
-              ),
-              true,
-            )}
+      ast.objectLiteralExpression(
+        getIdFieldNames(model).map(fieldName =>
+          ast.propertyAssignment(fieldName, template.expression`inputData.${() => ast.identifier(fieldName)}`()),
+        ),
+        true,
+      )}
         );
 
         const create = async (
@@ -503,21 +506,21 @@ export const defineModelFactoryInternal = (model: DMMF.Model, inputType: DMMF.In
       };
     }
   `({
-    MODEL_KEY: ast.identifier(camelize(model.name)),
-    MODEL_TRAIT_KEYS: ast.identifier(`${model.name}TraitKeys`),
-    DEFINE_MODEL_FACTORY_INTERNAL: ast.identifier(`define${model.name}FactoryInternal`),
-    MODEL_FACTORY_INTERFACE: ast.identifier(`${model.name}FactoryInterface`),
-    MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${model.name}FactoryDefineInput`),
-    MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
-    MODEL_CREATE_INPUT: ast.identifier(`${model.name}CreateInput`),
-    AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS: ast.identifier(`autoGenerate${model.name}ScalarsOrEnums`),
-    CREATE_INPUT_TYPE: template.typeNode`Partial<Prisma.MODEL_CREATE_INPUT & TTransients>`({
-      MODEL_CREATE_INPUT: ast.identifier(`${model.name}CreateInput`),
-    }),
-    DEFALUT_DATA_RESOLVER: filterRequiredInputObjectTypeField(inputType).length
-      ? template.expression(`defaultDataResolver`)({})
-      : template.expression(`defaultDataResolver ?? {}`)({}),
-  });
+        MODEL_KEY: ast.identifier(camelize(model.name)),
+        MODEL_TRAIT_KEYS: ast.identifier(`${model.name}TraitKeys`),
+        DEFINE_MODEL_FACTORY_INTERNAL: ast.identifier(`define${model.name}FactoryInternal`),
+        MODEL_FACTORY_INTERFACE: ast.identifier(`${model.name}FactoryInterface`),
+        MODEL_FACTORY_DEFINE_INPUT: ast.identifier(`${model.name}FactoryDefineInput`),
+        MODEL_FACTORY_DEFINE_OPTIONS: ast.identifier(`${model.name}FactoryDefineOptions`),
+        MODEL_CREATE_INPUT: ast.identifier(`${model.name}CreateInput`),
+        AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS: ast.identifier(`autoGenerate${model.name}ScalarsOrEnums`),
+        CREATE_INPUT_TYPE: template.typeNode`Partial<Prisma.MODEL_CREATE_INPUT & TTransients>`({
+          MODEL_CREATE_INPUT: ast.identifier(`${model.name}CreateInput`),
+        }),
+        DEFALUT_DATA_RESOLVER: filterRequiredInputObjectTypeField(inputType).length
+          ? template.expression(`defaultDataResolver`)({})
+          : template.expression(`defaultDataResolver ?? {}`)({}),
+      });
 
 export const modelFactoryBuilder = (model: DMMF.Model, inputType: DMMF.InputType) => {
   const compiled = filterRequiredInputObjectTypeField(inputType).length
@@ -595,7 +598,7 @@ export function getSourceFile({
   const modelEnums = [
     ...new Set(
       document.schema.inputObjectTypes.prisma
-        .filter(iOT => iOT.name.endsWith("CreateInput"))
+        ?.filter(iOT => iOT.name.endsWith("CreateInput"))
         .flatMap(filterEnumFields)
         .flatMap(field =>
           field.inputTypes
@@ -624,19 +627,23 @@ export function getSourceFile({
       )
       .flatMap(({ model, createInputType }) => [
         modelScalarOrEnumFields(model, createInputType),
-        ...filterBelongsToField(model, createInputType).map(fieldType =>
-          modelBelongsToRelationFactory(fieldType, model),
-        ),
-        modelFactoryDefineInput(model, createInputType),
+        ...filterBelongsToField(model, createInputType)
+          .filter(fieldType => findPrismaCreateInputTypeFromModelName(document, model.fields.find(byName(fieldType))!.type) !== null)
+          .map(fieldType =>
+            modelBelongsToRelationFactory(fieldType, model),
+          ),
+        modelFactoryDefineInput(document, model, createInputType),
         modelTransientFields(model),
         modelFactoryTrait(model),
         modelFactoryDefineOptions(model, filterRequiredInputObjectTypeField(createInputType).length === 0),
-        ...filterBelongsToField(model, createInputType).map(fieldType => isModelAssociationFactory(fieldType, model)),
+        ...filterBelongsToField(model, createInputType)
+          .filter(fieldType => findPrismaCreateInputTypeFromModelName(document, model.fields.find(byName(fieldType))!.type) !== null)
+          .map(fieldType => isModelAssociationFactory(fieldType, model)),
         modelTraitKeys(model),
         modelFactoryInterfaceWithoutTraits(model),
         modelFactoryInterface(model),
         autoGenerateModelScalarsOrEnums(model, createInputType, document.schema.enumTypes.model ?? []),
-        defineModelFactoryInternal(model, createInputType),
+        defineModelFactoryInternal(document, model, createInputType),
         modelFactoryBuilder(model, createInputType),
         defineModelFactory(model, createInputType),
         assignWithTransientFields(model, createInputType),

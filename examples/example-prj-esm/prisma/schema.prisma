@@ -3,6 +3,7 @@ generator client {
   output              = "../src/__generated__/client"
   moduleFormat        = "esm"
   importFileExtension = "ts"
+  previewFeatures     = ["views"]
 }
 
 generator fabbrica {
@@ -22,6 +23,7 @@ model User {
   name      String
   posts     Post[]
   comments  Comment[]
+  stats     UserStats?
   updatedAt DateTime  @default(now()) @updatedAt
   createdAt DateTime  @default(now())
 }
@@ -59,4 +61,11 @@ model Category {
   id    String @id
   name  String @unique
   posts Post[]
+}
+
+view UserStats {
+  userId       String @unique
+  postCount    Int
+  commentCount Int
+  user         User   @relation(fields: [userId], references: [id])
 }
