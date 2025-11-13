@@ -1,8 +1,4 @@
-import {
-  definePostFactory,
-  defineUserFactory,
-  defineCommentFactory,
-} from "./__generated__/fabbrica";
+import { definePostFactory, defineUserFactory, defineCommentFactory } from "./__generated__/fabbrica";
 
 const prisma = jestPrisma.client;
 
@@ -21,7 +17,6 @@ const CommentFactory = defineCommentFactory({
   },
 });
 
-
 describe("UserStats view", () => {
   test("should get user stats correctly", async () => {
     const users = await UserFactory.createList(2);
@@ -30,7 +25,7 @@ describe("UserStats view", () => {
       { author: { connect: { id: users[0].id } }, title: "JavaScript engine" },
       { author: { connect: { id: users[1].id } }, title: "Web Development" },
       { author: { connect: { id: users[1].id } }, title: "Database Systems" },
-    ])
+    ]);
 
     await CommentFactory.createList([
       { post: { connect: { id: posts[0].id } }, author: { connect: { id: users[0].id } } },

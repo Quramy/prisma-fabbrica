@@ -1,7 +1,4 @@
-import {
-  definePostFactory,
-  defineUserFactory,
-} from "../../fixtures/view-relations/__generated__/fabbrica";
+import { definePostFactory, defineUserFactory } from "../../fixtures/view-relations/__generated__/fabbrica";
 
 export const UserFactory = defineUserFactory();
 
