@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "example-prj",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "scripts": {
     "bootstrap": "npm run generate",
     "clean": "echo nothing to do",
