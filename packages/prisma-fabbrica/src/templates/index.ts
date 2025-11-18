@@ -8,14 +8,28 @@ import { ast } from "./ast-tools/astShorthand";
 import { createJSONLiteral } from "./ast-tools/createJSONLiteral";
 import { wrapWithTSDoc, insertLeadingBreakMarker } from "./ast-tools/comment";
 
-export function findPrismaCreateInputTypeFromModelName(document: DMMF.Document, modelName: string) {
+export function findPrismaCreateInputTypeFromModelName(
+  document: DMMF.Document,
+  modelName: string,
+  ignoredModelNames?: string[],
+) {
   const search = `${modelName}CreateInput`;
   const inputType = document.schema.inputObjectTypes.prisma.find(x => x.name === search);
 
   // When model has field annotated with Unsupported type, Prisma omits to output ModelCreateInput / ModelUpdateInput to DMMF.
   if (!inputType) return null;
 
-  return inputType;
+  if (!ignoredModelNames) return inputType;
+
+  return {
+    ...inputType,
+    fields: inputType.fields.filter(
+      field =>
+        !field.inputTypes.some(inputType =>
+          ignoredModelNames.some(ignoredModelName => inputType.type.includes(ignoredModelName)),
+        ),
+    ),
+  };
 }
 
 export function getIdFieldNames(model: DMMF.Model) {
@@ -593,9 +607,11 @@ export const assignWithTransientFields = (model: DMMF.Model, inputType: DMMF.Inp
 export function getSourceFile({
   document,
   prismaClientModuleSpecifier = "@prisma/client",
+  ignoredModelNames,
 }: {
   document: DMMF.Document;
   prismaClientModuleSpecifier?: string;
+  ignoredModelNames?: string[];
 }) {
   const modelEnums = [
     ...new Set(
@@ -609,19 +625,20 @@ export function getSourceFile({
         ),
     ),
   ];
-  const modelNames = document.datamodel.models
+  const modelsToGenerate = document.datamodel.models.filter(model => !ignoredModelNames?.includes(model.name));
+  const modelNames = modelsToGenerate
     .map(m => m.name)
-    .filter(modelName => findPrismaCreateInputTypeFromModelName(document, modelName));
+    .filter(modelName => findPrismaCreateInputTypeFromModelName(document, modelName, ignoredModelNames));
   const statements = [
     ...modelNames.map(modelName => importStatement(modelName, prismaClientModuleSpecifier)),
     ...modelEnums.map(enumName => importStatement(enumName, prismaClientModuleSpecifier)),
     ...header(prismaClientModuleSpecifier).statements,
     ...insertLeadingBreakMarker(genericDeclarations().statements),
-    insertLeadingBreakMarker(modelFieldDefinitions(document.datamodel.models)),
-    ...document.datamodel.models
+    insertLeadingBreakMarker(modelFieldDefinitions(modelsToGenerate)),
+    ...modelsToGenerate
       .reduce(
         (acc, model) => {
-          const createInputType = findPrismaCreateInputTypeFromModelName(document, model.name);
+          const createInputType = findPrismaCreateInputTypeFromModelName(document, model.name, ignoredModelNames);
           if (!createInputType) return acc;
           return [...acc, { model, createInputType }];
         },
