@@ -19,6 +19,10 @@ const modelFieldDefinitions = [{
                 name: "comments",
                 type: "Comment",
                 relationName: "CommentToUser"
+            }, {
+                name: "stats",
+                type: "UserStats",
+                relationName: "UserToUserStats"
             }]
     }, {
         name: "LoginLog",
@@ -55,6 +59,13 @@ const modelFieldDefinitions = [{
                 name: "posts",
                 type: "Post",
                 relationName: "CategoryToPost"
+            }]
+    }, {
+        name: "UserStats",
+        fields: [{
+                name: "user",
+                type: "User",
+                relationName: "UserToUserStats"
             }]
     }];
 function autoGenerateUserScalarsOrEnums({ seq }) {
@@ -96,7 +107,9 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, onAfterBu
                     ...traitData,
                 };
             }, resolveValue(resolverInput));
-            const defaultAssociations = {};
+            const defaultAssociations = {
+                stats: defaultData.stats
+            };
             const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
             await handleAfterBuild(data, transientFields);
             return data;
