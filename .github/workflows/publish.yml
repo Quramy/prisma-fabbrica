@@ -5,6 +5,10 @@ on:
     tags:
       - "*"
 
+permissions:
+  id-token: write # Required for OIDC
+  contents: read
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -21,6 +25,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          registry-url: "https://registry.npmjs.org"
           cache: npm
 
       - id: dist-tag
@@ -30,10 +35,11 @@ jobs:
           script: |
             return /^refs\/tags\/v\d+\.\d+\.\d+$/.test(context.ref) ? "latest" : "next"
 
+      - name: Update npm
+        run: npm install -g npm@latest
+
       - name: npm publish
         run: |
-          echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > ~/.npmrc
-          npm whoami
           npm ci
           npm run bootstrap
           npm publish --access=public --tag ${{ steps.dist-tag.outputs.result }} --workspace="packages/prisma-fabbrica"
