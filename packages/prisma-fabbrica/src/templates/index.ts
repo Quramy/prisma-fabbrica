@@ -371,21 +371,28 @@ export const autoGenerateModelScalarsOrEnums = (
   model: DMMF.Model,
   inputType: DMMF.InputType,
   enums: readonly DMMF.SchemaEnum[],
-) =>
-  template.statement<ts.FunctionDeclaration>`
-    function AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS({ seq }: { readonly seq: number }): MODEL_SCALAR_OR_ENUM_FIELDS {
-      return ${() =>
-        ast.objectLiteralExpression(
-          filterRequiredScalarOrEnumFields(inputType).map(field =>
-            ast.propertyAssignment(field.name, autoGenerateModelScalarsOrEnumsFieldArgs(model, field, enums)),
-          ),
-          true,
-        )};
-    }
-  `({
+) => {
+  const requiredFields = filterRequiredScalarOrEnumFields(inputType);
+  const compiled = requiredFields.length
+    ? template.statement<ts.FunctionDeclaration>`
+        function AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS({ seq }: { readonly seq: number }): MODEL_SCALAR_OR_ENUM_FIELDS {
+          return ${() =>
+            ast.objectLiteralExpression(
+              requiredFields.map(field =>
+                ast.propertyAssignment(field.name, autoGenerateModelScalarsOrEnumsFieldArgs(model, field, enums)),
+              ),
+              true,
+            )};
+        }`
+    : template.statement<ts.FunctionDeclaration>`
+        function AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS({}: { readonly seq: number }): MODEL_SCALAR_OR_ENUM_FIELDS {
+          return {};
+        }`;
+  return compiled({
     AUTO_GENERATE_MODEL_SCALARS_OR_ENUMS: ast.identifier(`autoGenerate${model.name}ScalarsOrEnums`),
     MODEL_SCALAR_OR_ENUM_FIELDS: ast.identifier(`${model.name}ScalarOrEnumFields`),
   });
+};
 
 export const defineModelFactoryInternal = (document: DMMF.Document, model: DMMF.Model, inputType: DMMF.InputType) =>
   template.statement<ts.FunctionDeclaration>`

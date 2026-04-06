@@ -59,6 +59,10 @@ model NoPkModel {
   id Int @unique
 }
 
+model NoRequiredScalarModel {
+  id String @id @default(cuid())
+}
+
 model UnsupportedModel {
   id               Int @id
   unsupportedField Unsupported("tsvector")
