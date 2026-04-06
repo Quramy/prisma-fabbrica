@@ -2,6 +2,7 @@ import type { EnumModel } from "../client/client.js";
 import type { ComplexIdModel } from "../client/client.js";
 import type { FieldTypePatternModel } from "../client/client.js";
 import type { NoPkModel } from "../client/client.js";
+import type { NoRequiredScalarModel } from "../client/client.js";
 import type { SampleEnum } from "../client/client.js";
 import type { Prisma, PrismaClient } from "../client/client.js";
 import { createInitializer, createScreener, getScalarFieldValueGenerator, normalizeResolver, normalizeList, getSequenceCounter, createCallbackChain, destructure } from "@quramy/prisma-fabbrica/lib/internal";
@@ -37,6 +38,9 @@ const modelFieldDefinitions: ModelWithFields[] = [{
         fields: []
     }, {
         name: "NoPkModel",
+        fields: []
+    }, {
+        name: "NoRequiredScalarModel",
         fields: []
     }, {
         name: "UnsupportedModel",
@@ -634,3 +638,136 @@ export const defineNoPkModelFactory = (<TOptions extends NoPkModelFactoryDefineO
 }) as NoPkModelFactoryBuilder;
 
 defineNoPkModelFactory.withTransientFields = defaultTransientFieldValues => options => defineNoPkModelFactoryInternal(options ?? {}, defaultTransientFieldValues);
+
+type NoRequiredScalarModelScalarOrEnumFields = {};
+
+type NoRequiredScalarModelFactoryDefineInput = {
+    id?: string;
+};
+
+type NoRequiredScalarModelTransientFields = Record<string, unknown> & Partial<Record<keyof NoRequiredScalarModelFactoryDefineInput, never>>;
+
+type NoRequiredScalarModelFactoryTrait<TTransients extends Record<string, unknown>> = {
+    data?: Resolver<Partial<NoRequiredScalarModelFactoryDefineInput>, BuildDataOptions<TTransients>>;
+} & CallbackDefineOptions<NoRequiredScalarModel, Prisma.NoRequiredScalarModelCreateInput, TTransients>;
+
+type NoRequiredScalarModelFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
+    defaultData?: Resolver<NoRequiredScalarModelFactoryDefineInput, BuildDataOptions<TTransients>>;
+    traits?: {
+        [traitName: TraitName]: NoRequiredScalarModelFactoryTrait<TTransients>;
+    };
+} & CallbackDefineOptions<NoRequiredScalarModel, Prisma.NoRequiredScalarModelCreateInput, TTransients>;
+
+type NoRequiredScalarModelTraitKeys<TOptions extends NoRequiredScalarModelFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
+
+export interface NoRequiredScalarModelFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
+    readonly _factoryFor: "NoRequiredScalarModel";
+    build(inputData?: Partial<Prisma.NoRequiredScalarModelCreateInput & TTransients>): PromiseLike<Prisma.NoRequiredScalarModelCreateInput>;
+    buildCreateInput(inputData?: Partial<Prisma.NoRequiredScalarModelCreateInput & TTransients>): PromiseLike<Prisma.NoRequiredScalarModelCreateInput>;
+    buildList(list: readonly Partial<Prisma.NoRequiredScalarModelCreateInput & TTransients>[]): PromiseLike<Prisma.NoRequiredScalarModelCreateInput[]>;
+    buildList(count: number, item?: Partial<Prisma.NoRequiredScalarModelCreateInput & TTransients>): PromiseLike<Prisma.NoRequiredScalarModelCreateInput[]>;
+    pickForConnect(inputData: NoRequiredScalarModel): Pick<NoRequiredScalarModel, "id">;
+    create(inputData?: Partial<Prisma.NoRequiredScalarModelCreateInput & TTransients>): PromiseLike<NoRequiredScalarModel>;
+    createList(list: readonly Partial<Prisma.NoRequiredScalarModelCreateInput & TTransients>[]): PromiseLike<NoRequiredScalarModel[]>;
+    createList(count: number, item?: Partial<Prisma.NoRequiredScalarModelCreateInput & TTransients>): PromiseLike<NoRequiredScalarModel[]>;
+    createForConnect(inputData?: Partial<Prisma.NoRequiredScalarModelCreateInput & TTransients>): PromiseLike<Pick<NoRequiredScalarModel, "id">>;
+}
+
+export interface NoRequiredScalarModelFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends NoRequiredScalarModelFactoryInterfaceWithoutTraits<TTransients> {
+    use(name: TTraitName, ...names: readonly TTraitName[]): NoRequiredScalarModelFactoryInterfaceWithoutTraits<TTransients>;
+}
+
+function autoGenerateNoRequiredScalarModelScalarsOrEnums({}: {
+    readonly seq: number;
+}): NoRequiredScalarModelScalarOrEnumFields {
+    return {};
+}
+
+function defineNoRequiredScalarModelFactoryInternal<TTransients extends Record<string, unknown>, TOptions extends NoRequiredScalarModelFactoryDefineOptions<TTransients>>({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }: TOptions, defaultTransientFieldValues: TTransients): NoRequiredScalarModelFactoryInterface<TTransients, NoRequiredScalarModelTraitKeys<TOptions>> {
+    const getFactoryWithTraits = (traitKeys: readonly NoRequiredScalarModelTraitKeys<TOptions>[] = []) => {
+        const seqKey = {};
+        const getSeq = () => getSequenceCounter(seqKey);
+        const screen = createScreener("NoRequiredScalarModel", modelFieldDefinitions);
+        const handleAfterBuild = createCallbackChain([
+            onAfterBuild,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
+        ]);
+        const handleBeforeCreate = createCallbackChain([
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
+            onBeforeCreate,
+        ]);
+        const handleAfterCreate = createCallbackChain([
+            onAfterCreate,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
+        ]);
+        const build = async (inputData: Partial<Prisma.NoRequiredScalarModelCreateInput & TTransients> = {}) => {
+            const seq = getSeq();
+            const requiredScalarData = autoGenerateNoRequiredScalarModelScalarsOrEnums({ seq });
+            const resolveValue = normalizeResolver<NoRequiredScalarModelFactoryDefineInput, BuildDataOptions<any>>(defaultDataResolver ?? {});
+            const [transientFields, filteredInputData] = destructure(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transientFields };
+            const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
+                const acc = await queue;
+                const resolveTraitValue = normalizeResolver<Partial<NoRequiredScalarModelFactoryDefineInput>, BuildDataOptions<TTransients>>(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue(resolverInput);
+                return {
+                    ...acc,
+                    ...traitData,
+                };
+            }, resolveValue(resolverInput));
+            const defaultAssociations = {} as Prisma.NoRequiredScalarModelCreateInput;
+            const data: Prisma.NoRequiredScalarModelCreateInput = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
+            await handleAfterBuild(data, transientFields);
+            return data;
+        };
+        const buildList = (...args: unknown[]) => Promise.all(normalizeList<Partial<Prisma.NoRequiredScalarModelCreateInput & TTransients>>(...args).map(data => build(data)));
+        const pickForConnect = (inputData: NoRequiredScalarModel) => ({
+            id: inputData.id
+        });
+        const create = async (inputData: Partial<Prisma.NoRequiredScalarModelCreateInput & TTransients> = {}) => {
+            const data = await build({ ...inputData }).then(screen);
+            const [transientFields] = destructure(defaultTransientFieldValues, inputData);
+            await handleBeforeCreate(data, transientFields);
+            const createdData = await getClient<PrismaClient>().noRequiredScalarModel.create({ data });
+            await handleAfterCreate(createdData, transientFields);
+            return createdData;
+        };
+        const createList = (...args: unknown[]) => Promise.all(normalizeList<Partial<Prisma.NoRequiredScalarModelCreateInput & TTransients>>(...args).map(data => create(data)));
+        const createForConnect = (inputData: Partial<Prisma.NoRequiredScalarModelCreateInput & TTransients> = {}) => create(inputData).then(pickForConnect);
+        return {
+            _factoryFor: "NoRequiredScalarModel" as const,
+            build,
+            buildList,
+            buildCreateInput: build,
+            pickForConnect,
+            create,
+            createList,
+            createForConnect,
+        };
+    };
+    const factory = getFactoryWithTraits();
+    const useTraits = (name: NoRequiredScalarModelTraitKeys<TOptions>, ...names: readonly NoRequiredScalarModelTraitKeys<TOptions>[]) => {
+        return getFactoryWithTraits([name, ...names]);
+    };
+    return {
+        ...factory,
+        use: useTraits,
+    };
+}
+
+interface NoRequiredScalarModelFactoryBuilder {
+    <TOptions extends NoRequiredScalarModelFactoryDefineOptions>(options?: TOptions): NoRequiredScalarModelFactoryInterface<{}, NoRequiredScalarModelTraitKeys<TOptions>>;
+    withTransientFields: <TTransients extends NoRequiredScalarModelTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends NoRequiredScalarModelFactoryDefineOptions<TTransients>>(options?: TOptions) => NoRequiredScalarModelFactoryInterface<TTransients, NoRequiredScalarModelTraitKeys<TOptions>>;
+}
+
+/**
+ * Define factory for {@link NoRequiredScalarModel} model.
+ *
+ * @param options
+ * @returns factory {@link NoRequiredScalarModelFactoryInterface}
+ */
+export const defineNoRequiredScalarModelFactory = (<TOptions extends NoRequiredScalarModelFactoryDefineOptions>(options?: TOptions): NoRequiredScalarModelFactoryInterface<TOptions> => {
+    return defineNoRequiredScalarModelFactoryInternal(options ?? {}, {});
+}) as NoRequiredScalarModelFactoryBuilder;
+
+defineNoRequiredScalarModelFactory.withTransientFields = defaultTransientFieldValues => options => defineNoRequiredScalarModelFactoryInternal(options ?? {}, defaultTransientFieldValues);
